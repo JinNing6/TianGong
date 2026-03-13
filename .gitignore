@@ -1,0 +1,62 @@
+# ============================================================
+# ⚒️ TianGong — Git 忽略配置
+# ============================================================
+
+# === Python ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+
+# === Virtual Environment ===
+.venv/
+venv/
+env/
+ENV/
+
+# === IDE ===
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# === OS ===
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# === Environment ===
+.env
+.env.local
+.env.*.local
+
+# === Testing ===
+.pytest_cache/
+htmlcov/
+.coverage
+.coverage.*
+
+# === Ruff ===
+.ruff_cache/
+
+# === TianGong 数据 ===
+agents/*/data/
+agents/*/logs/
+.tiangong_data/
+*.db
+
+# === 杂项 ===
+*.log
+tmp/
+
+# === PyPI 包名抢占脚本（敏感操作，不入库）===
+scripts/claim_pypi_names.py
+scripts/claim_pypi_names.bat
+scripts/claim_pypi_names_batch2.py
+.pypirc
+*.tar.gz
