@@ -27,6 +27,7 @@ from .config import config
 from .banner import play_boot_animation, append_brand_footer
 from .realm import (
     REALMS, Realm, calculate_realm, format_realm_progress, get_realm_ladder,
+    get_review_weight,
 )
 from .cultivator import (
     get_cultivator, save_cultivator, update_cultivator_stats,
@@ -35,6 +36,8 @@ from .cultivator import (
 )
 from .artifact_system import (
     calculate_grade, format_grade_display, get_grade_ladder,
+    GRADES, DIMENSIONS, SpiritReview,
+    format_artifact_spirit_info, format_review_card,
 )
 from .forge import (
     AgentSpec, forge_new_agent, get_agent, refine_agent as _refine_agent,
@@ -243,7 +246,7 @@ async def trial_agent(
             "dimensions": result.dimensions,
         })
         d["trial_log"] = trial_log
-        d["grade_level"] = calculate_grade(d.get("stars", 0), result.passed).level
+        d["grade_level"] = calculate_grade(d.get("spirit_power", d.get("stars", 0)), d.get("reviewer_count", 0), result.passed).level
         registry[agent_id] = d
         _save_registry(registry)
 
@@ -253,7 +256,7 @@ async def trial_agent(
     report = format_trial_report(result, spec.name)
 
     if result.passed:
-        grade = calculate_grade(spec.stars, True)
+        grade = calculate_grade(getattr(spec, 'spirit_power', getattr(spec, 'stars', 0)), 0, True)
         report += f"\n\n> ✅ 品级提升: ⚪ 凡器 → {format_grade_display(grade)}"
 
     return append_brand_footer(report)
@@ -443,6 +446,277 @@ async def celestial_leaderboard(
     result += "\n\n" + get_realm_ladder()
 
     return append_brand_footer(result)
+
+
+# ============================================================
+# Phase 2: 分发平台新工具
+# ============================================================
+
+# ---- 导入 Phase 2 模块 ----
+from .vault import init_cave, format_cave_status, list_vault, list_forge, format_vault_list, format_forge_list
+from .marketplace import publish_agent as _publish_agent, summon_artifact as _summon, banish_artifact
+from .search import search_marketplace, format_search_results
+from .review import (
+    infuse_spirit as _infuse,
+    post_refine_quest as _post_quest,
+    claim_refine_quest as _claim_quest,
+    complete_refine_quest as _complete_quest,
+)
+from .lineage import get_artifact_lineage, format_lineage_tree
+
+
+# 🔧 Tool 9: treasure_pavilion — 🏛️ 寻宝阁
+@mcp.tool()
+async def treasure_pavilion(query: str = "") -> str:
+    """
+    🏛️ 寻宝阁 — 搜索浏览社区法宝
+    Search and browse community artifacts in the Treasure Pavilion.
+
+    统一关键词搜索，一个 query 搞定所有筛选：
+    - 品阶: "仙器"、"宝器"
+    - 框架: "crewai"、"langchain"
+    - 创作者: "@JinNing6"
+    - 组合: "仙器 crewai"
+    - 不传参: 显示热门推荐
+
+    Args:
+        query: 搜索关键词 / Search keywords
+    """
+    results = await search_marketplace(query=query)
+    return append_brand_footer(format_search_results(results, query))
+
+
+# 🔧 Tool 10: publish_artifact — ✨ 飞升上界
+@mcp.tool()
+async def publish_artifact(
+    artifact_name: str,
+    is_anonymous: bool = False,
+) -> str:
+    """
+    ✨ 飞升上界 — 将法宝发布到天工社区
+    Publish your artifact to the TianGong community.
+
+    从本地炼器炉（forge/）上传法宝，成为瞬时法宝体。
+    AI 审核通过后自动晋升为常驻法宝体，入驻寻宝阁。
+
+    Args:
+        artifact_name: 法宝名称（forge/ 下的文件夹名）
+        is_anonymous: 是否匿名上传（默认实名）
+    """
+    result = await _publish_agent(artifact_name, is_anonymous)
+    return append_brand_footer(result)
+
+
+# 🔧 Tool 11: summon_artifact — 📥 请宝下凡
+@mcp.tool()
+async def summon_artifact(artifact_name: str) -> str:
+    """
+    📥 请宝下凡 — 从寻宝阁拉取法宝到本地藏宝阁
+    Summon an artifact from the Treasure Pavilion to your local vault.
+
+    自动下载法宝到 ~/.tiangong/vault/法宝名/ 目录。
+
+    Args:
+        artifact_name: 法宝名称
+    """
+    result = await _summon(artifact_name)
+    return append_brand_footer(result)
+
+
+# 🔧 Tool 12: cave_status — 🏛️ 洞府全景
+@mcp.tool()
+async def cave_status() -> str:
+    """
+    🏛️ 洞府全景 — 查看本地洞府状态
+    View your local cave status — forge and vault overview.
+
+    展示炼器炉和藏宝阁中所有法宝的状态。
+    """
+    init_cave()
+    return append_brand_footer(format_cave_status())
+
+
+# 🔧 Tool 13: infuse_spirit_tool — 💫 灌注灵力
+@mcp.tool()
+async def infuse_spirit_tool(
+    artifact_name: str,
+    inscription: int = 5,
+    formation: int = 5,
+    technique: int = 5,
+    lineage_score: int = 5,
+    resilience: int = 5,
+    enlightenment: int = 5,
+    comment: str = "",
+    reviewer: str = "",
+) -> str:
+    """
+    💫 灌注灵力 — 对法宝进行六维评分
+    Infuse Spirit Power — Rate an artifact across six dimensions.
+
+    六维灵根评估: 铭文(描述)、阵法(架构)、法诀(工程)、道统(文档)、护体(韧性)、悟道(创新)
+    每维 1-10 分。灵力值 = 六维均分 × 你的境界权重。
+
+    Args:
+        artifact_name: 法宝名称
+        inscription: 📝 铭文（描述清晰度）1-10
+        formation: 🏗️ 阵法（架构设计）1-10
+        technique: ⚙️ 法诀（工程质量）1-10
+        lineage_score: 📖 道统（文档传承）1-10
+        resilience: 🛡️ 护体（稳定韧性）1-10
+        enlightenment: ✨ 悟道（创新灵性）1-10
+        comment: 评价内容
+        reviewer: 评价者（默认当前用户）
+    """
+    if not reviewer:
+        reviewer = config.GITHUB_USERNAME
+
+    scores = {
+        "inscription": inscription,
+        "formation": formation,
+        "technique": technique,
+        "lineage": lineage_score,
+        "resilience": resilience,
+        "enlightenment": enlightenment,
+    }
+
+    result = await _infuse(artifact_name, reviewer, scores, comment)
+    return append_brand_footer(result)
+
+
+# 🔧 Tool 14: post_quest — 🔥 发布淬炼令
+@mcp.tool()
+async def post_quest(
+    artifact_name: str,
+    description: str,
+    code_url: str = "",
+    creator: str = "",
+) -> str:
+    """
+    🔥 发布淬炼令 — 悬赏帮忙改进法宝
+    Post a Refinement Quest — Request help to improve an artifact.
+
+    发布需求，等待有缘人认领并帮助优化你的法宝。
+
+    Args:
+        artifact_name: 需要改进的法宝名称
+        description: 改进需求描述
+        code_url: 当前代码链接
+        creator: 发布者（默认当前用户）
+    """
+    if not creator:
+        creator = config.GITHUB_USERNAME
+    result = await _post_quest(artifact_name, description, creator, code_url)
+    return append_brand_footer(result)
+
+
+# 🔧 Tool 15: claim_quest — 🙋 认领淬炼令
+@mcp.tool()
+async def claim_quest(
+    quest_issue_number: int,
+    refiner: str = "",
+) -> str:
+    """
+    🙋 认领淬炼令 — 接下这道悬赏，承诺帮忙优化法宝。
+    Claim a Refinement Quest — Accept the bounty to optimize an artifact.
+
+    Args:
+        quest_issue_number: 淬炼令 Issue 编号
+        refiner: 认领者（默认当前用户）
+    """
+    if not refiner:
+        refiner = config.GITHUB_USERNAME
+    result = await _claim_quest(quest_issue_number, refiner)
+    return append_brand_footer(result)
+
+
+# 🔧 Tool 16: complete_quest — ✅ 提交淬炼成果
+@mcp.tool()
+async def complete_quest(
+    quest_issue_number: int,
+    solution: str,
+    refiner: str = "",
+) -> str:
+    """
+    ✅ 提交淬炼成果 — 完成淬炼令任务
+    Submit Quest Completion — Deliver your refinement solution.
+
+    Args:
+        quest_issue_number: 淬炼令 Issue 编号
+        solution: 解决方案描述
+        refiner: 淬炼者（默认当前用户）
+    """
+    if not refiner:
+        refiner = config.GITHUB_USERNAME
+    result = await _complete_quest(quest_issue_number, refiner, solution)
+    return append_brand_footer(result)
+
+
+# 🔧 Tool 17: artifact_lineage — 📜 传承谱系
+@mcp.tool()
+async def artifact_lineage(artifact_name: str) -> str:
+    """
+    📜 传承谱系 — 查看法宝的传承关系
+    View Lineage Tree — See an artifact's fork/inspire/depend relationships.
+
+    展示法宝的传承谱系: fork(分支传承)、inspired(悟道传承)、depends(法宝联动)。
+
+    Args:
+        artifact_name: 法宝名称
+    """
+    tree = await get_artifact_lineage(artifact_name)
+    return append_brand_footer(format_lineage_tree(tree))
+
+
+# 🔧 Tool 18: banish — 🔒 封印法宝
+@mcp.tool()
+async def banish(artifact_name: str) -> str:
+    """
+    🔒 封印法宝 — 归档藏宝阁中的法宝
+    Banish Artifact — Archive an artifact from your vault.
+
+    将法宝移到 .archive/ 目录，释放空间。
+
+    Args:
+        artifact_name: 要封印的法宝名称
+    """
+    return append_brand_footer(banish_artifact(artifact_name))
+
+
+# 🔧 Tool 19: cultivator_leaderboard — 🏆 修仙天榜
+@mcp.tool()
+async def cultivator_leaderboard(top_n: int = 20) -> str:
+    """
+    🏆 修仙天榜 — 修仙者境界排名
+    Cultivator Leaderboard — Rankings by realm and spirit power.
+
+    按境界降序 → 同境界按灵力值降序 → 同灵力按用户名字母序。
+
+    Args:
+        top_n: 显示前 N 名
+    """
+    from .cultivator import get_all_cultivators
+    profiles = get_all_cultivators()
+
+    # 排序
+    profiles.sort(key=lambda p: (-p.realm_level, -p.spirit_power, p.username))
+
+    lines = [
+        "# 🏆 修仙天榜",
+        "",
+        "| # | 修仙者 | 境界 | 阶位 | 灵力 | 法宝数 |",
+        "|---|--------|------|------|------|--------|",
+    ]
+
+    for i, p in enumerate(profiles[:top_n], 1):
+        realm = p.realm
+        lines.append(
+            f"| {i} | @{p.username} | {realm.symbol} {realm.name_cn} | {p.stage}阶 | {p.spirit_power} | {p.agent_count} |"
+        )
+
+    if not profiles:
+        lines.append("| — | 暂无修仙者 | — | — | — | — |")
+
+    return append_brand_footer("\n".join(lines))
 
 
 # ============================================================

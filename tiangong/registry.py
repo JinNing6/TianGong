@@ -93,7 +93,7 @@ def get_leaderboard(top_n: int = 20) -> str:
 
     # 排名：品级 > 星标 > 淬炼次数
     def sort_key(a: AgentSpec) -> tuple:
-        grade = calculate_grade(a.stars, a.passed_trial)
+        grade = calculate_grade(getattr(a, 'spirit_power', a.stars), 0, a.passed_trial)
         return (grade.level, a.stars, len(a.refinement_log))
 
     ranked = sorted(agents, key=sort_key, reverse=True)[:top_n]
@@ -110,7 +110,7 @@ def get_leaderboard(top_n: int = 20) -> str:
     rank_emojis = ["🥇", "🥈", "🥉"]
 
     for i, agent in enumerate(ranked):
-        grade = calculate_grade(agent.stars, agent.passed_trial)
+        grade = calculate_grade(getattr(agent, 'spirit_power', agent.stars), 0, agent.passed_trial)
         rank = rank_emojis[i] if i < 3 else f"#{i + 1}"
         natal = " 💠" if agent.is_natal else ""
         lines.append(

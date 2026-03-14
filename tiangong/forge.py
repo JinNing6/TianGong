@@ -186,7 +186,7 @@ def format_agent_card(spec: AgentSpec) -> str:
     """格式化 Agent 展示卡片"""
     from .artifact_system import calculate_grade, format_grade_display
 
-    grade = calculate_grade(spec.stars, spec.passed_trial)
+    grade = calculate_grade(getattr(spec, 'spirit_power', spec.stars), 0, spec.passed_trial)
     natal_mark = " 💠 **本命法宝**" if spec.is_natal else ""
 
     lines = [

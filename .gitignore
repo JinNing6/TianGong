@@ -58,5 +58,6 @@ tmp/
 scripts/claim_pypi_names.py
 scripts/claim_pypi_names.bat
 scripts/claim_pypi_names_batch2.py
+scripts/claim_pypi_retry.py
 .pypirc
 *.tar.gz

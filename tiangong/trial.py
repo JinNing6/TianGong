@@ -31,49 +31,49 @@ class TrialResult:
 
 TRIAL_DIMENSIONS = [
     {
-        "name_cn": "灵根·描述",
-        "name_en": "Root: Description",
-        "key": "description",
+        "name_cn": "📝 铭文·描述",
+        "name_en": "Inscription: Description",
+        "key": "inscription",
         "weight": 0.20,
         "criteria_cn": "Agent 的描述是否清晰、准确、有吸引力",
         "criteria_en": "Is the description clear, accurate, and compelling?",
     },
     {
-        "name_cn": "灵根·架构",
-        "name_en": "Root: Architecture",
-        "key": "architecture",
+        "name_cn": "🏗️ 阵法·架构",
+        "name_en": "Formation: Architecture",
+        "key": "formation",
         "weight": 0.20,
         "criteria_cn": "Agent 的架构设计是否合理、模块化",
         "criteria_en": "Is the architecture well-designed and modular?",
     },
     {
-        "name_cn": "灵根·功法",
-        "name_en": "Root: Technique",
+        "name_cn": "⚙️ 法诀·工程",
+        "name_en": "Technique: Engineering",
         "key": "technique",
         "weight": 0.20,
         "criteria_cn": "使用的技术栈和方法是否先进合理",
         "criteria_en": "Are the tech stack and methods advanced and appropriate?",
     },
     {
-        "name_cn": "灵根·传承",
-        "name_en": "Root: Documentation",
-        "key": "documentation",
+        "name_cn": "📖 道统·文档",
+        "name_en": "Lineage: Documentation",
+        "key": "lineage",
         "weight": 0.15,
         "criteria_cn": "文档是否完善、是否方便他人传承",
         "criteria_en": "Is documentation thorough and inheritance-friendly?",
     },
     {
-        "name_cn": "灵根·韧性",
-        "name_en": "Root: Resilience",
+        "name_cn": "🛡️ 护体·韧性",
+        "name_en": "Resilience: Stability",
         "key": "resilience",
         "weight": 0.15,
         "criteria_cn": "错误处理、超时控制、异常恢复能力",
         "criteria_en": "Error handling, timeout control, recovery capability",
     },
     {
-        "name_cn": "灵根·灵性",
-        "name_en": "Root: Creativity",
-        "key": "creativity",
+        "name_cn": "✨ 悟道·灵性",
+        "name_en": "Enlightenment: Creativity",
+        "key": "enlightenment",
         "weight": 0.10,
         "criteria_cn": "是否有独特的创新点或解决问题的新方式",
         "criteria_en": "Does it bring unique innovation or novel problem-solving?",
@@ -100,37 +100,37 @@ def evaluate_agent(
     scores: dict[str, int] = {}
     recommendations: list[str] = []
 
-    # === 1. 描述评分 ===
-    desc_score = 0
+    # === 1. 铭文评分（描述清晰度）===
+    inscription_score = 0
     if description:
         desc_len = len(description)
         if desc_len >= 100:
-            desc_score = 90
+            inscription_score = 90
         elif desc_len >= 50:
-            desc_score = 70
+            inscription_score = 70
         elif desc_len >= 20:
-            desc_score = 50
+            inscription_score = 50
         else:
-            desc_score = 30
+            inscription_score = 30
             recommendations.append("💡 描述过于简短，请补充对 Agent 功能和用途的详细说明")
     else:
-        desc_score = 0
+        inscription_score = 0
         recommendations.append("⚠️ 缺少描述！一个好的描述是法宝通灵的基础")
-    scores["description"] = desc_score
+    scores["inscription"] = inscription_score
 
-    # === 2. 架构评分（基于元数据完整性）===
-    arch_score = 50  # 基础分
+    # === 2. 阵法评分（架构设计）===
+    formation_score = 50  # 基础分
     if framework:
-        arch_score += 20
+        formation_score += 20
     else:
         recommendations.append("💡 建议指定使用的框架（如 langchain、crewai、openai-agents）")
     if agent_type != "general":
-        arch_score += 15
+        formation_score += 15
     if repo_url:
-        arch_score += 15
+        formation_score += 15
     else:
         recommendations.append("💡 建议提供代码仓库链接，方便他人传承")
-    scores["architecture"] = min(100, arch_score)
+    scores["formation"] = min(100, formation_score)
 
     # === 3. 功法评分（技术栈）===
     tech_score = 50
@@ -142,17 +142,17 @@ def evaluate_agent(
         tech_score += 10
     scores["technique"] = min(100, tech_score)
 
-    # === 4. 文档评分 ===
-    doc_score = 40
+    # === 4. 道统评分（文档传承）===
+    lineage_score = 40
     if description and len(description) >= 50:
-        doc_score += 20
+        lineage_score += 20
     if tags and len(tags) >= 2:
-        doc_score += 20
+        lineage_score += 20
     if repo_url:
-        doc_score += 20
+        lineage_score += 20
     else:
         recommendations.append("💡 完善文档可以让法宝品级更快提升")
-    scores["documentation"] = min(100, doc_score)
+    scores["lineage"] = min(100, lineage_score)
 
     # === 5. 韧性评分（Phase 1 基础评估）===
     resilience_score = 60  # Phase 1 默认中等分
@@ -160,13 +160,13 @@ def evaluate_agent(
         resilience_score += 20
     scores["resilience"] = min(100, resilience_score)
 
-    # === 6. 灵性评分 ===
-    creativity_score = 50  # 基础分
+    # === 6. 悟道评分 ===
+    enlightenment_score = 50  # 基础分
     if tags and any(t in tags for t in ["innovative", "novel", "breakthrough", "创新", "突破"]):
-        creativity_score += 30
+        enlightenment_score += 30
     if description and len(description) >= 100:
-        creativity_score += 20
-    scores["creativity"] = min(100, creativity_score)
+        enlightenment_score += 20
+    scores["enlightenment"] = min(100, enlightenment_score)
 
     # === 综合评分 ===
     total_score = 0

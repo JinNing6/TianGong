@@ -1,0 +1,37 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.5, pytest-9.0.1, pluggy-1.5.0 -- E:\cuda\miniconda3\python.exe
+cachedir: .pytest_cache
+rootdir: E:\ideaProjects\agent\TianGong
+configfile: pyproject.toml
+plugins: anyio-4.12.1, langsmith-0.6.2, asyncio-1.3.0, timeout-2.4.0, respx-0.22.0, typeguard-4.4.4
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 2 items
+
+tests/test_marketplace.py::test_validate_artifact_for_publish FAILED     [ 50%]
+tests/test_marketplace.py::test_publish_agent_success FAILED             [100%]
+
+================================== FAILURES ===================================
+_____________________ test_validate_artifact_for_publish ______________________
+tests\test_marketplace.py:18: in test_validate_artifact_for_publish
+    valid, errors = validate_artifact_for_publish(artifact_dir)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tiangong\marketplace.py:84: in validate_artifact_for_publish
+    if meta and meta.get("entry"):
+       ^^^^
+E   UnboundLocalError: cannot access local variable 'meta' where it is not associated with a value
+_________________________ test_publish_agent_success __________________________
+tests\test_marketplace.py:64: in test_publish_agent_success
+    assert "\u2705 \u98de\u5347\u4e0a\u754c\u6210\u529f\uff01" in result
+E   assert '\u2705 \u98de\u5347\u4e0a\u754c\u6210\u529f\uff01' in "\u274c \u98de\u5347\u5931\u8d25: 'coroutine' object is not subscriptable"
+============================== warnings summary ===============================
+tests/test_marketplace.py::test_publish_agent_success
+  E:\ideaProjects\agent\TianGong\tests\test_marketplace.py:63: RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited
+    result = await publish_agent(artifact_name)
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_marketplace.py::test_validate_artifact_for_publish - Unboun...
+FAILED tests/test_marketplace.py::test_publish_agent_success - assert '\u2705 \u98de...
+======================== 2 failed, 1 warning in 0.39s =========================
