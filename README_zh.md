@@ -168,34 +168,35 @@ graph TD
 
 ### 炼器篇 (Creation)
 - `forge_agent`：起火开炉！注册一件新的法宝。
-- `publish_artifact`：飞升上界！把本地炼制好的法宝提交到云端仓库，等待审核。
+- `publish_agent`：飞升上界！把本地炼制好的法宝提交到云端仓库，等待审核。
 
 ### 探宝篇 (Discovery)
 - `treasure_pavilion`：进入寻宝阁，翻阅诸天万界开源的极品法宝。
 - `summon_artifact`：请宝下凡！一键克隆极品代码并自动安装依赖包，直接使用。
-- `cave_status`：洞府全景！检视本地炼器炉与藏宝阁的运转状态。
+- `my_vault`：我的法宝！查看本地炼器炉与藏宝阁中缓存的法宝。
+- `vault_status`：洞府状态！检查运行环境与网络状态。
 
 ### 论道篇 (Evaluation & Refinement)
-- `infuse_spirit_tool`：灵力灌注！按照六维标准给法宝打分。
-- `post_quest`：发布淬炼令（悬赏）。遇到代码瓶颈？高悬赏请大能帮你改 bug。
-- `claim_quest` & `complete_quest`：认领淬炼令并提交你的修改，豪取丰厚灵力值。
+- `infuse_spirit`：灵力灌注！按照六维标准给法宝打分。
+- `post_refine_quest`：发布淬炼令（悬赏）。遇到代码瓶颈？高悬赏请大能帮你改 bug。
+- `browse_quests`：悬赏布告栏。发现并挑选待改良的法宝。
+- `claim_quest`：认领淬炼令，接下悬赏。
+- `submit_refinement`：提交淬炼成果，上传你优化后的法宝代码。
+- `verify_refinement`：审核淬炼成果，法宝主确认通过并下发灵力奖励。
 
 ### 显圣篇 (Rankings)
 - `cultivator_leaderboard`：查阅修仙天榜，一览诸天巨头修为。
-- `celestial_leaderboard`：查阅法宝天榜，看哪些神器雄踞诸天万界。
+- `artifact_leaderboard`：查阅法宝天榜，看哪些神器雄踞诸天万界。
 
 ### ㊙️ 隐秘道法 (Hidden Spells)
 
 除了名扬天下的工具，天工 MCP 还暗藏了众多极具修仙特色的高阶术法：
 
 - **🔥 `refine_agent` (淬炼法宝)**：本地记录你针对法宝每一次代码优化。每一次优化，都是法宝通灵的一步。
-- **⚔️ `trial_agent` (法宝试剑)**：由六维标准对法宝自动跑测。只要评估达标（>= 50分），即可当场把作品从“凡器”跃升至“灵器”！
 - **🧙 `my_realm` (修行档案)**：开启你的修仙面板，检视距离下一次天劫还差几成功力。
 - **🔮 `my_artifacts` (法宝清单)**：清点储物袋，一览你在本地锻造的全部法宝及其神秘品阶。
-- **💠 `bind_natal_artifact` (绑定本命)**：与灵魂建立羁绊！最多可将 3 个亲手打造的法宝设为极品“本命法宝”。
-- **📋 `agent_registry` (仙器录)**：通过种类、框架等条件检索你的本地法宝全集。
 - **📜 `artifact_lineage` (传承谱系)**：以树状图显化一件法宝的师承关系（基于 Fork 和 Inspired 机制）。
-- **🔒 `banish` (小黑屋封印)**：将不再使用的法宝从藏宝阁流放至秘境深处（归档空间）。
+- **🔒 `banish_artifact` (封印法宝)**：将不再使用的法宝从藏宝阁流放至秘境深处（归档空间）。
 
 ---
 

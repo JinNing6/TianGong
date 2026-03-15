@@ -224,34 +224,7 @@ def record_review(username: str) -> None:
     save_cultivator(profile)
 
 
-def bind_natal_artifact(username: str, agent_id: str) -> tuple[bool, str]:
-    """
-    绑定本命法宝。
 
-    Returns:
-        (是否成功, 消息)
-    """
-    profile = get_cultivator(username)
-
-    if agent_id in profile.natal_artifacts:
-        return False, f"⚠️ 法宝 `{agent_id}` 已是你的本命法宝。"
-
-    if len(profile.natal_artifacts) >= config.MAX_NATAL_ARTIFACTS:
-        return False, (
-            f"⚠️ 本命法宝数量已达上限（{config.MAX_NATAL_ARTIFACTS} 件）。\n"
-            "本命法宝与灵魂绑定，贪多则灵力分散。\n"
-            "请先解除一件本命法宝再绑定新的。"
-        )
-
-    profile.natal_artifacts.append(agent_id)
-    profile.last_active = time.time()
-    save_cultivator(profile)
-
-    return True, (
-        f"✅ 法宝 `{agent_id}` 已绑定为本命法宝！\n"
-        f"本命法宝: {len(profile.natal_artifacts)}/{config.MAX_NATAL_ARTIFACTS}\n\n"
-        "从此刻起，此法宝将与你的灵魂共同成长。"
-    )
 
 
 def get_all_cultivators() -> list[CultivatorProfile]:

@@ -171,29 +171,29 @@ Configure TianGong into your IDE (Cursor / VSCode) or chat client (Claude) and c
 | Tool | Description |
 |------|-------------|
 | `forge_agent` | Create a new Agent (register artifact metadata) |
-| `publish_artifact` | Publish your forged artifact to the community |
+| `publish_agent` | Publish your forged artifact to the community |
 | `treasure_pavilion` | Search & browse community artifacts |
 | `summon_artifact` | One-click pull artifact to local (clone + install deps) |
-| `infuse_spirit_tool` | Rate an artifact (Six Root Assessment) |
-| `post_quest` | Post a refinement bounty for bug fixes |
+| `infuse_spirit` | Rate an artifact (Six Root Assessment) |
+| `post_refine_quest` | Post a refinement bounty for bug fixes |
+| `browse_quests` | Browse active refinement quests waiting to be claimed |
 | `claim_quest` | Claim a refinement task |
-| `complete_quest` | Submit a solution for a claimed refinement task |
+| `submit_refinement` | Submit a solution for a claimed refinement task |
+| `verify_refinement` | Verify and approve submitted refinement solutions |
 | `cultivator_leaderboard` | Cultivator rankings by realm |
-| `celestial_leaderboard` | Artifact rankings by grade |
+| `artifact_leaderboard` | Artifact rankings by grade |
 
 ### 🔮 Esoteric Spells (Hidden Features)
 
 Beyond the standard tools, experienced cultivators can discover hidden spells within the MCP to deepen their practice:
 
 - **🔥 `refine_agent`**: Optimize an existing Agent locally. Record each improvement to build your artifact’s sentience over time.
-- **⚔️ `trial_agent`**: Evaluate your artifact's 6 dimensions. Passing the trial promotes your creation from a Mortal Tool (凡器) to a Spirit Tool (灵器).
 - **🧙 `my_realm`**: View your detailed cultivator profile, tracking your progression, tribulation history, and spirit power accumulation.
 - **🔮 `my_artifacts`**: Take stock of your local vault, reviewing the grades, stars, and refinement counts of every artifact you've forged.
-- **💠 `bind_natal_artifact`**: Bind up to 3 Agents as your "Natal Artifacts" (本命法宝) — your ultimate, soul-linked creations.
-- **📋 `agent_registry`**: Perform local, filtered searches of your registered artifacts by name, framework, or type.
-- **🏛️ `cave_status`**: Survey the panoramic state of your local "cave" (workspace), covering the active forge and your gathered local vault.
 - **📜 `artifact_lineage`**: Trace the karmic ancestry of an artifact, viewing its lineage tree of forks, inspirations, and dependencies.
-- **🔒 `banish`**: Archive outdated or abandoned artifacts from your active vault into deep storage.
+- **📦 `my_vault`**: View your locally summoned and forged artifacts in your private vault.
+- **🏛️ `vault_status`**: Check the host environment resources, client connection, and synchronization status of your vault.
+- **🔒 `banish_artifact`**: Archive outdated or abandoned artifacts from your active vault into deep storage.
 
 ---
 

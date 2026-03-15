@@ -318,31 +318,21 @@ async def claim_refine_quest(
         return f"❌ 认领失败: {e}"
 
 
-async def complete_refine_quest(
+async def submit_refinement(
     quest_issue_number: int,
     refiner: str,
     solution_description: str,
 ) -> str:
-    """
-    提交淬炼成果。
-
-    Args:
-        quest_issue_number: 淬炼令 Issue 编号
-        refiner: 淬炼者
-        solution_description: 解决方案描述
-
-    Returns:
-        提交结果
-    """
+    """提交淬炼成果"""
     if not config.GITHUB_TOKEN:
         return "⚠️ 未配置 GITHUB_TOKEN"
 
-    comment_body = f"""## ✅ 淬炼完成提交
+    comment_body = f"""## 🛠️ 提交淬炼成果
 
 - **淬炼者**: @{refiner}
 - **解决方案**: {solution_description}
 
-> 请发布者审核。审核通过后请关闭此 Issue。
+> 请发布者使用 `verify_refinement` 审核。审核通过后此令即告完成。
 """
 
     try:
@@ -355,23 +345,129 @@ async def complete_refine_quest(
             )
 
             if resp.status_code == 201:
-                # 给淬炼者加灵力
-                from .cultivator import update_cultivator_stats
-                update_cultivator_stats(
-                    username=refiner,
-                    spirit_delta=5,
-                    quest_delta=1,
-                    refinement_delta=1,
-                )
-
                 return (
-                    f"# ✅ 淬炼成果已提交！\n\n"
-                    f"- Issue: #{quest_issue_number}\n"
-                    f"- 灵力奖励: +5\n\n"
-                    "> 等待发布者审核确认。"
+                    f"# 🛠️ 淬炼成果已提交！\n\n"
+                    f"- Issue: #{quest_issue_number}\n\n"
+                    f"> 等待发布者审核确认（使用 verify_refinement）。"
                 )
             else:
                 return f"❌ 提交失败: {resp.status_code}"
 
     except Exception as e:
         return f"❌ 提交失败: {e}"
+
+
+async def verify_refinement(
+    quest_issue_number: int,
+    refiner: str,
+    reviewer: str,
+    is_approved: bool,
+    feedback: str = "",
+) -> str:
+    """审核淬炼成果"""
+    if not config.GITHUB_TOKEN:
+        return "⚠️ 未配置 GITHUB_TOKEN"
+
+    status_icon = "✅ 审核通过" if is_approved else "❌ 需要修改"
+    comment_body = f"""## ⚖️ 淬炼成果审核
+
+- **审核者**: @{reviewer}
+- **淬炼者**: @{refiner}
+- **状态**: {status_icon}
+- **反馈**: {feedback or '无'}
+
+"""
+    if is_approved:
+        comment_body += "> 淬炼令已圆满完成！淬炼者将获得修仙点数奖励。"
+    else:
+        comment_body += "> 成果尚需打磨，请淬炼者根据反馈修改后再次提交。"
+
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            resp = await client.post(
+                f"{GITHUB_API}/repos/{config.GITHUB_REPO_OWNER}/{config.GITHUB_REPO_NAME}"
+                f"/issues/{quest_issue_number}/comments",
+                headers=_get_headers(),
+                json={"body": comment_body},
+            )
+
+            if resp.status_code == 201:
+                if is_approved:
+                    # 给淬炼者加灵力
+                    from .cultivator import update_cultivator_stats
+                    update_cultivator_stats(
+                        username=refiner,
+                        spirit_delta=5,
+                        quest_delta=1,
+                        refinement_delta=1,
+                    )
+                    
+                    # 尝试关闭 Issue
+                    await client.patch(
+                        f"{GITHUB_API}/repos/{config.GITHUB_REPO_OWNER}/{config.GITHUB_REPO_NAME}/issues/{quest_issue_number}",
+                        headers=_get_headers(),
+                        json={"state": "closed"},
+                    )
+
+                    return (
+                        f"# ✅ 淬炼审核通过！\n\n"
+                        f"- Issue: #{quest_issue_number}\n"
+                        f"- 淬炼者: @{refiner} 已获得灵力奖励！\n\n"
+                        "> 淬炼令已圆满完成并关闭。"
+                    )
+                else:
+                    return (
+                        f"# ❌ 淬炼需要修改！\n\n"
+                        f"- Issue: #{quest_issue_number}\n"
+                        f"- 已通知 @{refiner} 继续改进。\n"
+                    )
+            else:
+                return f"❌ 审核评价失败: {resp.status_code}"
+
+    except Exception as e:
+        return f"❌ 审核评价失败: {e}"
+
+
+async def browse_quests(limit: int = 10) -> str:
+    """浏览待认领的淬炼令"""
+    if not config.GITHUB_TOKEN:
+        return "⚠️ 未配置 GITHUB_TOKEN"
+
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            search_url = f"{GITHUB_API}/search/issues"
+            search_query = (
+                f"repo:{config.GITHUB_REPO_OWNER}/{config.GITHUB_REPO_NAME} "
+                f"state:open label:refine-quest"
+            )
+            resp = await client.get(
+                search_url,
+                headers=_get_headers(),
+                params={"q": search_query, "per_page": limit, "sort": "created", "order": "desc"},
+            )
+
+            if resp.status_code != 200:
+                return f"❌ 获取淬炼令失败: {resp.status_code}"
+
+            items = resp.json().get("items", [])
+            if not items:
+                return "📭 目前没有待认领的淬炼令。"
+
+            lines = [
+                "# 📜 悬赏布告栏 (Refinement Quests)",
+                "",
+                f"当前有 {len(items)} 个活跃的淬炼令：",
+                "",
+                "| 编号 | 标题 | 发布者 | 发布时间 | 悬赏连接 |",
+                "|------|------|--------|----------|----------|",
+            ]
+            
+            for item in items:
+                author = item["user"]["login"]
+                date = item["created_at"][:10]
+                lines.append(f"| #{item['number']} | {item['title']} | @{author} | {date} | [点击查看]({item['html_url']}) |")
+
+            return "\n".join(lines)
+
+    except Exception as e:
+        return f"❌ 获取淬炼令失败: {e}"

@@ -1,5 +1,6 @@
 """
 ⚒️ 天工 TianGong — 品牌横幅与签名系统
+Cinema-grade Celestial Boot Sequence & Brand Signatures
 """
 
 from __future__ import annotations
@@ -7,45 +8,25 @@ from __future__ import annotations
 import random
 
 from . import __version__
+from .animations import play_full_boot_sequence, _get_static_logo
 
 
 # ============================================================
-# 启动横幅 ASCII Art
+# 启动动画
 # ============================================================
-
-BOOT_BANNER = r"""
-╔══════════════════════════════════════════════════════════╗
-║                                                          ║
-║     ████████╗██╗ █████╗ ███╗   ██╗ ██████╗  ██████╗     ║
-║     ╚══██╔══╝██║██╔══██╗████╗  ██║██╔════╝ ██╔═══██╗    ║
-║        ██║   ██║███████║██╔██╗ ██║██║  ███╗██║   ██║    ║
-║        ██║   ██║██╔══██║██║╚██╗██║██║   ██║██║   ██║    ║
-║        ██║   ██║██║  ██║██║ ╚████║╚██████╔╝╚██████╔╝    ║
-║        ╚═╝   ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝  ╚═════╝     ║
-║                                                          ║
-║         ⚒️  天 工 · The Celestial Forge  ⚒️              ║
-║                                                          ║
-║       「我命由我不由天」                                   ║
-║        My fate is mine, not heaven's.                    ║
-║                                                          ║
-║       🩺 治(赛博华佗) · ⚒️ 造(天工) · 🌌 识(Noosphere)   ║
-║                                                          ║
-╚══════════════════════════════════════════════════════════╝
-"""
-
 
 def play_boot_animation() -> str:
-    """生成启动横幅（在 MCP Server 初始化时输出到 stderr）"""
-    import sys
-    if sys.stderr.writable():
-        try:
-            sys.stderr.write(BOOT_BANNER + "\n")
-            sys.stderr.write(f"  TianGong MCP Server v{__version__}\n")
-            sys.stderr.write("  https://github.com/JinNing6/TianGong\n\n")
-            sys.stderr.flush()
-        except (OSError, UnicodeEncodeError):
-            pass
-    return BOOT_BANNER
+    """
+    播放启动动画序列。
+
+    在真实终端 (TTY) 中播放完整科幻动画：
+      矩阵雨 → Logo 渐变 → 模块加载 → 天道链接
+
+    非 TTY 环境中 fallback 到静态 Logo。
+
+    返回: 静态 Logo 文本
+    """
+    return play_full_boot_sequence()
 
 
 # ============================================================
@@ -84,8 +65,8 @@ def build_brand_signature() -> str:
         f"*— {en_quote}*\n"
         "\n> ⚒️ Continue forging with TianGong / 天工:\n"
         "> --\n"
-        "> `forge_agent` to create | `trial_agent` to test | `my_realm` to check realm\n"
-        "> `refine_agent` to optimize — Walk the path of cultivation!"
+        "> `forge_agent` to create | `my_realm` to check realm\n"
+        "> `treasure_pavilion` to browse | `infuse_spirit` to review"
     )
 
 

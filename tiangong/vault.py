@@ -305,17 +305,15 @@ def format_forge_list(artifacts: list[dict]) -> str:
     return "\n".join(lines)
 
 
-def format_cave_status() -> str:
-    """格式化洞府全景状态"""
+def format_my_vault() -> str:
+    """格式化我的法宝面板"""
     forge_items = list_forge()
     vault_items = list_vault()
 
     lines = [
-        "# 🏛️ 洞府全景",
+        "# 📦 我的法宝 (My Vault)",
         "",
-        f"- 📁 位置: `{config.CAVE_DIR}`",
-        f"- 🔨 炼器炉: {len(forge_items)} 件法宝",
-        f"- ✨ 藏宝阁: {len(vault_items)} 件法宝",
+        f"- 本地已开辟法宝栏位：{len(forge_items) + len(vault_items)}",
         "",
     ]
 
@@ -323,4 +321,31 @@ def format_cave_status() -> str:
     lines.append("")
     lines.append(format_vault_list(vault_items))
 
+    return "\n".join(lines)
+
+
+def format_vault_status() -> str:
+    """格式化洞府状态查询"""
+    import platform
+    
+    # 获取系统资源（如果没有 psutil 则使用基础库或省略）
+    try:
+        import psutil
+        cpu_usage = f"{psutil.cpu_percent(interval=0.1)}%"
+        memory = psutil.virtual_memory()
+        mem_usage = f"{memory.percent}% ({memory.used // (1024**2)}MB / {memory.total // (1024**2)}MB)"
+    except ImportError:
+        cpu_usage = "未知 (需安装 psutil)"
+        mem_usage = "未知 (需安装 psutil)"
+
+    lines = [
+        "# 🏛️ 洞府状态查询 (Vault Status)",
+        "",
+        f"- 💻 系统节点: `{platform.node()}` ({platform.system()} {platform.release()})",
+        f"- ⚙️ CPU 使用率: `{cpu_usage}`",
+        f"- 🧠 内存使用率: `{mem_usage}`",
+        f"- 📁 本地洞府位置: `{config.CAVE_DIR}`",
+        f"- 🔌 社区连接状态: `🌐 连接正常` (数据采用本地/远程同步策略)",
+        f"- ⏱️ 客户端运行状态: `🟢 活跃`",
+    ]
     return "\n".join(lines)

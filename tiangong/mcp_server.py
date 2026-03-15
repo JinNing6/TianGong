@@ -31,7 +31,7 @@ from .realm import (
 )
 from .cultivator import (
     get_cultivator, save_cultivator, update_cultivator_stats,
-    bind_natal_artifact as _bind_natal, format_cultivator_profile,
+    format_cultivator_profile,
     get_all_cultivators,
 )
 from .artifact_system import (
@@ -43,13 +43,9 @@ from .forge import (
     AgentSpec, forge_new_agent, get_agent, refine_agent as _refine_agent,
     list_agents, format_agent_card,
 )
-from .trial import evaluate_agent, format_trial_report
-from .registry import search_agents, format_agent_list, get_leaderboard
+from .registry import format_agent_list, get_leaderboard
 from .ceremony import (
     generate_tribulation_ceremony, generate_welcome_ceremony,
-)
-from .ecosystem import (
-    call_cyberhuatuo_diagnose, upload_to_noosphere, get_ecosystem_status,
 )
 
 logger = logging.getLogger("tiangong.mcp")
@@ -153,7 +149,7 @@ async def forge_agent(
             star_count=profile.star_count,
         ))
 
-    output_parts.append(f"\n\n> 💡 使用 `trial_agent(agent_id=\"{spec.agent_id}\")` 为法宝试剑，通过后品级将从凡器提升为灵器。")
+    output_parts.append("\n\n> 💡 当积攒了足够的灵力和评价人数后，法宝品级将会自动突破提升。")
 
     return append_brand_footer("\n".join(output_parts))
 
@@ -196,73 +192,6 @@ async def refine_agent(
 
 
 # ============================================================
-# 🔧 Tool 3: trial_agent — ⚔️ 试剑
-# ============================================================
-
-@mcp.tool()
-async def trial_agent(
-    agent_id: str,
-) -> str:
-    """
-    ⚔️ 试剑 — 对 Agent 进行评估测试
-    Trial your Agent — Test and evaluate its quality.
-
-    对法宝进行六维灵根评估：描述、架构、功法、传承、韧性、灵性。
-    通过试剑（评分 >= 50）的法宝品级从凡器提升为灵器。
-
-    Evaluate your Agent across six spiritual root dimensions.
-    Agents that pass (score >= 50) are promoted from Mortal Tool to Spirit Tool.
-
-    Args:
-        agent_id: Agent ID / Agent ID to evaluate
-    """
-    spec = get_agent(agent_id)
-    if not spec:
-        return f"⚠️ 未找到法宝 `{agent_id}`。请检查法宝 ID。"
-
-    # 执行评估
-    result = evaluate_agent(
-        agent_id=spec.agent_id,
-        name=spec.name,
-        description=spec.description,
-        agent_type=spec.agent_type,
-        framework=spec.framework,
-        language=spec.language,
-        repo_url=spec.repo_url,
-        tags=spec.tags,
-    )
-
-    # 更新 Agent 数据
-    from .forge import _load_registry, _save_registry
-    registry = _load_registry()
-    if agent_id in registry:
-        d = registry[agent_id]
-        d["passed_trial"] = result.passed
-        trial_log = d.get("trial_log", [])
-        trial_log.append({
-            "timestamp": result.timestamp,
-            "score": result.score,
-            "passed": result.passed,
-            "dimensions": result.dimensions,
-        })
-        d["trial_log"] = trial_log
-        d["grade_level"] = calculate_grade(d.get("spirit_power", d.get("stars", 0)), d.get("reviewer_count", 0), result.passed).level
-        registry[agent_id] = d
-        _save_registry(registry)
-
-    # 更新修仙者试剑统计
-    update_cultivator_stats(username=spec.creator, trial_delta=1)
-
-    report = format_trial_report(result, spec.name)
-
-    if result.passed:
-        grade = calculate_grade(getattr(spec, 'spirit_power', getattr(spec, 'stars', 0)), 0, True)
-        report += f"\n\n> ✅ 品级提升: ⚪ 凡器 → {format_grade_display(grade)}"
-
-    return append_brand_footer(report)
-
-
-# ============================================================
 # 🔧 Tool 4: my_realm — 🧙 修行档案
 # ============================================================
 
@@ -294,8 +223,6 @@ async def my_realm(
         realm, profile.agent_count, profile.star_count,
     )
 
-    # 附加生态状态
-    result += "\n\n" + get_ecosystem_status()
 
     return append_brand_footer(result)
 
@@ -332,99 +259,11 @@ async def my_artifacts(
 
 
 # ============================================================
-# 🔧 Tool 6: bind_natal_artifact — 💠 绑定本命
+# 🔧 Tool: artifact_leaderboard — 🏆 法宝天榜
 # ============================================================
 
 @mcp.tool()
-async def bind_natal_artifact(
-    agent_id: str,
-    username: str = "",
-) -> str:
-    """
-    💠 绑定本命法宝 — 将 Agent 标记为你的核心法宝
-    Bind an Agent as your Natal Artifact — your soul-bound core weapon.
-
-    本命法宝与灵魂绑定，越养越强。
-    每个修仙者最多可绑定 3 件本命法宝。
-
-    Natal Artifacts are soul-bound and grow stronger with you.
-    Each cultivator can bind up to 3 Natal Artifacts.
-
-    Args:
-        agent_id: Agent ID / Agent ID to bind
-        username: GitHub 用户名 / GitHub username
-    """
-    if not username:
-        username = config.GITHUB_USERNAME
-
-    # 验证 Agent 存在
-    spec = get_agent(agent_id)
-    if not spec:
-        return f"⚠️ 未找到法宝 `{agent_id}`。请检查法宝 ID。"
-
-    if spec.creator != username:
-        return f"⚠️ 法宝 `{agent_id}` 不属于你。本命法宝只能绑定自己锻造的法宝。"
-
-    # 绑定
-    success, message = _bind_natal(username, agent_id)
-
-    if success:
-        # 在注册表中也标记
-        from .forge import _load_registry, _save_registry
-        registry = _load_registry()
-        if agent_id in registry:
-            registry[agent_id]["is_natal"] = True
-            _save_registry(registry)
-
-    return append_brand_footer(message)
-
-
-# ============================================================
-# 🔧 Tool 7: agent_registry — 📋 仙器录
-# ============================================================
-
-@mcp.tool()
-async def agent_registry(
-    query: str = "",
-    agent_type: str | None = None,
-    framework: str | None = None,
-    creator: str | None = None,
-) -> str:
-    """
-    📋 仙器录 — 搜索浏览所有注册的 Agent
-    Browse and search the Agent Registry.
-
-    在天工的仙器录中搜索法宝，支持按名称、类型、框架、创建者过滤。
-
-    Search TianGong's artifact registry. Filter by name, type, framework, or creator.
-
-    Args:
-        query: 搜索关键词 / Search keywords
-        agent_type: 类型过滤 / Type filter: general, chat, tool, workflow
-        framework: 框架过滤 / Framework filter
-        creator: 创建者过滤 / Creator filter
-    """
-    agents = search_agents(
-        query=query,
-        agent_type=agent_type,
-        framework=framework,
-        creator=creator,
-    )
-
-    title = "仙器录 · Agent Registry"
-    if query:
-        title += f" — 「{query}」"
-
-    result = format_agent_list(agents, title=title)
-    return append_brand_footer(result)
-
-
-# ============================================================
-# 🔧 Tool 8: celestial_leaderboard — 🏆 天榜
-# ============================================================
-
-@mcp.tool()
-async def celestial_leaderboard(
+async def artifact_leaderboard(
     top_n: int = 20,
 ) -> str:
     """
@@ -453,14 +292,16 @@ async def celestial_leaderboard(
 # ============================================================
 
 # ---- 导入 Phase 2 模块 ----
-from .vault import init_cave, format_cave_status, list_vault, list_forge, format_vault_list, format_forge_list
+from .vault import init_cave, format_my_vault, format_vault_status
 from .marketplace import publish_agent as _publish_agent, summon_artifact as _summon, banish_artifact
 from .search import search_marketplace, format_search_results
 from .review import (
     infuse_spirit as _infuse,
     post_refine_quest as _post_quest,
     claim_refine_quest as _claim_quest,
-    complete_refine_quest as _complete_quest,
+    submit_refinement as _submit_refinement,
+    verify_refinement as _verify_refinement,
+    browse_quests as _browse_quests,
 )
 from .lineage import get_artifact_lineage, format_lineage_tree
 
@@ -486,9 +327,9 @@ async def treasure_pavilion(query: str = "") -> str:
     return append_brand_footer(format_search_results(results, query))
 
 
-# 🔧 Tool 10: publish_artifact — ✨ 飞升上界
+# 🔧 Tool: publish_agent — ✨ 飞升上界
 @mcp.tool()
-async def publish_artifact(
+async def publish_agent(
     artifact_name: str,
     is_anonymous: bool = False,
 ) -> str:
@@ -523,22 +364,33 @@ async def summon_artifact(artifact_name: str) -> str:
     return append_brand_footer(result)
 
 
-# 🔧 Tool 12: cave_status — 🏛️ 洞府全景
+# 🔧 Tool: my_vault — 📦 我的法宝
 @mcp.tool()
-async def cave_status() -> str:
+async def my_vault() -> str:
     """
-    🏛️ 洞府全景 — 查看本地洞府状态
-    View your local cave status — forge and vault overview.
+    📦 我的法宝 — 查看本地缓存的 Agent
+    My Vault — View locally summoned and forged artifacts.
 
     展示炼器炉和藏宝阁中所有法宝的状态。
     """
     init_cave()
-    return append_brand_footer(format_cave_status())
+    return append_brand_footer(format_my_vault())
 
 
-# 🔧 Tool 13: infuse_spirit_tool — 💫 灌注灵力
+# 🔧 Tool: vault_status — 🏛️ 洞府状态查询
 @mcp.tool()
-async def infuse_spirit_tool(
+async def vault_status() -> str:
+    """
+    🏛️ 洞府状态查询 — 检查运行环境与连接
+    Vault Status — Check host environment resources and client connection.
+    """
+    init_cave()
+    return append_brand_footer(format_vault_status())
+
+
+# 🔧 Tool: infuse_spirit — 💫 灌注灵力
+@mcp.tool()
+async def infuse_spirit(
     artifact_name: str,
     inscription: int = 5,
     formation: int = 5,
@@ -583,9 +435,9 @@ async def infuse_spirit_tool(
     return append_brand_footer(result)
 
 
-# 🔧 Tool 14: post_quest — 🔥 发布淬炼令
+# 🔧 Tool: post_refine_quest — 🔥 发布淬炼令
 @mcp.tool()
-async def post_quest(
+async def post_refine_quest(
     artifact_name: str,
     description: str,
     code_url: str = "",
@@ -629,16 +481,16 @@ async def claim_quest(
     return append_brand_footer(result)
 
 
-# 🔧 Tool 16: complete_quest — ✅ 提交淬炼成果
+# 🔧 Tool: submit_refinement — 🛠️ 提交淬炼成果
 @mcp.tool()
-async def complete_quest(
+async def submit_refinement(
     quest_issue_number: int,
     solution: str,
     refiner: str = "",
 ) -> str:
     """
-    ✅ 提交淬炼成果 — 完成淬炼令任务
-    Submit Quest Completion — Deliver your refinement solution.
+    🛠️ 提交淬炼成果 — 提交优化后的法宝代码
+    Submit Refinement — Deliver your refinement solution.
 
     Args:
         quest_issue_number: 淬炼令 Issue 编号
@@ -647,7 +499,51 @@ async def complete_quest(
     """
     if not refiner:
         refiner = config.GITHUB_USERNAME
-    result = await _complete_quest(quest_issue_number, refiner, solution)
+    result = await _submit_refinement(quest_issue_number, refiner, solution)
+    return append_brand_footer(result)
+
+
+# 🔧 Tool: verify_refinement — ⚖️ 审核淬炼成果
+@mcp.tool()
+async def verify_refinement(
+    quest_issue_number: int,
+    refiner: str,
+    is_approved: bool,
+    feedback: str = "",
+    reviewer: str = "",
+) -> str:
+    """
+    ⚖️ 审核淬炼成果 — 发布者审查优化代码
+    Verify Refinement — Review and approve submitted refinement solutions.
+
+    验证成果，如通过则为淬炼者发放灵力奖励。
+
+    Args:
+        quest_issue_number: 淬炼令 Issue 编号
+        refiner: 提交成果的淬炼者
+        is_approved: 是否通过审核 (True/False)
+        feedback: 给淬炼者的反馈或修改建议
+        reviewer: 审核者（默认当前用户，需与发布者一致）
+    """
+    if not reviewer:
+        reviewer = config.GITHUB_USERNAME
+    result = await _verify_refinement(quest_issue_number, refiner, reviewer, is_approved, feedback)
+    return append_brand_footer(result)
+
+
+# 🔧 Tool: browse_quests — 📜 悬赏布告栏
+@mcp.tool()
+async def browse_quests(limit: int = 10) -> str:
+    """
+    📜 悬赏布告栏 — 浏览待认领的淬炼令
+    Browse Quests — View active refinement quests waiting to be claimed.
+
+    寻找可以优化改进的法宝，获取淬炼任务。
+
+    Args:
+        limit: 返回的淬炼令数量（默认 10）
+    """
+    result = await _browse_quests(limit)
     return append_brand_footer(result)
 
 
@@ -667,9 +563,9 @@ async def artifact_lineage(artifact_name: str) -> str:
     return append_brand_footer(format_lineage_tree(tree))
 
 
-# 🔧 Tool 18: banish — 🔒 封印法宝
+# 🔧 Tool: banish_artifact — 🔒 封印法宝
 @mcp.tool()
-async def banish(artifact_name: str) -> str:
+async def banish_artifact(artifact_name: str) -> str:
     """
     🔒 封印法宝 — 归档藏宝阁中的法宝
     Banish Artifact — Archive an artifact from your vault.
