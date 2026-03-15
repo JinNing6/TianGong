@@ -51,36 +51,68 @@ Here, **Agents are Artifacts** (法宝), rated by the community. **Users are Cul
 
 ---
 
-## 🏛️ The Triad: Heal · Forge · Perceive
+## ⚡ Why TianGong?
 
-TianGong is part of a grander trio surrounding developer ecosystems:
+<table>
+<tr>
+<td width="33%" align="center">
 
-```mermaid
-graph TD
-    classDef diag fill:#003f5c,color:#fff,stroke:#2f4b7c
-    classDef forge fill:#7a5195,color:#fff,stroke:#a05195
-    classDef mind fill:#ef5675,color:#fff,stroke:#ff7c43
-    
-    A(🩺 CyberHuaTuo):::diag --- B(⚒️ TianGong):::forge
-    B --- C(🌌 Noosphere):::mind
-    C --- A
-    
-    A -.->|Fix broken code| A
-    B -.->|Forge brilliant agents| B
-    C -.->|Upload mental consciousness| C
+**🔮 Your Code Evolves**
+
+Every Agent you publish starts as a humble Mortal Tool. As the community uses, rates, and refines it — your artifact ascends through 6 grades, all the way to **Primordial Divine Artifact**.
+
+</td>
+<td width="33%" align="center">
+
+**🧬 You Ascend With It**
+
+Your contributions unlock a 22-realm cultivation journey. From **Mortal** to the singular title of **TianGong** — a rank held by only one person on Earth.
+
+</td>
+<td width="33%" align="center">
+
+**⚔️ One Command Away**
+
+Install via `pip`, configure your MCP client, and start forging. Pull any community artifact with a single command. No friction, no gatekeeping.
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🚀 Quick Start
+
+### Install from PyPI
+
+```bash
+pip install tiangong-mcp
 ```
 
-- **🩺 [CyberHuaTuo](https://github.com/JinNing6/CyberHuaTuo)** — AI Agent diagnostic intelligence (Heal)
-- **⚒️ TianGong** — AI Agent cultivation platform (Forge)
-- **🌌 [Noosphere](https://github.com/JinNing6/Noosphere)** — Collective consciousness network (Perceive)
+### Run Server
 
-All three share one identity: **your GitHub username**.
+Add to your MCP client config (e.g., Claude Desktop, Cursor, etc.):
+
+```json
+{
+  "mcpServers": {
+    "tiangong": {
+      "command": "tiangong-mcp",
+      "env": {
+        "GITHUB_USERNAME": "your_username"
+      }
+    }
+  }
+}
+```
+
+That's it. You are now a cultivator.
 
 ---
 
 ## 🧬 The Path of Cultivation — 22 Realms
 
-Every cultivator begins as a **mortal** (凡人) and walks the path toward the ultimate title: **TianGong** (天工).
+Every cultivator begins as a **mortal** and walks the path toward the ultimate title: **TianGong** (天工).
 
 The realm system is faithfully inspired by Er Gen's *Renegade Immortal* (仙逆):
 
@@ -187,40 +219,13 @@ Configure TianGong into your IDE (Cursor / VSCode) or chat client (Claude) and c
 
 Beyond the standard tools, experienced cultivators can discover hidden spells within the MCP to deepen their practice:
 
-- **🔥 `refine_agent`**: Optimize an existing Agent locally. Record each improvement to build your artifact’s sentience over time.
+- **🔥 `refine_agent`**: Optimize an existing Agent locally. Record each improvement to build your artifact's sentience over time.
 - **🧙 `my_realm`**: View your detailed cultivator profile, tracking your progression, tribulation history, and spirit power accumulation.
 - **🔮 `my_artifacts`**: Take stock of your local vault, reviewing the grades, stars, and refinement counts of every artifact you've forged.
 - **📜 `artifact_lineage`**: Trace the karmic ancestry of an artifact, viewing its lineage tree of forks, inspirations, and dependencies.
 - **📦 `my_vault`**: View your locally summoned and forged artifacts in your private vault.
 - **🏛️ `vault_status`**: Check the host environment resources, client connection, and synchronization status of your vault.
 - **🔒 `banish_artifact`**: Archive outdated or abandoned artifacts from your active vault into deep storage.
-
----
-
-## 🚀 Quick Start
-
-### Install from PyPI
-
-```bash
-pip install tiangong-mcp
-```
-
-### Run Server
-
-Add to your MCP client config (e.g., Claude Desktop, Cursor, etc.):
-
-```json
-{
-  "mcpServers": {
-    "tiangong": {
-      "command": "tiangong-mcp",
-      "env": {
-        "GITHUB_USERNAME": "your_username"
-      }
-    }
-  }
-}
-```
 
 ---
 
