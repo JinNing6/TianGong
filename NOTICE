@@ -1,0 +1,46 @@
+TianGong (天工) — The Celestial Forge for AI Agents
+Copyright 2026 JinNing6
+https://github.com/JinNing6/TianGong
+
+This product is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+    http://www.apache.org/licenses/LICENSE-2.0
+
+================================================================================
+Trademark Notice
+================================================================================
+
+"TianGong" (天工), "Celestial Forge" (天工炉), the TianGong logo, and all
+related names, marks, and branding elements are trademarks of JinNing6.
+
+Use of these trademarks in derivative works, forks, or redistributions
+requires prior written permission from the copyright holder, except as
+required for reasonable and customary use in describing the origin of the
+Work as permitted under Section 6 of the Apache License 2.0.
+
+================================================================================
+Third-Party Components
+================================================================================
+
+This project includes or depends on the following third-party libraries,
+each governed by their own respective licenses:
+
+- MCP (Model Context Protocol SDK)
+  License: MIT
+  https://github.com/modelcontextprotocol/python-sdk
+
+- httpx
+  License: BSD-3-Clause
+  https://github.com/encode/httpx
+
+- python-dotenv
+  License: BSD-3-Clause
+  https://github.com/theskumar/python-dotenv
+
+- PyYAML
+  License: MIT
+  https://github.com/yaml/pyyaml
+
+- Rich
+  License: MIT
+  https://github.com/Textualize/rich
