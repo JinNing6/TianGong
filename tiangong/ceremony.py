@@ -10,7 +10,7 @@ from __future__ import annotations
 import math
 import textwrap
 
-from .realm import Realm, REALM_STAGES, REALMS
+from .realm import Realm, REALMS
 from .animations import (
     render_starfield,
     render_lightning_field,
