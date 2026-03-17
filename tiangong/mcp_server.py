@@ -107,11 +107,11 @@ async def forge_agent(
         creator = config.GITHUB_USERNAME
 
     # 检查是否是新修仙者
-    profile = get_cultivator(creator)
+    profile = await get_cultivator(creator)
     is_new = profile.agent_count == 0
 
     # 锻造法宝
-    spec = forge_new_agent(
+    spec = await forge_new_agent(
         name=name,
         description=description,
         creator=creator,
@@ -123,7 +123,7 @@ async def forge_agent(
     )
 
     # 更新修仙者数据
-    profile, triggered, old_realm, new_realm = update_cultivator_stats(
+    profile, triggered, old_realm, new_realm = await update_cultivator_stats(
         username=creator, agent_delta=1,
     )
 
@@ -182,11 +182,11 @@ async def refine_agent(
     if not refiner:
         refiner = config.GITHUB_USERNAME
 
-    success, message = _refine_agent(agent_id, changes, refiner)
+    success, message = await _refine_agent(agent_id, changes, refiner)
 
     if success:
         # 更新修仙者淬炼统计
-        update_cultivator_stats(username=refiner, refinement_delta=1)
+        await update_cultivator_stats(username=refiner, refinement_delta=1)
 
     return append_brand_footer(message)
 
@@ -214,13 +214,13 @@ async def my_realm(
     if not username:
         username = config.GITHUB_USERNAME
 
-    profile = get_cultivator(username)
+    profile = await get_cultivator(username)
     result = format_cultivator_profile(profile)
 
     # 附加境界进度
     realm = profile.realm
     result += "\n\n" + format_realm_progress(
-        realm, profile.agent_count, profile.star_count,
+        realm, profile.spirit_power, profile.agent_count,
     )
 
 
@@ -253,7 +253,7 @@ async def leaderboard(
     """
     if type == "cultivator":
         from .cultivator import get_all_cultivators
-        profiles = get_all_cultivators()
+        profiles = await get_all_cultivators()
         profiles.sort(key=lambda p: (-p.realm_level, -p.spirit_power, p.username))
 
         lines = [
@@ -275,7 +275,7 @@ async def leaderboard(
         return append_brand_footer("\n".join(lines))
 
     else:  # artifact (default)
-        result = get_leaderboard(top_n=top_n)
+        result = await get_leaderboard(top_n=top_n)
         result += "\n\n" + get_realm_ladder()
         return append_brand_footer(result)
 
@@ -389,8 +389,8 @@ async def my_vault(
     init_cave()
 
     # Part 1: 注册法宝数据（品级、星标、淬炼次数）
-    agents = list_agents(creator=username)
-    result = format_agent_list(agents, title=f"@{username} 的法宝清单")
+    agents = await list_agents(creator=username)
+    result = await format_agent_list(agents, title=f"@{username} 的法宝清单")
 
     # Part 2: 本地法宝文件状态（炼器炉 + 藏宝阁）
     result += "\n\n---\n\n" + format_my_vault()

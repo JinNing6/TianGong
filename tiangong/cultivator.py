@@ -1,6 +1,7 @@
 """
 ⚒️ 天工 TianGong — 修仙者档案管理（Phase 2）
 管理修仙者的个人信息、境界、灵力值、修行记录、渡劫进度
+数据存储在 GitHub 仓库，实现全平台共享。
 """
 
 from __future__ import annotations
@@ -61,32 +62,18 @@ class CultivatorProfile:
         return get_review_weight(self.realm_level)
 
 
-def _get_storage_path() -> Path:
-    """获取修仙者档案存储路径"""
-    return Path(config.CULTIVATORS_FILE)
+async def _load_all_cultivators() -> dict[str, dict]:
+    """从 GitHub 加载所有修仙者数据"""
+    from .github_store import read_cultivators
+    return await read_cultivators()
 
 
-def _load_all_cultivators() -> dict[str, dict]:
-    """加载所有修仙者数据"""
-    path = _get_storage_path()
-    if not path.exists():
-        return {}
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-        return data if isinstance(data, dict) else {}
-    except (json.JSONDecodeError, OSError) as e:
-        logger.warning(f"修仙者档案加载失败: {e}")
-        return {}
-
-
-def _save_all_cultivators(data: dict[str, dict]) -> None:
-    """保存所有修仙者数据"""
-    path = _get_storage_path()
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        json.dumps(data, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
+async def _save_all_cultivators(data: dict[str, dict], message: str = "") -> None:
+    """保存所有修仙者数据到 GitHub"""
+    from .github_store import write_cultivators
+    success = await write_cultivators(data, message)
+    if not success:
+        logger.error("修仙者档案保存到 GitHub 失败")
 
 
 def _dict_to_profile(username: str, d: dict) -> CultivatorProfile:
@@ -111,9 +98,9 @@ def _dict_to_profile(username: str, d: dict) -> CultivatorProfile:
     )
 
 
-def get_cultivator(username: str) -> CultivatorProfile:
+async def get_cultivator(username: str) -> CultivatorProfile:
     """获取修仙者档案，如不存在则自动创建（踏入修行）"""
-    all_data = _load_all_cultivators()
+    all_data = await _load_all_cultivators()
 
     if username in all_data:
         return _dict_to_profile(username, all_data[username])
@@ -124,18 +111,20 @@ def get_cultivator(username: str) -> CultivatorProfile:
         joined_at=time.time(),
         last_active=time.time(),
     )
-    save_cultivator(profile)
+    await save_cultivator(profile, message=f"🧙 new cultivator: @{username}")
     return profile
 
 
-def save_cultivator(profile: CultivatorProfile) -> None:
+async def save_cultivator(profile: CultivatorProfile, message: str = "") -> None:
     """保存修仙者档案"""
-    all_data = _load_all_cultivators()
+    all_data = await _load_all_cultivators()
     all_data[profile.username] = asdict(profile)
-    _save_all_cultivators(all_data)
+    if not message:
+        message = f"🧙 update: @{profile.username}"
+    await _save_all_cultivators(all_data, message)
 
 
-def update_cultivator_stats(
+async def update_cultivator_stats(
     username: str,
     agent_delta: int = 0,
     star_delta: int = 0,
@@ -151,7 +140,7 @@ def update_cultivator_stats(
     Returns:
         (更新后的档案, 是否渡劫, 旧境界, 新境界)
     """
-    profile = get_cultivator(username)
+    profile = await get_cultivator(username)
 
     old_spirit = profile.spirit_power
 
@@ -183,13 +172,13 @@ def update_cultivator_stats(
             "spirit_power": profile.spirit_power,
         })
 
-    save_cultivator(profile)
+    await save_cultivator(profile, message=f"🧙 stats: @{username}")
     return profile, triggered, old_realm, new_realm
 
 
-def can_review(username: str) -> tuple[bool, str]:
+async def can_review(username: str) -> tuple[bool, str]:
     """检查修仙者是否可以评价法宝"""
-    profile = get_cultivator(username)
+    profile = await get_cultivator(username)
 
     # 凡人无评价资格
     if profile.realm_level == 0:
@@ -208,10 +197,10 @@ def can_review(username: str) -> tuple[bool, str]:
     return True, ""
 
 
-def record_review(username: str) -> None:
+async def record_review(username: str) -> None:
     """记录一次评价"""
     import datetime
-    profile = get_cultivator(username)
+    profile = await get_cultivator(username)
     today = datetime.date.today().isoformat()
 
     if profile.last_review_date != today:
@@ -221,15 +210,12 @@ def record_review(username: str) -> None:
     profile.reviews_today += 1
     profile.reviews_given += 1
     profile.last_active = time.time()
-    save_cultivator(profile)
+    await save_cultivator(profile, message=f"🧙 review: @{username}")
 
 
-
-
-
-def get_all_cultivators() -> list[CultivatorProfile]:
+async def get_all_cultivators() -> list[CultivatorProfile]:
     """获取所有修仙者的列表（用于天榜排名）"""
-    all_data = _load_all_cultivators()
+    all_data = await _load_all_cultivators()
     profiles = []
     for username, d in all_data.items():
         profiles.append(_dict_to_profile(username, d))

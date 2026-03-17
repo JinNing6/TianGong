@@ -62,7 +62,7 @@ async def infuse_spirit(
 
     # 检查评价资格
     from .cultivator import can_review, record_review, get_cultivator
-    can, msg = can_review(reviewer)
+    can, msg = await can_review(reviewer)
     if not can:
         return msg
 
@@ -70,14 +70,14 @@ async def infuse_spirit(
     # (需要从 marketplace 元数据中获取创建者信息来检查)
 
     # 获取评价者信息
-    reviewer_profile = get_cultivator(reviewer)
+    reviewer_profile = await get_cultivator(reviewer)
 
     # 计算灵力值
     avg_score = sum(scores.values()) / len(scores)
     spirit_value = avg_score * reviewer_profile.review_weight
 
     # 记录评价
-    record_review(reviewer)
+    await record_review(reviewer)
 
     # 通过 GitHub Issue 评论记录评价
     review_data = {
@@ -96,7 +96,7 @@ async def infuse_spirit(
     # 更新法宝灵力值（给法宝创作者加灵力）
     from .cultivator import update_cultivator_stats
     # 评价者也获得少量灵力奖励（鼓励评价）
-    update_cultivator_stats(username=reviewer, spirit_delta=1, review_delta=1)
+    await update_cultivator_stats(username=reviewer, spirit_delta=1, review_delta=1)
 
     # 格式化评分展示
     lines = [
@@ -395,7 +395,7 @@ async def verify_refinement(
                 if is_approved:
                     # 给淬炼者加灵力
                     from .cultivator import update_cultivator_stats
-                    update_cultivator_stats(
+                    await update_cultivator_stats(
                         username=refiner,
                         spirit_delta=5,
                         quest_delta=1,

@@ -1,6 +1,6 @@
 """
 ⚒️ 天工 TianGong — 开炉炼器引擎
-创建新 Agent，注册到本地仓库
+创建新 Agent，注册到 GitHub 全局仓库
 """
 
 from __future__ import annotations
@@ -39,29 +39,21 @@ class AgentSpec:
     trial_log: list[dict] = field(default_factory=list)       # 试剑日志
 
 
-def _load_registry() -> dict[str, dict]:
-    """加载 Agent 注册表"""
-    path = Path(config.REGISTRY_FILE)
-    if not path.exists():
-        return {}
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-        return data if isinstance(data, dict) else {}
-    except (json.JSONDecodeError, OSError):
-        return {}
+async def _load_registry() -> dict[str, dict]:
+    """从 GitHub 加载 Agent 注册表"""
+    from .github_store import read_registry
+    return await read_registry()
 
 
-def _save_registry(data: dict[str, dict]) -> None:
-    """保存 Agent 注册表"""
-    path = Path(config.REGISTRY_FILE)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        json.dumps(data, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
+async def _save_registry(data: dict[str, dict], message: str = "") -> None:
+    """保存 Agent 注册表到 GitHub"""
+    from .github_store import write_registry
+    success = await write_registry(data, message)
+    if not success:
+        logger.error("Agent 注册表保存到 GitHub 失败")
 
 
-def forge_new_agent(
+async def forge_new_agent(
     name: str,
     description: str,
     creator: str,
@@ -74,7 +66,7 @@ def forge_new_agent(
     """
     ⚒️ 开炉炼器 — 创建新 Agent。
 
-    生成唯一 ID，注册到本地仓库，创建 Agent 目录结构。
+    生成唯一 ID，注册到 GitHub 全局仓库。
     """
     agent_id = f"tg-{uuid.uuid4().hex[:8]}"
     now = time.time()
@@ -93,29 +85,21 @@ def forge_new_agent(
         updated_at=now,
     )
 
-    # 注册到注册表
-    registry = _load_registry()
+    # 注册到 GitHub 注册表
+    registry = await _load_registry()
     registry[agent_id] = asdict(spec)
-    _save_registry(registry)
-
-    # 创建 Agent 目录
-    agent_dir = Path(config.DATA_DIR) / agent_id
-    agent_dir.mkdir(parents=True, exist_ok=True)
-
-    # 写入 Agent 元数据
-    meta_path = agent_dir / "agent.json"
-    meta_path.write_text(
-        json.dumps(asdict(spec), ensure_ascii=False, indent=2),
-        encoding="utf-8",
+    await _save_registry(
+        registry,
+        message=f"⚒️ forge: {name} by @{creator}",
     )
 
     logger.info(f"⚒️ 新法宝已锻造: {name} ({agent_id})")
     return spec
 
 
-def get_agent(agent_id: str) -> AgentSpec | None:
+async def get_agent(agent_id: str) -> AgentSpec | None:
     """获取 Agent 信息"""
-    registry = _load_registry()
+    registry = await _load_registry()
     d = registry.get(agent_id)
     if not d:
         return None
@@ -126,7 +110,7 @@ def get_agent(agent_id: str) -> AgentSpec | None:
     })
 
 
-def refine_agent(
+async def refine_agent(
     agent_id: str,
     changes: str,
     refiner: str = "",
@@ -136,7 +120,7 @@ def refine_agent(
 
     每次淬炼都是对法宝的千锤百炼。
     """
-    registry = _load_registry()
+    registry = await _load_registry()
     if agent_id not in registry:
         return False, f"⚠️ 未找到法宝 `{agent_id}`。请检查法宝 ID。"
 
@@ -154,7 +138,10 @@ def refine_agent(
     d["updated_at"] = now
 
     registry[agent_id] = d
-    _save_registry(registry)
+    await _save_registry(
+        registry,
+        message=f"🔥 refine: {d.get('name', agent_id)} by @{refiner}",
+    )
 
     count = len(refinement_log)
     return True, (
@@ -166,9 +153,9 @@ def refine_agent(
     )
 
 
-def list_agents(creator: str | None = None) -> list[AgentSpec]:
+async def list_agents(creator: str | None = None) -> list[AgentSpec]:
     """列出所有 Agent（可按创建者过滤）"""
-    registry = _load_registry()
+    registry = await _load_registry()
     agents = []
 
     for agent_id, d in registry.items():

@@ -1,6 +1,6 @@
 """
 ⚒️ 天工 TianGong — Agent 注册表管理
-全局 Agent 检索与排名
+全局 Agent 检索与排名（从 GitHub 读取数据）
 """
 
 from __future__ import annotations
@@ -13,7 +13,7 @@ from .artifact_system import calculate_grade
 logger = logging.getLogger("tiangong.registry")
 
 
-def search_agents(
+async def search_agents(
     query: str = "",
     agent_type: str | None = None,
     framework: str | None = None,
@@ -24,7 +24,7 @@ def search_agents(
 
     支持按名称/描述关键词、类型、框架、创建者过滤。
     """
-    agents = list_agents(creator=creator)
+    agents = await list_agents(creator=creator)
 
     results = []
     for agent in agents:
@@ -51,7 +51,7 @@ def search_agents(
     return results
 
 
-def format_agent_list(agents: list[AgentSpec], title: str = "仙器录") -> str:
+async def format_agent_list(agents: list[AgentSpec], title: str = "仙器录") -> str:
     """格式化 Agent 列表展示"""
     if not agents:
         return (
@@ -75,13 +75,13 @@ def format_agent_list(agents: list[AgentSpec], title: str = "仙器录") -> str:
     return "\n".join(lines)
 
 
-def get_leaderboard(top_n: int = 20) -> str:
+async def get_leaderboard(top_n: int = 20) -> str:
     """
     生成天榜排名。
 
     按 (品级, 星标数, 淬炼次数) 综合排名。
     """
-    agents = list_agents()
+    agents = await list_agents()
 
     if not agents:
         return (
