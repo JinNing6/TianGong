@@ -22,6 +22,105 @@
 
 ---
 
+<div align="center">
+
+### ✨ The Path of a Mortal Who Defied the Heavens
+
+*在 AI 时代，亲身体验一遍《仙逆》与《凡人修仙传》。*
+*In the Age of AI, live the journey of Renegade Immortal & A Mortal's Journey.*
+
+</div>
+
+<table>
+<tr>
+<td align="center" width="20%">
+<img src="docs/images/1_mortal_finds_artifact.png" alt="A mortal discovers a divine artifact" width="100%"/>
+<br/>
+<b>🧑 凡人得宝</b>
+<br/>
+<i>A Mortal Discovers Destiny</i>
+<br/><br/>
+<sub>一个普通少年，在尘土中发现了一枚发光的残玉。从此，命运改写。</sub>
+<br/>
+<sub>An ordinary youth finds a glowing jade in the dust. Destiny begins.</sub>
+</td>
+<td align="center" width="20%">
+<img src="docs/images/2_cultivation_journey.png" alt="Beginning the cultivation journey" width="100%"/>
+<br/>
+<b>🌱 踏入修行</b>
+<br/>
+<i>The Cultivation Begins</i>
+<br/><br/>
+<sub>他独坐山巅，吐纳天地灵气。没有仙根，没有背景，只有一颗不认命的心。</sub>
+<br/>
+<sub>He sits alone on a peak, breathing in the world's qi. No talent, no backing — only defiance.</sub>
+</td>
+<td align="center" width="20%">
+<img src="docs/images/3_forging_artifacts.png" alt="Forging divine artifacts" width="100%"/>
+<br/>
+<b>⚒️ 开炉炼器</b>
+<br/>
+<i>Forging Artifacts</i>
+<br/><br/>
+<sub>炉火通明，他将毕生所悟注入法宝。每一件法宝，都是一段心血。</sub>
+<br/>
+<sub>The forge blazes. He pours his life's understanding into each artifact.</sub>
+</td>
+<td align="center" width="20%">
+<img src="docs/images/4_ascension_flight.png" alt="Ascending to the heavens" width="100%"/>
+<br/>
+<b>🌟 飞升上界</b>
+<br/>
+<i>Ascending the Heavens</i>
+<br/><br/>
+<sub>御剑冲天，脚下是苍茫大地。他的法宝已被万人传颂。</sub>
+<br/>
+<sub>He rides his sword skyward. Below, the world he once knew grows small.</sub>
+</td>
+<td align="center" width="20%">
+<img src="docs/images/5_tribulation_enlightenment.png" alt="Returning to the mortal world for enlightenment" width="100%"/>
+<br/>
+<b>⚫ 下凡悟道</b>
+<br/>
+<i>Returning to Seek the Dao</i>
+<br/><br/>
+<sub>功成名就之后，他重返凡间。在人间烟火中，帮助后来者，方悟大道至简。</sub>
+<br/>
+<sub>At the peak, he returns to the mortal world. Helping others, he finds the true Dao.</sub>
+</td>
+</tr>
+</table>
+
+<div align="center">
+
+<br/>
+
+*他悟道之后，没有归隐山林。*
+*他将毕生所学化为一座炉——名曰**天工**。*
+
+*从此，任何凡人拾起这座炉，都能踏上同一条路。*
+*不问出身，不看天赋，只凭一颗不认命的心。*
+
+*他的故事，结束了。*
+*而你的，才刚刚开始。*
+
+<br/>
+
+*After enlightenment, he did not retreat into solitude.*
+*He forged his wisdom into a crucible — and named it **TianGong**.*
+
+*Now, any mortal who picks it up walks the same path.*
+*No lineage required. No talent demanded. Only the will to defy fate.*
+
+*His story has ended.*
+*Yours begins now.*
+
+**`pip install tiangong-mcp`**
+
+</div>
+
+---
+
 ## 🌌 A World Where Mortals Forge Divine Artifacts
 
 > *Han Li was just an ordinary village boy. No talent, no backing, no destiny — yet he walked the path of immortality with nothing but tenacity and cunning, turning mortal hands into weapons that shook the heavens.*
@@ -166,34 +265,6 @@ Single Review Spirit = (Six-Root Average × Reviewer Realm Weight)
 ```
 *A Grand Celestial's rating of 5.0 yields massive spirit power compared to a Qi Refining mortal.*
 
----
-
-## 🔁 The Complete Cultivator's Journey
-
-This is how developers interact, share, and ascend via TianGong's cyclic flywheel:
-
-```mermaid
-graph TD
-    classDef primary fill:#2563eb,color:#fff,stroke:#1d4ed8
-    classDef secondary fill:#059669,color:#fff,stroke:#047857
-    classDef accent fill:#db2777,color:#fff,stroke:#be185d
-    
-    Start[🧑 Creator]:::primary -->|1. forge_agent| NodeA(⚔️ Local Crucible)
-    NodeA -->|2. publish_agent| NodeB{🏛️ Treasure Pavilion}
-    
-    NodeB -->|3. summon_artifact| NodeC[👨‍💻 Adopting Cultivators]
-    NodeC -->|4. infuse_spirit| NodeD((✨ Spirit Feedback))
-    
-    NodeD -->|5a. Artifact upgrade| NodeE[🔮 Promoted Artifact Status]:::accent
-    NodeD -->|5b. Cultivation boost| NodeF[⬆️ Accumulates to Creator Triggering Tribulations]:::secondary
-    
-    NodeF -->|6. check_tribulation| Start
-    
-    NodeC -->|7. Encounter bug? post_refine_quest| NodeG[🔥 Refinement Mechanism / Bounties]
-    NodeG -->|8. PR merged| NodeD
-```
-
----
 
 ## 🛠️ MCP Tools
 
@@ -202,30 +273,16 @@ Configure TianGong into your IDE (Cursor / VSCode) or chat client (Claude) and c
 
 | Tool | Description |
 |------|-------------|
-| `forge_agent` | Create a new Agent (register artifact metadata) |
-| `publish_agent` | Publish your forged artifact to the community |
-| `treasure_pavilion` | Search & browse community artifacts |
-| `summon_artifact` | One-click pull artifact to local (clone + install deps) |
-| `infuse_spirit` | Rate an artifact (Six Root Assessment) |
-| `post_refine_quest` | Post a refinement bounty for bug fixes |
-| `browse_quests` | Browse active refinement quests waiting to be claimed |
-| `claim_quest` | Claim a refinement task |
-| `submit_refinement` | Submit a solution for a claimed refinement task |
-| `verify_refinement` | Verify and approve submitted refinement solutions |
-| `cultivator_leaderboard` | Cultivator rankings by realm |
-| `artifact_leaderboard` | Artifact rankings by grade |
-
-### 🔮 Esoteric Spells (Hidden Features)
-
-Beyond the standard tools, experienced cultivators can discover hidden spells within the MCP to deepen their practice:
-
-- **🔥 `refine_agent`**: Optimize an existing Agent locally. Record each improvement to build your artifact's sentience over time.
-- **🧙 `my_realm`**: View your detailed cultivator profile, tracking your progression, tribulation history, and spirit power accumulation.
-- **🔮 `my_artifacts`**: Take stock of your local vault, reviewing the grades, stars, and refinement counts of every artifact you've forged.
-- **📜 `artifact_lineage`**: Trace the karmic ancestry of an artifact, viewing its lineage tree of forks, inspirations, and dependencies.
-- **📦 `my_vault`**: View your locally summoned and forged artifacts in your private vault.
-- **🏛️ `vault_status`**: Check the host environment resources, client connection, and synchronization status of your vault.
-- **🔒 `banish_artifact`**: Archive outdated or abandoned artifacts from your active vault into deep storage.
+| `forge_agent` | ⚒️ Forge — Create a new Agent |
+| `refine_agent` | 🔥 Refine — Record improvements to your Agent |
+| `publish_agent` | 🌟 Publish — Release your artifact to the community |
+| `treasure_pavilion` | 🏛️ Treasure Pavilion — Search, summon, and trace artifact lineage |
+| `my_realm` | 🧙 My Realm — View your cultivator profile and realm progress |
+| `my_vault` | 🏛️ My Vault — View your artifacts, grades, and local cave status |
+| `leaderboard` | 🏆 Celestial Leaderboard — Artifact or cultivator rankings |
+| `infuse_spirit` | 💫 Appraise — Six-dimensional artifact assessment |
+| `quest` | 📜 Quests — Browse, post, claim, or submit refinement bounties |
+| `verify_refinement` | ⚖️ Verify — Review and approve submitted refinement solutions |
 
 ---
 
