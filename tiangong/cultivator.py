@@ -39,7 +39,12 @@ class CultivatorProfile:
     tribulation_progress: dict = field(default_factory=dict)    # 渡劫任务进度
     quests_completed: int = 0              # 完成的淬炼令次数
     is_anonymous: bool = False             # 是否匿名模式
-    last_active: float = 0.0              # 最后活跃时间
+    last_active: float = 0.0               # 最后活跃时间
+    
+    # 宗门相关
+    sect: str = ""                         # 当前所属宗门名，空串表示散修
+    sect_role: str = ""                    # 在宗门中的身份：master, elder, inner, outer
+    sect_cooldown: float = 0.0             # 退出宗门后的冷却期结束时间
 
     @property
     def realm(self) -> Realm:
@@ -95,6 +100,9 @@ def _dict_to_profile(username: str, d: dict) -> CultivatorProfile:
         quests_completed=d.get("quests_completed", 0),
         is_anonymous=d.get("is_anonymous", False),
         last_active=d.get("last_active", 0.0),
+        sect=d.get("sect", ""),
+        sect_role=d.get("sect_role", ""),
+        sect_cooldown=d.get("sect_cooldown", 0.0),
     )
 
 
@@ -253,6 +261,10 @@ def format_cultivator_profile(profile: CultivatorProfile) -> str:
         f"- 📅 入门时间: {joined}",
         f"- ⚖️ 评价权重: ×{profile.review_weight}",
     ]
+
+    from .sect import ROLE_DISPLAY
+    sect_display = f"「{profile.sect}」{ROLE_DISPLAY.get(profile.sect_role, '')}" if profile.sect else "散修"
+    lines.insert(6, f"- ⛰️ 宗门归属: {sect_display}")
 
     if profile.natal_artifacts:
         lines.extend([

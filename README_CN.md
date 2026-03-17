@@ -11,6 +11,7 @@
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://python.org)
 [![MCP](https://img.shields.io/badge/MCP-Model%20Context%20Protocol-green.svg)](https://modelcontextprotocol.io)
 [![PyPI](https://img.shields.io/pypi/v/tiangong-mcp.svg)](https://pypi.org/project/tiangong-mcp/)
+[![Discord](https://img.shields.io/badge/Discord-加入社区-5865F2?logo=discord&logoColor=white)](https://discord.gg/CqMWY9FF)
 
 [English](README.md) | 中文
 

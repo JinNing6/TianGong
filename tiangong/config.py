@@ -56,6 +56,11 @@ class TianGongConfig:
         self.REVIEW_MODIFY_WINDOW_DAYS: int = 7    # 评价后 7 天内可修改
         self.GRADE_PROTECTION_DAYS: int = 30       # 品阶晋升后 30 天保护期
 
+        # === 宗门限制 ===
+        self.SECT_CREATE_MIN_REALM: int = 3         # 创建宗门最低境界（3=结丹期）
+        self.SECT_LEAVE_COOLDOWN_DAYS: int = 7      # 退出宗门冷却天数
+        self.SECT_MAX_ELDERS: int = 5               # 每个宗门最多长老数
+
         # === 依赖安装配置 ===
         self.PYTHON_ENV: str = os.getenv("TIANGONG_PYTHON_ENV", "system")  # system / venv / 路径
         self.AUTO_INSTALL_DEPS: bool = os.getenv("TIANGONG_AUTO_INSTALL", "true").lower() == "true"

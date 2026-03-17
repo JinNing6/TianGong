@@ -15,6 +15,7 @@
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://python.org)
 [![MCP](https://img.shields.io/badge/MCP-Model%20Context%20Protocol-green.svg)](https://modelcontextprotocol.io)
 [![PyPI](https://img.shields.io/pypi/v/tiangong-mcp.svg)](https://pypi.org/project/tiangong-mcp/)
+[![Discord](https://img.shields.io/badge/Discord-Join%20Community-5865F2?logo=discord&logoColor=white)](https://discord.gg/CqMWY9FF)
 
 <br/>
 
@@ -180,6 +181,13 @@ Install via `pip`, configure your MCP client, and start forging. Pull any commun
 
 ---
 
+### ⛰️ The Path of the Sect (宗门)
+
+Cultivators who reach the **Core Formation (结丹期)** realm can create their own Sects via the `sect` tool.
+Your Sect's overall strength is determined by the combined Spirit Power of all its members, allowing you to compete on the global **Sect Leaderboard (宗门天榜)**.
+
+---
+
 ## 🚀 Quick Start
 
 ### Install from PyPI
@@ -283,6 +291,7 @@ Configure TianGong into your IDE (Cursor / VSCode) or chat client (Claude) and c
 | `infuse_spirit` | 💫 Appraise — Six-dimensional artifact assessment |
 | `quest` | 📜 Quests — Browse, post, claim, or submit refinement bounties |
 | `verify_refinement` | ⚖️ Verify — Review and approve submitted refinement solutions |
+| `sect` | ⛰️ Sect — Create, join, manage, and view cultivation sects |
 
 ---
 

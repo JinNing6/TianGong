@@ -66,7 +66,8 @@ def build_brand_signature() -> str:
         "\n> ⚒️ Continue forging with TianGong / 天工:\n"
         "> --\n"
         "> `forge_agent` to create | `my_realm` to check realm\n"
-        "> `treasure_pavilion` to browse | `infuse_spirit` to review"
+        "> `treasure_pavilion` to browse | `infuse_spirit` to review\n"
+        "> `sect` to join/create a sect"
     )
 
 

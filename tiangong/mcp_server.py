@@ -285,6 +285,16 @@ async def leaderboard(
 # ============================================================
 
 # ---- 导入 Phase 2 模块 ----
+from .sect import (
+    create_sect as _create_sect,
+    join_sect as _join_sect,
+    leave_sect as _leave_sect,
+    manage_sect as _manage_sect,
+    get_sect as _get_sect,
+    get_all_sects,
+    format_sect_card,
+    format_sect_leaderboard,
+)
 from .vault import init_cave, format_my_vault
 from .marketplace import publish_agent as _publish_agent, summon_artifact as _summon
 from .search import search_marketplace, format_search_results
@@ -534,7 +544,109 @@ async def verify_refinement(
     return append_brand_footer(result)
 
 
+# ============================================================
+# Phase 2.5: 宗门系统
+# ============================================================
 
+@mcp.tool()
+async def sect(
+    action: str = "info",
+    sect_name: str = "",
+    motto: str = "",
+    target_user: str = "",
+    manage_action: str = "",
+    username: str = "",
+    top_n: int = 10,
+) -> str:
+    """
+    ⛰️ 宗门系统 — 开宗立派、拜入宗门、宗门管理
+    Sect System — Create, join, manage, and view cultivation sects.
+
+    通过 action 参数指定操作：
+    - info: 查看宗门信息（需 sect_name），如属于某宗门则传自己的 sect_name
+    - leaderboard: 宗门天榜 — 按宗门总灵力排行
+    - create: 开宗立派（需 sect_name, 可选 motto），要求境界 ≥ 结丹期
+    - join: 拜入宗门（需 sect_name）
+    - leave: 退出当前宗门（有 7 天冷却期）
+    - manage: 宗门管理（需 target_user 和 manage_action）
+
+    管理操作 (manage_action) 支持：
+    - promote_elder: 任命长老 (仅宗主)
+    - promote_inner: 升为内门弟子 (宗主/长老)
+    - demote: 降为外门弟子 (宗主/长老)
+    - kick: 踢出宗门 (宗主/长老)
+    - transfer: 传位 (仅宗主)
+    - disband: 解散宗门 (仅宗主)
+
+    Args:
+        action: 操作类型 (info/leaderboard/create/join/leave/manage)
+        sect_name: 宗门名称 (create/join/info 必填)
+        motto: 宗门宣言 (create 可填)
+        target_user: 目标成员用户名 (manage 必填)
+        manage_action: 管理操作 (manage 必填)
+        username: 当前操作者 GitHub 用户名
+        top_n: 排行榜显示数量 (leaderboard 默认 10)
+    """
+    if not username:
+        username = config.GITHUB_USERNAME
+
+    # 1. 宗门天榜
+    if action == "leaderboard":
+        all_sects = await get_all_sects()
+        return append_brand_footer(format_sect_leaderboard(all_sects, top_n))
+
+    # 2. 从当前修仙者获取宗门
+    from .cultivator import get_cultivator
+    profile = await get_cultivator(username)
+    
+    # 如果没传 sect_name，默认用自己当前的宗门
+    target_sect = sect_name if sect_name else profile.sect
+
+    # 3. 创建宗门
+    if action == "create":
+        if not sect_name:
+            return append_brand_footer("⚠️ 开宗立派需要指定宗门名称 `sect_name`。")
+        success, msg = await _create_sect(sect_name, username, motto)
+        return append_brand_footer(msg)
+
+    # 4. 拜入宗门
+    elif action == "join":
+        if not sect_name:
+            return append_brand_footer("⚠️ 拜入宗门需要指定目标宗门名称 `sect_name`。")
+        success, msg = await _join_sect(sect_name, username)
+        return append_brand_footer(msg)
+
+    # 5. 退出宗门
+    elif action == "leave":
+        success, msg = await _leave_sect(username)
+        return append_brand_footer(msg)
+
+    # 6. 管理宗门
+    elif action == "manage":
+        if not target_sect:
+            return append_brand_footer("⚠️ 你当前不属于任何宗门。")
+        if not target_user:
+            return append_brand_footer("⚠️ 请指定要管理的目标用户 `target_user`。")
+        if not manage_action:
+            return append_brand_footer("⚠️ 请指定具体的管理操作 `manage_action`。")
+            
+        success, msg = await _manage_sect(target_sect, manage_action, target_user, username)
+        return append_brand_footer(msg)
+
+    # 7. 查看宗门信息
+    else:  # info
+        if not target_sect:
+            return append_brand_footer("⚠️ 请指定要查看的宗门名称 `sect_name`，或你是某宗门成员。")
+            
+        # 顺便刷新一下灵力
+        from .sect import refresh_sect_spirit
+        await refresh_sect_spirit(target_sect)
+        
+        sect_profile = await _get_sect(target_sect)
+        if not sect_profile:
+            return append_brand_footer(f"⚠️ 宗门「{target_sect}」不存在。")
+            
+        return append_brand_footer(format_sect_card(sect_profile))
 
 
 

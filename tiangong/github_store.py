@@ -33,6 +33,7 @@ MAX_RETRIES = 3
 # 数据文件路径
 REGISTRY_PATH = "data/registry.json"
 CULTIVATORS_PATH = "data/cultivators.json"
+SECTS_PATH = "data/sects.json"
 
 
 class _Cache:
@@ -246,4 +247,18 @@ async def write_cultivators(data: dict, message: str = "") -> bool:
     """写入全局修仙者档案"""
     if not message:
         message = "⚒️ TianGong: update cultivator profiles"
-    return await write_json(CULTIVATORS_PATH, data, message)
+# ============================================================
+# 便捷接口：宗门档案
+# ============================================================
+
+async def read_sects() -> dict:
+    """读取全局宗门档案"""
+    data, _ = await read_json(SECTS_PATH)
+    return data
+
+
+async def write_sects(data: dict, message: str = "") -> bool:
+    """写入全局宗门档案"""
+    if not message:
+        message = "⛰️ TianGong: update sects"
+    return await write_json(SECTS_PATH, data, message)
