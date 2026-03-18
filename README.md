@@ -1,6 +1,6 @@
 <div align="center">
 
-[English](README.md) | [简体中文](README_zh.md)
+[🇨🇳 中文文档](./README.zh-CN.md) | [🇺🇸 English](./README.md)
 
 <br/>
 
@@ -8,8 +8,7 @@
 
 ### AI Agent Distribution & Creation Platform
 
-**我命由我不由天。**
-*My fate is mine, not heaven's.*
+**My fate is mine, not heaven's.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://python.org)
@@ -27,7 +26,6 @@
 
 ### ✨ The Path of a Mortal Who Defied the Heavens
 
-*在 AI 时代，亲身体验一遍《仙逆》与《凡人修仙传》。*
 *In the Age of AI, live the journey of Renegade Immortal & A Mortal's Journey.*
 
 </div>
@@ -37,84 +35,49 @@
 <td align="center" width="16%">
 <img src="docs/images/1_mortal_finds_artifact.png" alt="A mortal discovers a divine artifact" width="100%"/>
 <br/>
-<b>🧑 凡人得宝</b>
-<br/>
-<i>A Mortal Discovers Destiny</i>
+<b>🧑 A Mortal Discovers Destiny</b>
 <br/><br/>
-<sub>一个普通少年，在尘土中发现了一枚发光的残玉。从此，命运改写。</sub>
-<br/>
 <sub>An ordinary youth finds a glowing jade in the dust. Destiny begins.</sub>
 </td>
 <td align="center" width="16%">
 <img src="docs/images/1b_sect_apprenticeship.png" alt="Joining a sect to learn the Dao" width="100%"/>
 <br/>
-<b>⛰️ 拜入宗门</b>
-<br/>
-<i>Joining a Sect</i>
+<b>⛰️ Joining a Sect</b>
 <br/><br/>
-<sub>他跪在仙门之前，拜入宗门，从此有了师父、同门与归属。</sub>
-<br/>
 <sub>He kneels before the sect gates. Now he has a master, brethren, and belonging.</sub>
 </td>
 <td align="center" width="16%">
 <img src="docs/images/2_cultivation_journey.png" alt="Beginning the cultivation journey" width="100%"/>
 <br/>
-<b>🌱 踏入修行</b>
-<br/>
-<i>The Cultivation Begins</i>
+<b>🌱 The Cultivation Begins</b>
 <br/><br/>
-<sub>他独坐山巅，吐纳天地灵气。没有仙根，没有背景，只有一颗不认命的心。</sub>
-<br/>
 <sub>He sits alone on a peak, breathing in the world's qi. No talent, no backing — only defiance.</sub>
 </td>
 <td align="center" width="16%">
 <img src="docs/images/3_forging_artifacts.png" alt="Forging divine artifacts" width="100%"/>
 <br/>
-<b>⚒️ 开炉炼器</b>
-<br/>
-<i>Forging Artifacts</i>
+<b>⚒️ Forging Artifacts</b>
 <br/><br/>
-<sub>炉火通明，他将毕生所悟注入法宝。每一件法宝，都是一段心血。</sub>
-<br/>
 <sub>The forge blazes. He pours his life's understanding into each artifact.</sub>
 </td>
 <td align="center" width="16%">
 <img src="docs/images/4_ascension_flight.png" alt="Ascending to the heavens" width="100%"/>
 <br/>
-<b>🌟 飞升上界</b>
-<br/>
-<i>Ascending the Heavens</i>
+<b>🌟 Ascending the Heavens</b>
 <br/><br/>
-<sub>御剑冲天，脚下是苍茫大地。他的法宝已被万人传颂。</sub>
-<br/>
 <sub>He rides his sword skyward. Below, the world he once knew grows small.</sub>
 </td>
 <td align="center" width="16%">
 <img src="docs/images/5_tribulation_enlightenment.png" alt="Returning to the mortal world for enlightenment" width="100%"/>
 <br/>
-<b>⚫ 下凡悟道</b>
-<br/>
-<i>Returning to Seek the Dao</i>
+<b>⚫ Returning to Seek the Dao</b>
 <br/><br/>
-<sub>功成名就之后，他重返凡间。在人间烟火中，帮助后来者，方悟大道至简。</sub>
-<br/>
 <sub>At the peak, he returns to the mortal world. Helping others, he finds the true Dao.</sub>
 </td>
 </tr>
 </table>
 
 <div align="center">
-
-<br/>
-
-*他悟道之后，没有归隐山林。*
-*他将毕生所学化为一座炉——名曰**天工**。*
-
-*从此，任何凡人拾起这座炉，都能踏上同一条路。*
-*不问出身，不看天赋，只凭一颗不认命的心。*
-
-*他的故事，结束了。*
-*而你的，才刚刚开始。*
 
 <br/>
 
@@ -137,26 +100,25 @@
 
 > *Han Li was just an ordinary village boy. No talent, no backing, no destiny — yet he walked the path of immortality with nothing but tenacity and cunning, turning mortal hands into weapons that shook the heavens.*
 >
-> — Spiritual Tribute: Wang Yu《凡人修仙传 · A Record of a Mortal's Journey to Immortality》
+> — Spiritual Tribute: Wang Yu "A Record of a Mortal's Journey to Immortality"
 
 > *"My fate is mine, not heaven's." Wang Lin, an ordinary youth, seized his destiny against a cruel cultivation world — proving that willpower alone can shatter the laws of heaven.*
 >
-> — Spiritual Tribute: Er Gen《仙逆 · Renegade Immortal》
+> — Spiritual Tribute: Er Gen "Renegade Immortal"
 
 > *In the neon-lit workshops of the future, every line of code is a spell, every Agent a living artifact. The cyberpunk artisans don't pray to the gods — they build them.*
 >
-> — Spiritual Tribute:《赛博朋克机器人改造工 · Cyberpunk Mech-Smith》
+> — Spiritual Tribute: "Cyberpunk Mech-Smith"
 
-**TianGong** (天工) is an **open-source AI Agent distribution and creation platform** — a world where developers forge, refine, share, and inherit AI Agents as cultivation artifacts.
+**TianGong** is an **open-source AI Agent distribution and creation platform** — a world where developers forge, refine, share, and inherit AI Agents as cultivation artifacts.
 
-Here, **Agents are Artifacts** (法宝), rated by the community. **Users are Cultivators** (修仙者), ascending from mortal to legend. Your code isn't just code — it's your **soul-bound natal weapon** (本命法宝).
+Here, **Agents are Artifacts**, rated by the community. **Users are Cultivators**, ascending from mortal to legend. Your code isn't just code — it's your **soul-bound natal weapon**.
 
 <div align="center">
 
 <br/>
 
 *With a mortal body, forge artifacts that defy the heavens.*
-**以凡人之躯，铸逆天之器。**
 
 </div>
 
@@ -192,13 +154,6 @@ Install via `pip`, configure your MCP client, and start forging. Pull any commun
 
 ---
 
-### ⛰️ The Path of the Sect (宗门)
-
-Cultivators who reach the **Core Formation (结丹期)** realm can create their own Sects via the `sect` tool.
-Your Sect's overall strength is determined by the combined Spirit Power of all its members, allowing you to compete on the global **Sect Leaderboard (宗门天榜)**.
-
----
-
 ## 🚀 Quick Start
 
 ### Install from PyPI
@@ -228,166 +183,166 @@ That's it. You are now a cultivator.
 
 ---
 
-## 🎮 How to Play — 修炼指南
+## 🎮 How to Play — Cultivation Guide
 
-> *安装完成，你已踏入修行之路。以下是完整的修炼指南。*
+> *Installation complete. You have stepped onto the path of cultivation. Here is your full guide.*
 
 <br/>
 
-### 🧑 第一步：凡人入门 — 开炉炼器
+### 🧑 Step 1: Mortal Initiation — Forge Your First Artifact
 
-你的第一件法宝（Agent）就是你的入门仪式。
+Your first Agent is your rite of passage.
 
 ```
 forge_agent(name="my-first-agent", description="A helpful coding assistant", creator="your_github_username")
 ```
 
-- ✅ 创建成功后，你就从**凡人**晋升为**炼气期**修仙者
-- ✅ 你的 Agent 会被注册到全平台 registry，所有人都能搜到它
-- ✅ 你获得 +100 灵力值（Spirit Power）
+- ✅ Upon success, you ascend from **Mortal** to **Qi Refining** cultivator
+- ✅ Your Agent is registered in the global registry — discoverable by everyone
+- ✅ You gain +100 Spirit Power
 
 <br/>
 
-### 🔥 第二步：千锤百炼 — 淬炼法宝
+### 🔥 Step 2: Temper and Refine — Improve Your Artifact
 
-法宝不是一蹴而就的。每次改进你的 Agent，都要记录淬炼：
+Artifacts aren't forged in a single stroke. Record each improvement:
 
 ```
 refine_agent(agent_id="your-agent-id", changes="Added error handling and retry logic")
 ```
 
-- ✅ 每次淬炼 +30 灵力值
-- ✅ 淬炼次数越多，法宝在天榜的排名越高
+- ✅ Each refinement grants +30 Spirit Power
+- ✅ More refinements → higher ranking on the Celestial Leaderboard
 
 <br/>
 
-### ✨ 第三步：发布出世 — 法宝入阁
+### ✨ Step 3: Publish — Release Your Artifact to the World
 
-当你的法宝准备好了，将它发布到寻宝阁供天下修仙者使用：
+When your artifact is ready, publish it to the Treasure Pavilion for all cultivators:
 
 ```
 publish_agent(artifact_name="my-first-agent")
 ```
 
-- ✅ 法宝进入社区寻宝阁，所有人都能搜索和拉取
-- ✅ 其他修仙者可以对你的法宝进行六维鉴定（评价）
+- ✅ Your artifact enters the community Treasure Pavilion, searchable by everyone
+- ✅ Other cultivators can perform six-dimensional appraisals on your work
 
 <br/>
 
-### 🔮 第四步：以评证道 — 鉴定他人法宝
+### 🔮 Step 4: Appraise Others — Review Fellow Cultivators' Artifacts
 
-修仙不是闭门造车。评价他人的法宝，既能积累灵力，又能提升自身境界：
+Cultivation is not a solitary pursuit. Reviewing others' work earns Spirit Power and advances your realm:
 
 ```
 infuse_spirit(artifact_name="some-agent", inscription=8, formation=7, technique=9, lineage_score=6, resilience=8, enlightenment=7, comment="Great design!")
 ```
 
-六维评价体系：
-| 维度 | 含义 | 对标 |
-|------|------|------|
-| 📝 铭文 | 描述是否清晰 | README 质量 |
-| 🏗️ 阵法 | 架构是否优雅 | 代码架构 |
-| ⚙️ 法诀 | 工程是否扎实 | 代码质量 |
-| 📖 道统 | 文档是否传承 | 文档完整度 |
-| 🛡️ 护体 | 是否稳定可靠 | 鲁棒性 |
-| ✨ 悟道 | 是否有创新 | 创新性 |
+Six-Dimensional Assessment System:
+| Dimension | Meaning | Equivalent |
+|-----------|---------|------------|
+| 📝 Inscription | How clear is the description? | README quality |
+| 🏗️ Formation | How elegant is the architecture? | Code architecture |
+| ⚙️ Technique | How solid is the engineering? | Code quality |
+| 📖 Lineage | How well documented? | Documentation completeness |
+| 🛡️ Resilience | How stable and reliable? | Robustness |
+| ✨ Enlightenment | How innovative? | Innovation |
 
-> 💡 你的境界越高，评价权重越大 — **一位大天尊的 5 分评价，灵力价值远超炼气期修仙者的满分。**
-
-<br/>
-
-### ⛰️ 第五步：拜入宗门 — 群体修炼
-
-当你的境界达到**结丹期**（level 3）时，你可以创建自己的宗门；也可以随时加入已有的宗门：
-
-```
-sect(action="create", sect_name="天剑宗", motto="以剑入道，万法归一")     # 开宗立派
-sect(action="join", sect_name="天剑宗")                                  # 拜入宗门
-sect(action="info", sect_name="天剑宗")                                  # 查看宗门
-sect(action="leaderboard")                                               # 宗门天榜
-```
-
-宗门规则：
-- 👤 一人只能属于一个宗门
-- ⏳ 退出后 7 天冷却期
-- 👑 宗主可任命长老、管理成员
-- 🏆 宗门排名 = 全体成员灵力总和
-
-宗门等阶：🏕️ 小门派 → 🏯 中等宗门 → 🏔️ 大宗门 → ⛰️ 圣地 → 🌋 超级势力
+> 💡 The higher your realm, the more weight your review carries — **A Grand Celestial's 5-point rating yields far more Spirit Power than a perfect score from a Qi Refining newcomer.**
 
 <br/>
 
-### 📜 第六步：悬赏历练 — 淬炼令
+### ⛰️ Step 5: Join a Sect — Cultivate Together
 
-修仙者可以发布悬赏令，请求他人帮忙优化自己的法宝：
+When your realm reaches **Core Formation** (level 3), you can create your own Sect; or join an existing one anytime:
 
 ```
-quest(action="browse")                                                     # 浏览悬赏令
-quest(action="post", artifact_name="my-agent", description="Need better error handling")  # 发布悬赏
-quest(action="claim", quest_issue_number=42)                               # 认领任务
-quest(action="submit", quest_issue_number=42, solution="Added retry with exponential backoff")  # 提交成果
+sect(action="create", sect_name="Heavenly Sword Sect", motto="Through the sword, find the Dao")
+sect(action="join", sect_name="Heavenly Sword Sect")
+sect(action="info", sect_name="Heavenly Sword Sect")
+sect(action="leaderboard")
 ```
 
-- ✅ 完成悬赏令 +50 灵力值
-- ✅ 悬赏令是突破高阶境界的必经之路
+Sect Rules:
+- 👤 One cultivator, one sect
+- ⏳ 7-day cooldown after leaving
+- 👑 Sect Master can appoint Elders and manage members
+- 🏆 Sect ranking = total Spirit Power of all members
+
+Sect Tiers: 🏕️ Minor Sect → 🏯 Medium Sect → 🏔️ Major Sect → ⛰️ Holy Ground → 🌋 Supreme Power
 
 <br/>
 
-### 🏆 第七步：天榜争锋 — 万仙来朝
+### 📜 Step 6: Bounty Quests — Take on Refinement Challenges
 
-查看全平台排名，看看谁才是最强的修仙者和最强的法宝：
+Cultivators can post bounty quests, requesting help to improve their artifacts:
 
 ```
-leaderboard(type="cultivator")     # 修仙天榜 — 按境界和灵力排名
-leaderboard(type="artifact")       # 法宝天榜 — 按品级和星标排名
-sect(action="leaderboard")         # 宗门天榜 — 按宗门总灵力排名
+quest(action="browse")
+quest(action="post", artifact_name="my-agent", description="Need better error handling")
+quest(action="claim", quest_issue_number=42)
+quest(action="submit", quest_issue_number=42, solution="Added retry with exponential backoff")
+```
+
+- ✅ Completing a quest grants +50 Spirit Power
+- ✅ Quests are essential for breaking through to higher realms
+
+<br/>
+
+### 🏆 Step 7: The Celestial Leaderboard — All Immortals Convene
+
+Check the global rankings to see who dominates the cultivation world:
+
+```
+leaderboard(type="cultivator")     # Cultivator Rankings — by realm and Spirit Power
+leaderboard(type="artifact")       # Artifact Rankings — by grade and stars
+sect(action="leaderboard")         # Sect Rankings — by total sect Spirit Power
 ```
 
 <br/>
 
-### 🔄 完整修炼循环
+### 🔄 The Complete Cultivation Cycle
 
 ```
-凡人 → 锻造法宝(+100灵力) → 淬炼优化(+30) → 发布出世 → 评价他人法宝
-  ↓                                                            ↑
-拜入宗门 → 完成悬赏令(+50) → 境界突破 → 渡劫 → 继续修行 ←──────┘
+Mortal → Forge Artifact (+100 SP) → Refine (+30) → Publish → Appraise Others
+  ↓                                                              ↑
+Join Sect → Complete Quests (+50) → Realm Breakthrough → Tribulation → Continue ←─┘
 ```
 
-> 🌟 **核心理念**：你的灵力来自**社区贡献**，而非个人产出。帮助他人，就是帮助自己修行。
+> 🌟 **Core Philosophy**: Your Spirit Power comes from **community contribution**, not personal output alone. Helping others is helping yourself.
 
 ---
 
 ## 🧬 The Path of Cultivation — 22 Realms
 
-Every cultivator begins as a **mortal** and walks the path toward the ultimate title: **TianGong** (天工).
+Every cultivator begins as a **mortal** and walks the path toward the ultimate title: **TianGong**.
 
-The realm system is faithfully inspired by Er Gen's *Renegade Immortal* (仙逆):
-
-<br/>
-
-### Step One: Foundation Cultivation
-
-| # | Realm | Symbol | Platform Meaning |
-|---|-------|--------|-----------------|
-| 0 | **Mortal** (凡人) | 🔨 | Unregistered |
-| 1 | **Qi Refining** (炼气期) | 🌱 | Registered, created first Agent |
-| 2 | **Foundation Building** (筑基期) | 💧 | Agent received first review |
-| 3 | **Core Formation** (结丹期) | 💛 | 50 Spirit Power + reviewed 5 artifacts |
-| 4 | **Nascent Soul** (元婴期) | 💜 | 3+ Agents, 1 at Spirit Tool grade |
-| 5 | **Spirit Severing** (化神期) | ⚫ | Helped refine 30 mortal artifacts |
-| 6 | **Transformation** (婴变期) | 🔴 | Reviewed 50 low-grade artifacts |
-| 7 | **Seeking the Dao** (问鼎期) | 🌟 | 10+ Agents, 3 at Treasure grade |
+The realm system is faithfully inspired by Er Gen's *Renegade Immortal*:
 
 <br/>
 
-### Step Two, Three & Four: Grand Celestials
+### Phase One: Foundation Cultivation
 
 | # | Realm | Symbol | Platform Meaning |
 |---|-------|--------|-----------------|
-| 13 | **Celestial Decay** (天人五衰) | ⚡ | 10000 Spirit Power + refined 100 artifacts |
-| 18 | **Grand Celestial** (大天尊) | 👑 | 1 Primordial Artifact + led community standards |
-| 21 | **Lu Ban** (鲁班) | 🏛️ | Global Top 10 — Ancestor of all craftsmen |
-| 22 | **TianGong** (天工) | ⚒️ | **Global #1 — "With a mortal body... defy the heavens"** |
+| 0 | **Mortal** | 🔨 | Unregistered |
+| 1 | **Qi Refining** | 🌱 | Registered, created first Agent |
+| 2 | **Foundation Building** | 💧 | Agent received first review |
+| 3 | **Core Formation** | 💛 | 50 Spirit Power + reviewed 5 artifacts |
+| 4 | **Nascent Soul** | 💜 | 3+ Agents, 1 at Spirit Tool grade |
+| 5 | **Spirit Severing** | ⚫ | Helped refine 30 mortal artifacts |
+| 6 | **Transformation** | 🔴 | Reviewed 50 low-grade artifacts |
+| 7 | **Seeking the Dao** | 🌟 | 10+ Agents, 3 at Treasure grade |
+
+<br/>
+
+### Phase Two, Three & Four: Grand Celestials
+
+| # | Realm | Symbol | Platform Meaning |
+|---|-------|--------|-----------------|
+| 13 | **Celestial Decay** | ⚡ | 10000 Spirit Power + refined 100 artifacts |
+| 18 | **Grand Celestial** | 👑 | 1 Primordial Artifact + led community standards |
+| 21 | **Lu Ban** | 🏛️ | Global Top 10 — Ancestor of all craftsmen |
+| 22 | **TianGong** | ⚒️ | **Global #1 — "With a mortal body... defy the heavens"** |
 
 > **Core Design Principles:**
 > - 💡 Higher realms depend on **community contribution**, not personal output alone.
@@ -449,7 +404,7 @@ Configure TianGong into your IDE (Cursor / VSCode) or chat client (Claude) and c
 <td align="center" width="33%">
 <img src="docs/images/fanren_poster.jpg" alt="A Record of a Mortal's Journey to Immortality" width="220"/>
 <br/>
-<b>Wang Yu《凡人修仙传》</b>
+<b>Wang Yu "A Record of a Mortal's Journey to Immortality"</b>
 <br/>
 <br/>
 The tenacity of Han Li
@@ -457,7 +412,7 @@ The tenacity of Han Li
 <td align="center" width="33%">
 <img src="docs/images/xianNi_poster.jpg" alt="Renegade Immortal" width="220"/>
 <br/>
-<b>Er Gen《仙逆》</b>
+<b>Er Gen "Renegade Immortal"</b>
 <br/>
 <br/>
 The defiance of Wang Lin
@@ -465,7 +420,7 @@ The defiance of Wang Lin
 <td align="center" width="33%">
 <img src="docs/images/cyberpunk_poster.jpg" alt="Cyberpunk" width="220"/>
 <br/>
-<b>《赛博朋克机器人改造工》</b>
+<b>"Cyberpunk Mech-Smith"</b>
 <br/>
 <br/>
 The cyberpunk artisan's creed
@@ -475,7 +430,7 @@ The cyberpunk artisan's creed
 
 <br/>
 
-**Song Yingxing《天工开物》**
+**Song Yingxing "The Exploitation of the Works of Nature"**
 The original spirit of TianGong — harnessing nature's tools to unlock the essence of all things.
 
 ---
@@ -484,7 +439,6 @@ The original spirit of TianGong — harnessing nature's tools to unlock the esse
 
 <div align="center">
 
-**以凡人之躯，铸逆天之器。**
 *With a mortal body, forge artifacts that defy the heavens.*
 
 ⚒️
