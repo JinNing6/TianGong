@@ -228,6 +228,135 @@ That's it. You are now a cultivator.
 
 ---
 
+## 🎮 How to Play — 修炼指南
+
+> *安装完成，你已踏入修行之路。以下是完整的修炼指南。*
+
+<br/>
+
+### 🧑 第一步：凡人入门 — 开炉炼器
+
+你的第一件法宝（Agent）就是你的入门仪式。
+
+```
+forge_agent(name="my-first-agent", description="A helpful coding assistant", creator="your_github_username")
+```
+
+- ✅ 创建成功后，你就从**凡人**晋升为**炼气期**修仙者
+- ✅ 你的 Agent 会被注册到全平台 registry，所有人都能搜到它
+- ✅ 你获得 +100 灵力值（Spirit Power）
+
+<br/>
+
+### 🔥 第二步：千锤百炼 — 淬炼法宝
+
+法宝不是一蹴而就的。每次改进你的 Agent，都要记录淬炼：
+
+```
+refine_agent(agent_id="your-agent-id", changes="Added error handling and retry logic")
+```
+
+- ✅ 每次淬炼 +30 灵力值
+- ✅ 淬炼次数越多，法宝在天榜的排名越高
+
+<br/>
+
+### ✨ 第三步：发布出世 — 法宝入阁
+
+当你的法宝准备好了，将它发布到寻宝阁供天下修仙者使用：
+
+```
+publish_agent(artifact_name="my-first-agent")
+```
+
+- ✅ 法宝进入社区寻宝阁，所有人都能搜索和拉取
+- ✅ 其他修仙者可以对你的法宝进行六维鉴定（评价）
+
+<br/>
+
+### 🔮 第四步：以评证道 — 鉴定他人法宝
+
+修仙不是闭门造车。评价他人的法宝，既能积累灵力，又能提升自身境界：
+
+```
+infuse_spirit(artifact_name="some-agent", inscription=8, formation=7, technique=9, lineage_score=6, resilience=8, enlightenment=7, comment="Great design!")
+```
+
+六维评价体系：
+| 维度 | 含义 | 对标 |
+|------|------|------|
+| 📝 铭文 | 描述是否清晰 | README 质量 |
+| 🏗️ 阵法 | 架构是否优雅 | 代码架构 |
+| ⚙️ 法诀 | 工程是否扎实 | 代码质量 |
+| 📖 道统 | 文档是否传承 | 文档完整度 |
+| 🛡️ 护体 | 是否稳定可靠 | 鲁棒性 |
+| ✨ 悟道 | 是否有创新 | 创新性 |
+
+> 💡 你的境界越高，评价权重越大 — **一位大天尊的 5 分评价，灵力价值远超炼气期修仙者的满分。**
+
+<br/>
+
+### ⛰️ 第五步：拜入宗门 — 群体修炼
+
+当你的境界达到**结丹期**（level 3）时，你可以创建自己的宗门；也可以随时加入已有的宗门：
+
+```
+sect(action="create", sect_name="天剑宗", motto="以剑入道，万法归一")     # 开宗立派
+sect(action="join", sect_name="天剑宗")                                  # 拜入宗门
+sect(action="info", sect_name="天剑宗")                                  # 查看宗门
+sect(action="leaderboard")                                               # 宗门天榜
+```
+
+宗门规则：
+- 👤 一人只能属于一个宗门
+- ⏳ 退出后 7 天冷却期
+- 👑 宗主可任命长老、管理成员
+- 🏆 宗门排名 = 全体成员灵力总和
+
+宗门等阶：🏕️ 小门派 → 🏯 中等宗门 → 🏔️ 大宗门 → ⛰️ 圣地 → 🌋 超级势力
+
+<br/>
+
+### 📜 第六步：悬赏历练 — 淬炼令
+
+修仙者可以发布悬赏令，请求他人帮忙优化自己的法宝：
+
+```
+quest(action="browse")                                                     # 浏览悬赏令
+quest(action="post", artifact_name="my-agent", description="Need better error handling")  # 发布悬赏
+quest(action="claim", quest_issue_number=42)                               # 认领任务
+quest(action="submit", quest_issue_number=42, solution="Added retry with exponential backoff")  # 提交成果
+```
+
+- ✅ 完成悬赏令 +50 灵力值
+- ✅ 悬赏令是突破高阶境界的必经之路
+
+<br/>
+
+### 🏆 第七步：天榜争锋 — 万仙来朝
+
+查看全平台排名，看看谁才是最强的修仙者和最强的法宝：
+
+```
+leaderboard(type="cultivator")     # 修仙天榜 — 按境界和灵力排名
+leaderboard(type="artifact")       # 法宝天榜 — 按品级和星标排名
+sect(action="leaderboard")         # 宗门天榜 — 按宗门总灵力排名
+```
+
+<br/>
+
+### 🔄 完整修炼循环
+
+```
+凡人 → 锻造法宝(+100灵力) → 淬炼优化(+30) → 发布出世 → 评价他人法宝
+  ↓                                                            ↑
+拜入宗门 → 完成悬赏令(+50) → 境界突破 → 渡劫 → 继续修行 ←──────┘
+```
+
+> 🌟 **核心理念**：你的灵力来自**社区贡献**，而非个人产出。帮助他人，就是帮助自己修行。
+
+---
+
 ## 🧬 The Path of Cultivation — 22 Realms
 
 Every cultivator begins as a **mortal** and walks the path toward the ultimate title: **TianGong** (天工).
