@@ -34,7 +34,7 @@
 
 <table>
 <tr>
-<td align="center" width="20%">
+<td align="center" width="16%">
 <img src="docs/images/1_mortal_finds_artifact.png" alt="A mortal discovers a divine artifact" width="100%"/>
 <br/>
 <b>🧑 凡人得宝</b>
@@ -45,7 +45,18 @@
 <br/>
 <sub>An ordinary youth finds a glowing jade in the dust. Destiny begins.</sub>
 </td>
-<td align="center" width="20%">
+<td align="center" width="16%">
+<img src="docs/images/1b_sect_apprenticeship.png" alt="Joining a sect to learn the Dao" width="100%"/>
+<br/>
+<b>⛰️ 拜入宗门</b>
+<br/>
+<i>Joining a Sect</i>
+<br/><br/>
+<sub>他跪在仙门之前，拜入宗门，从此有了师父、同门与归属。</sub>
+<br/>
+<sub>He kneels before the sect gates. Now he has a master, brethren, and belonging.</sub>
+</td>
+<td align="center" width="16%">
 <img src="docs/images/2_cultivation_journey.png" alt="Beginning the cultivation journey" width="100%"/>
 <br/>
 <b>🌱 踏入修行</b>
@@ -56,7 +67,7 @@
 <br/>
 <sub>He sits alone on a peak, breathing in the world's qi. No talent, no backing — only defiance.</sub>
 </td>
-<td align="center" width="20%">
+<td align="center" width="16%">
 <img src="docs/images/3_forging_artifacts.png" alt="Forging divine artifacts" width="100%"/>
 <br/>
 <b>⚒️ 开炉炼器</b>
@@ -67,7 +78,7 @@
 <br/>
 <sub>The forge blazes. He pours his life's understanding into each artifact.</sub>
 </td>
-<td align="center" width="20%">
+<td align="center" width="16%">
 <img src="docs/images/4_ascension_flight.png" alt="Ascending to the heavens" width="100%"/>
 <br/>
 <b>🌟 飞升上界</b>
@@ -78,7 +89,7 @@
 <br/>
 <sub>He rides his sword skyward. Below, the world he once knew grows small.</sub>
 </td>
-<td align="center" width="20%">
+<td align="center" width="16%">
 <img src="docs/images/5_tribulation_enlightenment.png" alt="Returning to the mortal world for enlightenment" width="100%"/>
 <br/>
 <b>⚫ 下凡悟道</b>

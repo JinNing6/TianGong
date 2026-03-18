@@ -247,6 +247,9 @@ async def write_cultivators(data: dict, message: str = "") -> bool:
     """写入全局修仙者档案"""
     if not message:
         message = "⚒️ TianGong: update cultivator profiles"
+    return await write_json(CULTIVATORS_PATH, data, message)
+
+
 # ============================================================
 # 便捷接口：宗门档案
 # ============================================================
