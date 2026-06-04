@@ -1,0 +1,42 @@
+name: TianGong Refinement Quest
+description: Open a public bounty that points contributors back to the real TianGong quest loop.
+title: "[TianGong Quest]: "
+labels: ["tiangong:quest", "refine-quest", "help-wanted"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form when you want the community to improve a real artifact.
+        The IssueOps bot will reply with safe TianGong commands; it will not award Spirit Power or fabricate quest completion.
+  - type: input
+    id: artifact_name
+    attributes:
+      label: Artifact name
+      description: Use the exact artifact name that should be refined.
+      placeholder: dragon-forge
+    validations:
+      required: true
+  - type: textarea
+    id: refinement_need
+    attributes:
+      label: Refinement request
+      description: State the concrete improvement needed.
+      placeholder: Improve first-run docs and error recovery for new contributors.
+    validations:
+      required: true
+  - type: input
+    id: current_code_url
+    attributes:
+      label: Current code or artifact URL
+      description: Link to the current artifact, PR, branch, release, or documentation.
+      placeholder: https://github.com/JinNing6/TianGong/tree/main
+    validations:
+      required: false
+  - type: textarea
+    id: proof
+    attributes:
+      label: Real-data proof
+      description: What existing issue, artifact, PR, or user need proves this quest is real?
+      placeholder: Existing artifact exists in Treasure Pavilion; current users miss the setup step.
+    validations:
+      required: true

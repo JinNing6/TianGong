@@ -39,6 +39,16 @@ dependencies = [
     "rich>=13.0.0",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.2",
+    "pytest-asyncio>=0.23",
+    "ruff>=0.6",
+    "build>=1.2",
+    "twine>=5.1",
+    "tomli>=2.0; python_version < '3.11'",
+]
+
 [project.urls]
 Homepage = "https://github.com/JinNing6/TianGong"
 Documentation = "https://github.com/JinNing6/TianGong#readme"
@@ -46,7 +56,7 @@ Repository = "https://github.com/JinNing6/TianGong"
 Issues = "https://github.com/JinNing6/TianGong/issues"
 
 [project.scripts]
-tiangong-mcp = "tiangong.mcp_server:main"
+tiangong-mcp = "tiangong.cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["tiangong"]

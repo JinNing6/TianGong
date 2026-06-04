@@ -10,7 +10,6 @@
 
 from __future__ import annotations
 
-import json
 import logging
 
 import httpx
@@ -140,6 +139,30 @@ def _extract_artifact_name(title: str) -> str:
     return title.replace("🔮", "").replace("[法宝]", "").strip()
 
 
+def _build_lineage_share_block(tree: dict) -> str:
+    """Build a paste-ready share block for artifact lineage discovery."""
+    artifact_name = tree["name"]
+    children = tree.get("children", [])
+    dependents = tree.get("dependents", [])
+    lineage_count = len(children) + len(dependents)
+    bonus = calculate_lineage_bonus(artifact_name, tree)
+
+    return (
+        "\n\n---\n\n"
+        "## 📣 复制分享\n\n"
+        "```text\n"
+        f"我在 TianGong 追溯道统：{artifact_name} 已留下 {lineage_count} 条道统传承，"
+        f"传承加成 +{bonus} 灵力。\n"
+        "加入修炼: pip install tiangong-mcp\n"
+        "```\n\n"
+        "## 下一步\n\n"
+        f"- 请宝下凡: `treasure_pavilion(action=\"summon\", artifact_name=\"{artifact_name}\")`\n"
+        f"- 灌注灵力: `infuse_spirit(artifact_name=\"{artifact_name}\")`\n"
+        f"- 搜索同源法宝: `treasure_pavilion(action=\"search\", query=\"{artifact_name}\")`\n"
+        "- 冲击法宝天榜: `leaderboard(type=\"artifact\")`"
+    )
+
+
 def format_lineage_tree(tree: dict, indent: int = 0) -> str:
     """格式化传承谱系展示"""
     name = tree["name"]
@@ -147,6 +170,9 @@ def format_lineage_tree(tree: dict, indent: int = 0) -> str:
 
     if indent == 0:
         lines.append(f"# 📜 {name} 传承谱系")
+        lines.append("")
+        lines.append("> 真实 GitHub Issue 传承快照：来自当前 `get_artifact_lineage` 搜索结果，不伪造历史谱系。")
+        lines.append(f"> 传承加成: +{calculate_lineage_bonus(name, tree)} 灵力")
         lines.append("")
 
     prefix = "│   " * indent
@@ -158,7 +184,9 @@ def format_lineage_tree(tree: dict, indent: int = 0) -> str:
         child_type = child.get("type", "fork")
         type_info = LINEAGE_TYPES.get(child_type, LINEAGE_TYPES["fork"])
         child_prefix = "│   " * (indent + 1)
-        lines.append(f"{child_prefix}├── {type_info['symbol']} {child['name']}")
+        issue = child.get("issue")
+        issue_note = f" (Issue #{issue})" if issue else ""
+        lines.append(f"{child_prefix}├── {type_info['symbol']} {child['name']}{issue_note}")
 
     dependents = tree.get("dependents", [])
     if dependents:
@@ -168,6 +196,9 @@ def format_lineage_tree(tree: dict, indent: int = 0) -> str:
     if not tree.get("children") and not dependents:
         lines.append("")
         lines.append("> 暂无传承记录。")
+
+    if indent == 0:
+        lines.append(_build_lineage_share_block(tree))
 
     return "\n".join(lines)
 

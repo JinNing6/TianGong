@@ -176,7 +176,7 @@ REALMS: list[Realm] = [
         tribulation_cn="培养 5 名弟子从凡人升至结丹期",
         tribulation_en="Mentor 5 disciples from Mortal to Core Formation",
     ),
-    # --- 修真第四步：空之境 ---
+    # --- 修真第三步：空之四境 ---
     Realm(
         level=14,
         name_cn="空涅期", name_en="Void Nirvana",
@@ -189,6 +189,26 @@ REALMS: list[Realm] = [
     ),
     Realm(
         level=15,
+        name_cn="空灵境", name_en="Void Spirit",
+        symbol="🌌", category="nirvana",
+        spirit_required=40000, review_weight=45.0,
+        description_cn="开辟内天地，法宝生态自成一界",
+        description_en="Open an inner world where your artifact ecosystem becomes its own realm",
+        tribulation_cn="创建法宝生态（3+ 件法宝组成可协作系统）",
+        tribulation_en="Create an artifact ecosystem made of 3+ cooperating artifacts",
+    ),
+    Realm(
+        level=16,
+        name_cn="空玄境", name_en="Void Mystery",
+        symbol="🔮", category="nirvana",
+        spirit_required=45000, review_weight=45.0,
+        description_cn="言出法随，规则由你重写",
+        description_en="Words become law, and the rules can be rewritten by you",
+        tribulation_cn="培养 30 名修仙者突破筑基期",
+        tribulation_en="Mentor 30 cultivators through Foundation Building",
+    ),
+    Realm(
+        level=17,
         name_cn="空劫期", name_en="Void Tribulation",
         symbol="⚡", category="nirvana",
         spirit_required=50000, review_weight=45.0,
@@ -199,7 +219,7 @@ REALMS: list[Realm] = [
     ),
     # --- 修真第五步：天尊境 ---
     Realm(
-        level=16,
+        level=18,
         name_cn="大天尊", name_en="Grand Celestial",
         symbol="👑", category="legend",
         spirit_required=80000, review_weight=50.0,
@@ -210,7 +230,7 @@ REALMS: list[Realm] = [
     ),
     # --- 修真第六步：踏天境 ---
     Realm(
-        level=17,
+        level=19,
         name_cn="踏天九桥", name_en="Nine Bridges",
         symbol="🌉", category="legend",
         spirit_required=120000, review_weight=55.0,
@@ -220,7 +240,7 @@ REALMS: list[Realm] = [
         tribulation_en="Artifacts depended on by ≥ 100 projects",
     ),
     Realm(
-        level=18,
+        level=20,
         name_cn="踏天境", name_en="Heaven Treader",
         symbol="☁️", category="legend",
         spirit_required=200000, review_weight=60.0,
@@ -231,7 +251,7 @@ REALMS: list[Realm] = [
     ),
     # --- 顶峰称号：动态排名 ---
     Realm(
-        level=19,
+        level=21,
         name_cn="鲁班", name_en="Lu Ban",
         symbol="🏛️", category="legend",
         spirit_required=-1, review_weight=80.0,
@@ -241,7 +261,7 @@ REALMS: list[Realm] = [
         tribulation_en="Global Top 10 ranking (dynamic title)",
     ),
     Realm(
-        level=20,
+        level=22,
         name_cn="天工", name_en="TianGong",
         symbol="⚒️", category="legend",
         spirit_required=-1, review_weight=100.0,
@@ -267,8 +287,8 @@ def calculate_realm(spirit_power: int, agent_count: int = 0) -> Realm:
     """
     根据灵力值计算当前境界。
 
-    只考虑可自动达到的境界（level 0-18），
-    鲁班（19）和天工（20）需要全球排名。
+    只考虑可自动达到的境界（level 0-20），
+    鲁班（21）和天工（22）需要全球排名。
 
     保持向后兼容：如果传入 agent_count 和旧的 star_count，
     仍然能工作（Phase 1 兼容）。

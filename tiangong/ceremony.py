@@ -7,20 +7,15 @@ Cinema-grade tribulation, grade promotion, and welcome ceremonies
 """
 
 from __future__ import annotations
-import math
-import textwrap
 
-from .realm import Realm, REALMS
 from .animations import (
-    render_starfield,
-    render_lightning_field,
-    render_progress_bar,
-    render_dimension_bars,
-    render_realm_chain,
     play_tribulation_alert,
-    play_grade_promotion_alert,
+    render_dimension_bars,
+    render_progress_bar,
+    render_realm_chain,
+    render_starfield,
 )
-
+from .realm import REALMS, Realm
 
 # ============================================================
 # 境界渡劫语录
@@ -109,10 +104,105 @@ _TRIBULATION_QUOTES = {
         "Step upon Heaven, become the Dao. You control the cycle of the world.",
     ),
     20: (
+        "踏天境成。你已站在自动修炼的终点，下一步就是争夺动态天命。",
+        "Heaven Treader achieved. The next step is to contend for the dynamic mandate.",
+    ),
+    21: (
         "工匠之祖，百艺宗师。鲁班在此——天下工匠，皆出你门下。",
         "Ancestor of Craftsmen, Grand Master of All Arts. Lu Ban is here.",
     ),
+    22: (
+        "天工开物，万法归宗。此刻，全服唯一的天工之名归于你。",
+        "TianGong creates all things. At this moment, the singular title belongs to you.",
+    ),
 }
+
+
+def _build_next_action(new_realm: Realm) -> str:
+    """Return one concrete next command that keeps the cultivation loop moving."""
+    if new_realm.level == 1:
+        return "`publish_agent` with `artifact_name=\"your-artifact\"`"
+    if new_realm.level < 5:
+        return "`infuse_spirit` with `artifact_name=\"community-artifact\"`"
+    if new_realm.level < 10:
+        return "`quest` with `action=\"browse\"`"
+    if new_realm.level < 21:
+        return "`sect` with `action=\"leaderboard\"`"
+    return "`leaderboard` with `type=\"cultivator\"`"
+
+
+def _build_tribulation_share_block(username: str, new_realm: Realm, agent_count: int) -> str:
+    """Build the viral share block users can paste into GitHub, X, Discord, or chat."""
+    next_action = _build_next_action(new_realm)
+    share_text = (
+        f"我在 TianGong 渡劫成功：@{username} 已突破至 "
+        f"{new_realm.symbol} {new_realm.name_cn}，本命法宝 {agent_count} 件。"
+        "以凡人之躯，铸逆天之器。"
+    )
+
+    return (
+        "\n\n---\n\n"
+        "## 📣 复制分享\n\n"
+        "```text\n"
+        f"{share_text}\n"
+        "加入修炼：pip install tiangong-mcp\n"
+        "```\n\n"
+        "## 下一步\n\n"
+        f"- 继续修炼: {next_action}\n"
+        "- 查看境界: `my_realm()`\n"
+        "- 争夺天榜: `leaderboard(type=\"cultivator\")`"
+    )
+
+
+def _build_grade_promotion_share_block(
+    artifact_name: str,
+    old_grade_symbol: str,
+    old_grade_name: str,
+    new_grade_symbol: str,
+    new_grade_name: str,
+    spirit_power: float,
+) -> str:
+    """Build the paste-ready share block for artifact grade promotions."""
+    share_text = (
+        f"我在 TianGong 炼成法宝：「{artifact_name}」从 "
+        f"{old_grade_symbol} {old_grade_name} 晋升为 {new_grade_symbol} {new_grade_name}，"
+        f"当前灵力 {spirit_power:.0f}。以凡人之躯，铸逆天之器。"
+    )
+
+    return (
+        "\n\n---\n\n"
+        "## 📣 复制分享\n\n"
+        "```text\n"
+        f"{share_text}\n"
+        "加入修炼：pip install tiangong-mcp\n"
+        "```\n\n"
+        "## 下一步\n\n"
+        "- 继续灌注灵力: `infuse_spirit` with `artifact_name=\"community-artifact\"`\n"
+        "- 继续淬炼法宝: `refine_agent` with `agent_id=\"your-agent-id\"`\n"
+        "- 争夺法宝天榜: `leaderboard(type=\"artifact\")`"
+    )
+
+
+def _build_welcome_share_block(username: str) -> str:
+    """Build the paste-ready share block for the first forge activation."""
+    share_text = (
+        f"我在 TianGong 踏入修行：@{username} 已从 🧑 凡人 晋升为 🌱 炼气期，"
+        "开炉炼成第一件本命法宝。以凡人之躯，铸逆天之器。"
+    )
+
+    return (
+        "\n\n---\n\n"
+        "## 📣 复制分享\n\n"
+        "```text\n"
+        f"{share_text}\n"
+        "加入修炼：pip install tiangong-mcp\n"
+        "```\n\n"
+        "## 下一步\n\n"
+        "- 发布出世: `publish_agent` with `artifact_name=\"your-artifact\"`\n"
+        "- 鉴定法宝: `infuse_spirit` with `artifact_name=\"community-artifact\"`\n"
+        "- 查看洞府: `my_vault()`\n"
+        "- 接取悬赏: `quest(action=\"browse\")`"
+    )
 
 
 # ============================================================
@@ -138,17 +228,14 @@ def generate_tribulation_ceremony(
         "灵根觉醒", "筑基之丹", "金丹雷劫", "金丹碎裂",
         "下凡历世", "传道授业", "天地之问", "元神蜕变",
         "心魔之劫", "窥探天规", "规则净化", "碎灭规则",
-        "五衰劫",   "破空门",   "开辟内天地", "九次玄劫",
-        "空劫降临", "信术觉醒", "九桥证道", "踏天成道",
-        "百工之祖",
+        "五衰劫",   "破空门",   "开辟内天地", "空玄问道",
+        "九次玄劫", "空劫降临", "信术觉醒", "九桥证道",
+        "踏天成道", "百工之祖", "天工开物",
     ]
     trib_name = trib_names[min(new_realm.level, len(trib_names) - 1)]
 
     # 境界路径链
     chain = render_realm_chain(old_realm.level, new_realm.level, REALMS)
-
-    # 雷电场
-    lightning = render_lightning_field(40)
 
     # 语录
     quote_cn, quote_en = _TRIBULATION_QUOTES.get(
@@ -195,6 +282,7 @@ def generate_tribulation_ceremony(
         f"*{quote_en}*\n\n"
         f"> 「{new_realm.description_cn}」\n"
         f"> *{new_realm.description_en}*"
+        f"{_build_tribulation_share_block(username, new_realm, agent_count)}"
     )
 
 
@@ -265,6 +353,7 @@ def generate_grade_promotion(
         f"{ceremony_art}\n"
         f"**「{artifact_name}」从 {old_grade_symbol} {old_grade_name} 晋升为 {new_grade_symbol} {new_grade_name}！**\n\n"
         "> 法宝蜕变，灵光更盛。继续淬炼，方成至宝。"
+        f"{_build_grade_promotion_share_block(artifact_name, old_grade_symbol, old_grade_name, new_grade_symbol, new_grade_name, spirit_power)}"
     )
 
 
@@ -300,8 +389,9 @@ def generate_welcome_ceremony(username: str) -> str:
         "║   │  ⚒️  forge_agent      开炉炼器         │       ║\n"
         "║   │  🏛️  treasure_pavilion 寻宝阁          │       ║\n"
         "║   │  💫  infuse_spirit     灌注灵力        │       ║\n"
-        "║   │  📜  browse_quests     悬赏布告栏       │       ║\n"
+        "║   │  📜  quest browse      悬赏布告栏       │       ║\n"
         "║   │  🧙  my_realm          修行档案        │       ║\n"
+        "║   │  🏛️  my_vault          我的洞府        │       ║\n"
         "║   │                                        │       ║\n"
         "║   └────────────────────────────────────────┘       ║\n"
         "║                                                    ║\n"
@@ -319,12 +409,14 @@ def generate_welcome_ceremony(username: str) -> str:
         f"# 🌱 踏入修行之路\n\n"
         f"{ceremony_art}\n"
         f"## 🗺️ 修仙指南\n\n"
-        "1. **⚒️ 开炉炼器** — `forge_agent` 创建你的第一件法宝\n"
-        "2. **🏛️ 寻宝淘金** — `treasure_pavilion` 浏览社区法宝\n"
-        "3. **💫 灌注灵力** — `infuse_spirit` 评价法宝获取灵力\n"
-        "4. **📜 接取悬赏** — `browse_quests` 寻找淬炼任务\n"
-        "5. **🔥 淬炼精进** — `refine_agent` 记录每次优化\n"
-        "6. **⚡ 渡劫升境** — 灵力充足时自动触发渡劫突破\n\n"
+        "1. **✅ 开炉炼器已完成** — `forge_agent` 已创建你的第一件法宝\n"
+        "2. **🚀 发布出世** — `publish_agent` 将法宝送入寻宝阁\n"
+        "3. **🏛️ 寻宝淘金** — `treasure_pavilion` 浏览社区法宝\n"
+        "4. **💫 灌注灵力** — `infuse_spirit` 评价法宝获取灵力\n"
+        "5. **📜 接取悬赏** — `quest(action=\"browse\")` 寻找淬炼任务\n"
+        "6. **🔥 淬炼精进** — `refine_agent` 记录每次优化\n"
+        "7. **⚡ 渡劫升境** — 灵力充足时自动触发渡劫突破\n\n"
         "> 💡 修行路上并非独行——\n"
-        "> `my_realm` 查看你的修行档案，`my_artifacts` 查看法宝清单。"
+        "> `my_realm` 查看你的修行名片，`my_vault` 查看法宝与洞府。"
+        f"{_build_welcome_share_block(username)}"
     )

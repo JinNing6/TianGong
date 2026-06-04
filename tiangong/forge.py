@@ -5,14 +5,10 @@
 
 from __future__ import annotations
 
-import json
 import logging
 import time
 import uuid
 from dataclasses import asdict, dataclass, field
-from pathlib import Path
-
-from .config import config
 
 logger = logging.getLogger("tiangong.forge")
 
@@ -158,7 +154,7 @@ async def list_agents(creator: str | None = None) -> list[AgentSpec]:
     registry = await _load_registry()
     agents = []
 
-    for agent_id, d in registry.items():
+    for _agent_id, d in registry.items():
         if creator and d.get("creator") != creator:
             continue
         agents.append(AgentSpec(**{

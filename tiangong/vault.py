@@ -23,6 +23,7 @@ import json
 import logging
 import shutil
 import time
+from contextlib import suppress
 from pathlib import Path
 
 from .config import config
@@ -136,6 +137,31 @@ def ensure_cave() -> None:
 # 藏宝阁管理
 # ============================================================
 
+def _load_local_artifact_meta(artifact_dir: Path) -> dict:
+    """Load local artifact metadata from supported TianGong manifest files."""
+    yaml_file = artifact_dir / "tiangong.yaml"
+    json_file = artifact_dir / "tiangong.json"
+
+    if yaml_file.exists():
+        try:
+            import yaml
+        except ImportError:
+            pass
+        else:
+            with suppress(OSError, yaml.YAMLError):
+                meta = yaml.safe_load(yaml_file.read_text(encoding="utf-8")) or {}
+                if isinstance(meta, dict):
+                    return meta
+
+    if json_file.exists():
+        with suppress(json.JSONDecodeError, OSError):
+            meta = json.loads(json_file.read_text(encoding="utf-8"))
+            if isinstance(meta, dict):
+                return meta
+
+    return {}
+
+
 def list_vault() -> list[dict]:
     """列出藏宝阁中所有法宝"""
     vault_dir = Path(config.VAULT_DIR)
@@ -148,10 +174,8 @@ def list_vault() -> list[dict]:
             meta_file = item / ".tiangong_meta.json"
             meta = {}
             if meta_file.exists():
-                try:
+                with suppress(json.JSONDecodeError, OSError):
                     meta = json.loads(meta_file.read_text(encoding="utf-8"))
-                except (json.JSONDecodeError, OSError):
-                    pass
 
             artifacts.append({
                 "name": item.name,
@@ -174,12 +198,15 @@ def list_forge() -> list[dict]:
     artifacts = []
     for item in sorted(forge_dir.iterdir()):
         if item.is_dir() and not item.name.startswith("."):
-            # 检查是否有 tiangong.yaml
+            # 检查是否有 TianGong 元数据清单
             yaml_file = item / "tiangong.yaml"
-            has_config = yaml_file.exists()
+            json_file = item / "tiangong.json"
+            has_config = yaml_file.exists() or json_file.exists()
+            meta = _load_local_artifact_meta(item)
 
             artifacts.append({
                 "name": item.name,
+                "agent_id": meta.get("agent_id") or meta.get("id") or "",
                 "path": str(item),
                 "has_config": has_config,
                 "status": "ready" if has_config else "draft",
@@ -261,7 +288,12 @@ def format_vault_list(artifacts: list[dict]) -> str:
     if not artifacts:
         return (
             "## ✨ 藏宝阁（空）\n\n"
-            "> 还没有拉取任何法宝。使用 `summon_artifact(\"法宝名\")` 请宝下凡！"
+            "> 还没有拉取任何法宝。本地 vault/ 目录真实快照为 0；"
+            "先搜索寻宝阁，再用公开工具请宝下凡。\n\n"
+            "## 下一步\n\n"
+            "- 搜索寻宝阁: `treasure_pavilion(action=\"search\")`\n"
+            "- 请宝下凡: `treasure_pavilion(action=\"summon\", artifact_name=\"artifact-name\")`\n"
+            "- 冲击法宝天榜: `leaderboard(type=\"artifact\")`"
         )
 
     lines = [
@@ -269,13 +301,19 @@ def format_vault_list(artifacts: list[dict]) -> str:
         "",
         f"共 {len(artifacts)} 件法宝：",
         "",
-        "| 法宝 | 品阶 | 版本 | 来源 | 拉取时间 |",
-        "|------|------|------|------|---------|",
+        "| 法宝 | 品阶 | 版本 | 来源 | 拉取时间 | 动作 |",
+        "|------|------|------|------|---------|------|",
     ]
 
     for a in artifacts:
+        artifact_name = a["name"]
+        actions = (
+            f"`infuse_spirit(artifact_name=\"{artifact_name}\")` · "
+            f"`treasure_pavilion(action=\"lineage\", artifact_name=\"{artifact_name}\")`"
+        )
         lines.append(
-            f"| {a['name']} | {a['grade']} | {a['version']} | {a['source']} | {a['pulled_at'][:10]} |"
+            f"| {artifact_name} | {a['grade']} | {a['version']} | {a['source']} | "
+            f"{a['pulled_at'][:10]} | {actions} |"
         )
 
     return "\n".join(lines)
@@ -286,7 +324,14 @@ def format_forge_list(artifacts: list[dict]) -> str:
     if not artifacts:
         return (
             "## 🔨 炼器炉（空）\n\n"
-            "> 还没有创作任何法宝。开始在 `forge/` 目录中打造你的法宝！"
+            "> 还没有创作任何法宝。本地 forge/ 目录真实快照为 0；"
+            "用公开工具开炉炼器，生成第一件可发布法宝。\n\n"
+            "## 下一步\n\n"
+            "- 开炉炼器: `forge_agent(name=\"my-first-artifact\", "
+            "description=\"My first TianGong artifact\")`\n"
+            "- 发布悬赏: `quest(action=\"post\", artifact_name=\"my-first-artifact\", "
+            "description=\"需要一件适合新手入道的法宝\")`\n"
+            "- 冲击法宝天榜: `leaderboard(type=\"artifact\")`"
         )
 
     lines = [
@@ -294,13 +339,74 @@ def format_forge_list(artifacts: list[dict]) -> str:
         "",
         f"共 {len(artifacts)} 件法宝：",
         "",
-        "| 法宝 | 状态 | 路径 |",
-        "|------|------|------|",
+        "| 法宝 | 状态 | 路径 | 动作 |",
+        "|------|------|------|------|",
     ]
 
     for a in artifacts:
-        status = "✅ 就绪" if a["status"] == "ready" else "📝 草稿（缺 tiangong.yaml）"
-        lines.append(f"| {a['name']} | {status} | `{a['path']}` |")
+        artifact_name = a["name"]
+        status = "✅ 就绪" if a["status"] == "ready" else "📝 草稿（缺 tiangong.yaml/tiangong.json）"
+        actions = f"`publish_agent(artifact_name=\"{artifact_name}\")`"
+        if a.get("agent_id"):
+            actions += f" · `refine_agent(agent_id=\"{a['agent_id']}\")`"
+        else:
+            actions += " · 发布后使用返回的 `agent_id` 淬炼"
+        lines.append(f"| {artifact_name} | {status} | `{a['path']}` | {actions} |")
+
+    return "\n".join(lines)
+
+
+def _build_vault_share_block(forge_items: list[dict], vault_items: list[dict]) -> str:
+    """Build a paste-ready share card for the local cave portfolio."""
+    total_count = len(forge_items) + len(vault_items)
+    share_text = (
+        f"我在 TianGong 本地洞府已有 {total_count} 件法宝："
+        f"炼器炉 {len(forge_items)} 件，藏宝阁 {len(vault_items)} 件。"
+    )
+
+    lines = [
+        "",
+        "---",
+        "",
+        "## 📣 复制洞府名片",
+        "",
+        "```text",
+        share_text,
+        "加入修炼: pip install tiangong-mcp",
+        "```",
+        "",
+        "## 下一步",
+        "",
+    ]
+
+    if forge_items:
+        first_forge = forge_items[0]["name"]
+        lines.append(f"- 发布炼器炉法宝: `publish_agent(artifact_name=\"{first_forge}\")`")
+    else:
+        lines.append(
+            "- 开炉炼器: `forge_agent(name=\"my-first-artifact\", "
+            "description=\"My first TianGong artifact\")`"
+        )
+        lines.append(
+            "- 发布首件悬赏: `quest(action=\"post\", "
+            "artifact_name=\"my-first-artifact\", "
+            "description=\"需要一件适合新手入道的法宝\")`"
+        )
+
+    if vault_items:
+        first_vault = vault_items[0]["name"]
+        lines.append(f"- 鉴定藏宝阁法宝: `infuse_spirit(artifact_name=\"{first_vault}\")`")
+    else:
+        lines.append("- 寻宝请宝: `treasure_pavilion(action=\"search\")`")
+        lines.append(
+            "- 请宝下凡: `treasure_pavilion(action=\"summon\", "
+            "artifact_name=\"artifact-name\")`"
+        )
+
+    lines.extend([
+        "- 继续寻宝: `treasure_pavilion(action=\"search\")`",
+        "- 冲击法宝天榜: `leaderboard(type=\"artifact\")`",
+    ])
 
     return "\n".join(lines)
 
@@ -313,6 +419,9 @@ def format_my_vault() -> str:
     lines = [
         "# 📦 我的法宝 (My Vault)",
         "",
+        "> 本地洞府快照：来自当前机器的 forge/ 与 vault/ 目录扫描，不伪造远程拥有量。",
+        f"> 炼器炉: {len(forge_items)} 件 · 藏宝阁: {len(vault_items)} 件",
+        "",
         f"- 本地已开辟法宝栏位：{len(forge_items) + len(vault_items)}",
         "",
     ]
@@ -320,6 +429,7 @@ def format_my_vault() -> str:
     lines.append(format_forge_list(forge_items))
     lines.append("")
     lines.append(format_vault_list(vault_items))
+    lines.append(_build_vault_share_block(forge_items, vault_items))
 
     return "\n".join(lines)
 
@@ -327,7 +437,7 @@ def format_my_vault() -> str:
 def format_vault_status() -> str:
     """格式化洞府状态查询"""
     import platform
-    
+
     # 获取系统资源（如果没有 psutil 则使用基础库或省略）
     try:
         import psutil
@@ -345,7 +455,7 @@ def format_vault_status() -> str:
         f"- ⚙️ CPU 使用率: `{cpu_usage}`",
         f"- 🧠 内存使用率: `{mem_usage}`",
         f"- 📁 本地洞府位置: `{config.CAVE_DIR}`",
-        f"- 🔌 社区连接状态: `🌐 连接正常` (数据采用本地/远程同步策略)",
-        f"- ⏱️ 客户端运行状态: `🟢 活跃`",
+        "- 🔌 社区连接状态: `🌐 连接正常` (数据采用本地/远程同步策略)",
+        "- ⏱️ 客户端运行状态: `🟢 活跃`",
     ]
     return "\n".join(lines)

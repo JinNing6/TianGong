@@ -1,0 +1,38 @@
+name: TianGong Season Board
+description: Ask for a current real-data season leaderboard and challenge card.
+title: "[TianGong Season]: "
+labels: ["tiangong:season"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to turn the current cultivator snapshots into a public season race.
+        The workflow only comments commands; TianGong itself must compute rankings from real profiles.
+  - type: dropdown
+    id: board_type
+    attributes:
+      label: Board request
+      description: Pick the public surface you want to refresh.
+      options:
+        - Seasonal leaderboard
+        - Tournament board
+        - Tournament recap
+        - Sect war leaderboard
+    validations:
+      required: true
+  - type: input
+    id: target_username
+    attributes:
+      label: Target cultivator
+      description: Optional GitHub username to challenge or inspect.
+      placeholder: JinNing6
+    validations:
+      required: false
+  - type: textarea
+    id: campaign_hook
+    attributes:
+      label: Campaign hook
+      description: The public challenge, theme, or call-to-action for this season.
+      placeholder: "June artifact sprint: forge, appraise, and complete quests to climb the TianGong board."
+    validations:
+      required: true

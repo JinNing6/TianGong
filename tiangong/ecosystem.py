@@ -22,6 +22,8 @@ async def call_cyberhuatuo_diagnose(error_message: str, framework: str = "") -> 
     if not config.CYBERHUATUO_ENABLED:
         return "⚠️ 赛博华佗联动未启用。请在 .env 中设置 CYBERHUATUO_ENABLED=true"
 
+    framework_arg = f', framework="{framework}"' if framework else ""
+
     return (
         "## 🩺 走火入魔 · 自动求医\n\n"
         "检测到你的法宝出了问题——已为你准备好就医信息：\n\n"
@@ -29,8 +31,7 @@ async def call_cyberhuatuo_diagnose(error_message: str, framework: str = "") -> 
         f"**相关框架**: {framework or '未知'}\n\n"
         "**请调用赛博华佗进行诊断：**\n\n"
         "```\n"
-        f"diagnose(query=\"{error_message}\""
-        f"{f', framework=\"{framework}\"' if framework else ''})\n"
+        f'diagnose(query="{error_message}"{framework_arg})\n'
         "```\n\n"
         "> 💡 赛博华佗（CyberHuaTuo）是天工生态的诊断系统。\n"
         "> 修仙路上，华佗是你最可靠的伙伴。"

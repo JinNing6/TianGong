@@ -9,14 +9,13 @@ from __future__ import annotations
 
 import json
 import logging
-import os
-import time
 from pathlib import Path
 
 import httpx
 
+from .activation import format_share_attribution_command
 from .config import config
-from .vault import ensure_cave, save_artifact_meta, check_artifact_exists
+from .vault import check_artifact_exists, ensure_cave, save_artifact_meta
 
 logger = logging.getLogger("tiangong.marketplace")
 
@@ -88,6 +87,59 @@ def validate_artifact_for_publish(artifact_dir: Path) -> tuple[bool, list[str]]:
             errors.append(f"❌ 入口文件 `{meta['entry']}` 不存在")
 
     return len(errors) == 0, errors
+
+
+def _build_publish_share_block(
+    artifact_name: str,
+    creator: str,
+    issue_url: str,
+) -> str:
+    """Build a paste-ready share block for a successful artifact publish."""
+    share_text = (
+        f"我在 TianGong 发布法宝：`{artifact_name}` 已飞升上界，"
+        f"进入 AI 炼化审核。创建者 @{creator}，围观与鉴定：{issue_url}"
+    )
+
+    return (
+        "\n\n---\n\n"
+        "## 📣 复制分享\n\n"
+        "```text\n"
+        f"{share_text}\n"
+        "加入修炼：pip install tiangong-mcp\n"
+        "```\n\n"
+        "## 下一步\n\n"
+        f"- 去寻宝阁看法宝: `treasure_pavilion` with `query=\"{artifact_name}\"`\n"
+        f"- 邀请道友鉴定: `infuse_spirit` with `artifact_name=\"{artifact_name}\"`\n"
+        "- 争夺法宝天榜: `leaderboard(type=\"artifact\")`\n"
+        f"- 记录公开分享归因: {format_share_attribution_command(contribution='publish', actor=creator, artifact_name=artifact_name, share_url=issue_url)}"
+    )
+
+
+def _build_summon_share_block(
+    artifact_name: str,
+    creator: str,
+    grade: str,
+) -> str:
+    """Build a paste-ready share block for a successful artifact summon."""
+    share_text = (
+        f"我在 TianGong 请宝下凡：`{artifact_name}` 已入藏宝阁，"
+        f"品阶 {grade}，创建者 @{creator}。下一步灌注灵力，以评证道。"
+    )
+
+    return (
+        "\n\n---\n\n"
+        "## 📣 复制分享\n\n"
+        "```text\n"
+        f"{share_text}\n"
+        "加入修炼：pip install tiangong-mcp\n"
+        "```\n\n"
+        "## 下一步\n\n"
+        f"- 灌注灵力: `infuse_spirit(artifact_name=\"{artifact_name}\")`\n"
+        "- 查看洞府: `my_vault()`\n"
+        f"- 追溯传承: `treasure_pavilion(action=\"lineage\", artifact_name=\"{artifact_name}\")`\n"
+        "- 冲击法宝天榜: `leaderboard(type=\"artifact\")`\n"
+        f"- 记录公开分享归因: {format_share_attribution_command(contribution='summon', actor='your_github_username', artifact_name=artifact_name)}"
+    )
 
 
 async def publish_agent(
@@ -164,6 +216,7 @@ async def publish_agent(
                     f"- 👤 创建者: {creator}\n"
                     f"- ⏳ 状态: **待炼化**（等待 AI 审核）\n\n"
                     "> AI 审核通过后将自动晋升为 🏛️ 常驻法宝体，正式入驻寻宝阁。"
+                    f"{_build_publish_share_block(artifact_name, creator, issue_url)}"
                 )
             else:
                 return f"❌ 飞升失败: GitHub API 返回 {resp.status_code}\n{resp.text}"
@@ -245,7 +298,10 @@ async def summon_artifact(artifact_name: str) -> str:
         return (
             f"⚠️ 法宝 `{artifact_name}` 已存在于藏宝阁\n"
             f"- 路径: `{config.VAULT_DIR}/{artifact_name}/`\n\n"
-            "> 如需更新版本，请先使用 `banish_artifact` 封印旧版"
+            "## 下一步\n\n"
+            "- 查看洞府: `my_vault()`\n"
+            f"- 灌注灵力: `infuse_spirit(artifact_name=\"{artifact_name}\")`\n"
+            f"- 重新搜索: `treasure_pavilion(action=\"search\", query=\"{artifact_name}\")`"
         )
 
     # 2. 从 GitHub API 查询法宝
@@ -288,6 +344,7 @@ async def summon_artifact(artifact_name: str) -> str:
         f"- 👤 创建者: {meta.get('creator', 'unknown')}\n"
         f"- {meta.get('grade', '⚪ 凡器')}"
         f"{env_hint}"
+        f"{_build_summon_share_block(artifact_name, meta.get('creator', 'unknown'), meta.get('grade', '⚪ 凡器'))}"
     )
 
 

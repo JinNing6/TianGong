@@ -1,0 +1,242 @@
+name: TianGong IssueOps Onboarding
+
+on:
+  issues:
+    types: [opened, labeled]
+
+permissions:
+  issues: write
+
+concurrency:
+  group: tiangong-issueops-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  comment:
+    name: Comment safe TianGong commands
+    runs-on: ubuntu-latest
+    steps:
+      - name: Route issue form to TianGong loop
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const marker = '<!-- tiangong:issueops-onboarding:v1 -->';
+            const issue = context.payload.issue;
+            const issueUrl = issue.html_url;
+            const issueActor = issue.user?.login || 'github-user';
+            const labels = new Set((issue.labels || []).map((label) => typeof label === 'string' ? label : label.name));
+            const body = issue.body || '';
+            const title = issue.title || '';
+
+            function escapeRegExp(value) {
+              return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            }
+
+            function readField(label, fallback = '') {
+              const pattern = new RegExp(`###\\s+${escapeRegExp(label)}\\s*\\n+([\\s\\S]*?)(?=\\n###\\s+|\\s*$)`, 'i');
+              const match = body.match(pattern);
+              return clean(match ? match[1] : fallback, fallback);
+            }
+
+            function clean(value, fallback = '') {
+              const text = String(value || '')
+                .replace(/<!--[\s\S]*?-->/g, '')
+                .replace(/```[\s\S]*?```/g, '')
+                .split(/\r?\n/)
+                .map((line) => line.trim())
+                .filter(Boolean)
+                .join(' ')
+                .slice(0, 240);
+              return /^_?no response_?$/i.test(text) ? fallback : (text || fallback);
+            }
+
+            function quote(value, fallback) {
+              return clean(value, fallback).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+            }
+
+            function readPositiveIntegerField(label, fallback = 10) {
+              const raw = readField(label, String(fallback));
+              const match = raw.match(/\d+/);
+              const value = match ? Number.parseInt(match[0], 10) : fallback;
+              return Number.isFinite(value) && value > 0 ? Math.min(value, 10000) : fallback;
+            }
+
+            function commandBlock(commands) {
+              return ['```text', ...commands, '```'].join('\n');
+            }
+
+            const routes = [
+              {
+                key: 'quest',
+                matches: labels.has('tiangong:quest') || labels.has('refine-quest') || title.startsWith('[TianGong Quest]'),
+                heading: 'Refinement quest route',
+                commands: () => {
+                  const artifact = quote(readField('Artifact name'), 'artifact-name');
+                  const need = quote(readField('Refinement request'), 'Describe the refinement needed');
+                  return [
+                    `quest(action="post", artifact_name="${artifact}", description="${need}")`,
+                    'quest(action="browse")',
+                    'leaderboard(type="season")',
+                  ];
+                },
+                share: () => 'This issue is a public refinement quest. Claim it through `quest(action="claim", quest_issue_number=...)` after the TianGong quest exists.'
+              },
+              {
+                key: 'growth',
+                matches: labels.has('tiangong:growth') || title.startsWith('[TianGong Growth]'),
+                heading: 'Growth flywheel route',
+                commands: () => {
+                  const bottleneck = quote(readField('Growth bottleneck'), 'Let TianGong detect the weakest real stage');
+                  const hook = quote(readField('Campaign hook'), 'Open a public TianGong growth flywheel push');
+                  const targetContributors = readPositiveIntegerField('Target contributors', 10);
+                  return [
+                    'growth_flywheel()',
+                    `growth_campaign(campaign_name="${hook}", target_contributors=${targetContributors})`,
+                    `public_growth_report(record_snapshot=True, target_contributors=${targetContributors})`,
+                    `public_launch_preflight(target_contributors=${targetContributors})`,
+                    'leaderboard(type="growth")',
+                    'share_attribution_report()',
+                    'leaderboard(type="share")',
+                    `quest(action="post", artifact_name="growth-flywheel-bounty", description="${hook} / Focus: ${bottleneck}")`,
+                    'leaderboard(type="season")',
+                    'leaderboard(type="sect")',
+                  ];
+                },
+                share: () => 'This route diagnoses the current TianGong loop from real registry fields. It does not invent retention, downloads, attribution, or historical growth events.'
+              },
+              {
+                key: 'season',
+                matches: labels.has('tiangong:season') || title.startsWith('[TianGong Season]'),
+                heading: 'Season board route',
+                commands: () => [
+                  'leaderboard(type="season")',
+                  'leaderboard(type="tournament")',
+                  'leaderboard(type="tournament_recap")',
+                  'leaderboard(type="sect")',
+                  `quest(action="post", artifact_name="season-challenge", description="${quote(readField('Campaign hook'), 'Open a public TianGong season challenge')}")`,
+                ],
+                share: () => 'This route refreshes current real leaderboard snapshots. It does not invent historical seasons, wins, or ranks.'
+              },
+              {
+                key: 'tournament',
+                matches: labels.has('tiangong:tournament') || title.startsWith('[TianGong Tournament]'),
+                heading: 'Tournament route',
+                commands: () => {
+                  const artifact = quote(readField('Featured artifact'), 'duel-artifact');
+                  const rule = quote(readField('Entry rule'), 'Current real profile snapshots decide the first bracket');
+                  return [
+                    'leaderboard(type="tournament")',
+                    'leaderboard(type="tournament_recap")',
+                    `quest(action="post", artifact_name="${artifact}", description="${rule}")`,
+                    'leaderboard(type="season")',
+                  ];
+                },
+                share: () => 'This cup seeds participants from current TianGong profile power only. No match result is recorded by this comment.'
+              },
+              {
+                key: 'mentor',
+                matches: labels.has('tiangong:mentor') || title.startsWith('[TianGong Mentor]'),
+                heading: 'Mentor pact route',
+                commands: () => {
+                  const mentor = quote(readField('Mentor username'), 'mentor');
+                  const apprentice = quote(readField('Apprentice username'), 'apprentice');
+                  const trial = quote(readField('First trial'), 'Complete one real refinement quest');
+                  return [
+                    `my_realm(username="${mentor}", apprentice_username="${apprentice}")`,
+                    `quest(action="post", artifact_name="mentor-trial-${apprentice}", description="${trial}")`,
+                    `my_realm(username="${apprentice}")`,
+                    'leaderboard(type="season")',
+                  ];
+                },
+                share: () => 'Mentor readiness must be proven by the real TianGong profile snapshot before the pact becomes a growth loop.'
+              },
+              {
+                key: 'sect',
+                matches: labels.has('tiangong:sect') || title.startsWith('[TianGong Sect]'),
+                heading: 'Sect recruitment route',
+                commands: () => {
+                  const sect = quote(readField('Sect name'), 'sect-name');
+                  const candidate = quote(readField('Candidate username'), 'candidate');
+                  const trial = quote(readField('Admission trial'), 'Complete one real refinement quest for the sect');
+                  return [
+                    `sect(action="info", sect_name="${sect}", username="${candidate}")`,
+                    `quest(action="post", artifact_name="sect-trial-${sect}", description="${trial}")`,
+                    `sect(action="join", sect_name="${sect}")`,
+                    'sect(action="leaderboard")',
+                    'leaderboard(type="sect")',
+                  ];
+                },
+                share: () => 'The sect card must be rendered from the real sect and candidate snapshots. This comment is only the public route.'
+              },
+              {
+                key: 'share',
+                matches: labels.has('tiangong:share') || title.startsWith('[TianGong Share]'),
+                heading: 'Public share proof route',
+                commands: () => {
+                  const contribution = quote(readField('Contribution type'), 'forge');
+                  const shareUrl = quote(readField('Public share URL'), 'https://github.com/owner/repo/issues/1');
+                  const artifact = quote(readField('Artifact name'), 'artifact-name');
+                  const hook = quote(readField('Campaign hook'), 'Bind one public TianGong share to real contribution proof');
+                  return [
+                    `record_share_attribution(contribution="${contribution}", share_url="${shareUrl}", actor="${issueActor}", artifact_name="${artifact}", source_url="${issueUrl}", issue_number=${issue.number}, campaign_hook="${hook}")`,
+                    'share_attribution_report()',
+                    'leaderboard(type="share")',
+                    'activation_funnel()',
+                    'growth_flywheel()',
+                    'public_launch_preflight()',
+                  ];
+                },
+                share: () => 'This route binds one reviewable public share URL to a real TianGong contribution. It does not claim downloads, retention, repost counts, referrals, or Spirit Power.'
+              },
+            ];
+
+            const route = routes.find((candidate) => candidate.matches);
+            if (!route) {
+              core.info('No TianGong IssueOps route matched this issue.');
+              return;
+            }
+
+            const commentBody = [
+              marker,
+              `## TianGong IssueOps: ${route.heading}`,
+              '',
+              'This issue was opened through a public TianGong route. The workflow only posts safe commands back into the real MCP loop; it does not checkout code, execute repository scripts, award Spirit Power, close issues, or fabricate leaderboard results.',
+              '',
+              '### Run next',
+              '',
+              commandBlock([
+                `record_growth_referral(route="${route.key}", source_url="${issueUrl}", actor="${issueActor}", issue_number=${issue.number})`,
+                ...route.commands(),
+                'activation_funnel()',
+              ]),
+              '',
+              '### Share',
+              '',
+              route.share(),
+              '',
+              'Install: `pip install tiangong-mcp`',
+            ].join('\n');
+
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              per_page: 100,
+            });
+            const existing = comments.data.find((comment) => comment.user.type === 'Bot' && comment.body.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body: commentBody,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: commentBody,
+              });
+            }

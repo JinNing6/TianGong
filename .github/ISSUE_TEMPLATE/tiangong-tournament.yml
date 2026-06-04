@@ -1,0 +1,34 @@
+name: TianGong Tournament
+description: Open a public cup request that routes people to tournament and recap commands.
+title: "[TianGong Tournament]: "
+labels: ["tiangong:tournament"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to start or replay a public duel board.
+        The bot reply never invents wins; tournament commands seed from current profile snapshots only.
+  - type: input
+    id: cup_name
+    attributes:
+      label: Cup name
+      description: A short public name for the tournament.
+      placeholder: June Artifact Duel Cup
+    validations:
+      required: true
+  - type: textarea
+    id: entry_rule
+    attributes:
+      label: Entry rule
+      description: Who should enter and what real contribution qualifies them?
+      placeholder: Anyone with a forged artifact, one appraisal, or one completed quest this month.
+    validations:
+      required: true
+  - type: input
+    id: featured_artifact
+    attributes:
+      label: Featured artifact
+      description: Optional artifact name for the first duel bounty.
+      placeholder: duel-artifact
+    validations:
+      required: false

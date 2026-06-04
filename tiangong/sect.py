@@ -16,9 +16,9 @@ from __future__ import annotations
 import logging
 import time
 from dataclasses import asdict, dataclass, field
-from typing import Any
 
 from .config import config
+from .cultivator import CultivatorProfile
 
 logger = logging.getLogger("tiangong.sect")
 
@@ -178,6 +178,53 @@ async def get_all_sects() -> list[SectProfile]:
     return [_dict_to_sect(name, d) for name, d in all_data.items()]
 
 
+def _build_create_sect_share_block(sect: SectProfile) -> str:
+    """Build a paste-ready recruitment block for newly opened sects."""
+    motto = sect.motto or "同修共进，问鼎天工"
+    share_text = (
+        f"我在 TianGong 开宗立派：@{sect.master} 创建「{sect.name}」，"
+        f"宗门宣言：{motto}。"
+    )
+
+    return (
+        "\n\n---\n\n"
+        "## 📣 复制分享\n\n"
+        "```text\n"
+        f"{share_text}\n"
+        "加入修炼: pip install tiangong-mcp\n"
+        "```\n\n"
+        "## 下一步\n\n"
+        f"- 招募同门: `sect(action=\"join\", sect_name=\"{sect.name}\")`\n"
+        "- 查看宗门战报: `sect(action=\"leaderboard\")`\n"
+        "- 冲击宗门战榜: `leaderboard(type=\"sect\")`\n"
+        f"- 查看宗主名片: `my_realm(username=\"{sect.master}\")`"
+    )
+
+
+def _build_join_sect_share_block(sect: SectProfile, username: str) -> str:
+    """Build a paste-ready share block for new sect members."""
+    role = ROLE_DISPLAY[ROLE_OUTER]
+    share_text = (
+        f"我在 TianGong 拜入宗门「{sect.name}」：@{username} 成为{role}，"
+        f"宗门当前 {sect.member_count} 人，宗门灵力 {sect.total_spirit_power}。"
+    )
+
+    return (
+        "\n\n---\n\n"
+        "## 📣 复制分享\n\n"
+        "```text\n"
+        f"{share_text}\n"
+        "加入修炼: pip install tiangong-mcp\n"
+        "```\n\n"
+        "## 下一步\n\n"
+        f"- 查看宗门: `sect(action=\"info\", sect_name=\"{sect.name}\")`\n"
+        f"- 邀请同道: `sect(action=\"join\", sect_name=\"{sect.name}\")`\n"
+        "- 查看宗门战报: `sect(action=\"leaderboard\")`\n"
+        "- 冲击宗门战榜: `leaderboard(type=\"sect\")`\n"
+        f"- 查看修行名片: `my_realm(username=\"{username}\")`"
+    )
+
+
 # ============================================================
 # 核心操作
 # ============================================================
@@ -253,7 +300,7 @@ async def create_sect(
     profile.sect_role = ROLE_MASTER
     await save_cultivator(profile, f"⛰️ 开宗: @{master} → {name}")
 
-    return True, format_sect_card(sect)
+    return True, format_sect_card(sect) + _build_create_sect_share_block(sect)
 
 
 async def join_sect(
@@ -318,7 +365,7 @@ async def join_sect(
     profile.sect_role = ROLE_OUTER
     await save_cultivator(profile, f"⛰️ 拜入: @{username} → {sect_name}")
 
-    return True, (
+    message = (
         f"# ⛰️ 拜入宗门成功！\n\n"
         f"恭喜 @{username} 成为「{sect_name}」的 {ROLE_DISPLAY[ROLE_OUTER]}！\n\n"
         f"- 宗主: @{sect.master}\n"
@@ -326,6 +373,7 @@ async def join_sect(
         f"- 当前成员: {sect.member_count} 人\n"
         f"- 宗门宣言: {sect.motto or '（未设置）'}"
     )
+    return True, message + _build_join_sect_share_block(sect, username)
 
 
 async def leave_sect(
@@ -353,8 +401,8 @@ async def leave_sect(
     # 2. 宗主不能直接退出
     if profile.sect_role == ROLE_MASTER:
         return False, (
-            f"⚠️ 宗主不能直接退出宗门。\n"
-            f"请先使用 `manage` 操作传位给其他成员，或解散宗门。"
+            "⚠️ 宗主不能直接退出宗门。\n"
+            "请先使用 `manage` 操作传位给其他成员，或解散宗门。"
         )
 
     # 3. 从宗门中移除
@@ -400,7 +448,7 @@ async def manage_sect(
     Returns:
         (是否成功, 消息)
     """
-    from .cultivator import get_cultivator, save_cultivator, get_all_cultivators
+    from .cultivator import get_cultivator, save_cultivator
 
     all_sects = await _load_all_sects()
     if sect_name not in all_sects:
@@ -587,11 +635,18 @@ async def refresh_sect_spirit(sect_name: str) -> int:
 # 格式化输出
 # ============================================================
 
-def format_sect_card(sect: SectProfile) -> str:
+def format_sect_card(sect: SectProfile, candidate: CultivatorProfile | None = None) -> str:
     """格式化宗门信息卡片"""
     grade = sect.grade
     import datetime
     created = datetime.datetime.fromtimestamp(sect.created_at).strftime("%Y-%m-%d")
+    candidate_slug = candidate.username if candidate else "candidate"
+    trial_artifact = f"sect-trial-{sect.name}-{candidate_slug}" if candidate else f"sect-trial-{sect.name}"
+    trial_description = (
+        f"邀请 @{candidate.username} 用一次真实改进证明愿为{sect.name}贡献"
+        if candidate
+        else f"请候选人用一次真实改进证明愿为{sect.name}贡献"
+    )
 
     lines = [
         f"# ⛰️ 宗门 · {sect.name}",
@@ -616,6 +671,87 @@ def format_sect_card(sect: SectProfile) -> str:
     for username, info in sorted_members:
         role = info.get("role", ROLE_OUTER)
         lines.append(f"- {ROLE_DISPLAY.get(role, '❓')} @{username}")
+
+    lines.extend([
+        "",
+        "## 📣 入宗招募",
+        "",
+        f"> 真实宗门档案快照：宗门当前 {sect.member_count} 人，宗门灵力 {sect.total_spirit_power}，"
+        f"等阶为 {grade.symbol} {grade.name_cn}。没有伪造候选人或历史入宗记录。",
+        "",
+    ])
+
+    if candidate:
+        candidate_realm = candidate.realm
+        lines.extend([
+            f"- 候选人真实快照: @{candidate.username} · 灵力 {candidate.spirit_power} · "
+            f"法宝 {candidate.agent_count} · 境界 {candidate_realm.symbol} {candidate_realm.name_cn}",
+            f"- 候选人贡献: 淬炼 {candidate.refinement_count} · 评价 {candidate.reviews_given} · 悬赏 {candidate.quests_completed}",
+            f"- 拜入宗门: `sect(action=\"join\", sect_name=\"{sect.name}\")`",
+            f"- 入宗试炼: `quest(action=\"post\", artifact_name=\"{trial_artifact}\", description=\"{trial_description}\")`",
+            "- 查看宗门战报: `sect(action=\"leaderboard\")`",
+            "- 冲击宗门战榜: `leaderboard(type=\"sect\")`",
+            f"- 查看候选人名片: `my_realm(username=\"{candidate.username}\")`",
+            f"- 查看宗主名片: `my_realm(username=\"{sect.master}\")`",
+            "",
+            "### 复制入宗招募",
+            "",
+            "```text",
+            f"我在 TianGong 邀请 @{candidate.username} 拜入宗门「{sect.name}」："
+            f"候选人灵力 {candidate.spirit_power}，法宝 {candidate.agent_count}，"
+            f"境界 {candidate_realm.name_cn}；宗门当前 {sect.member_count} 人，宗门灵力 {sect.total_spirit_power}。",
+            "加入修炼：pip install tiangong-mcp",
+            f"拜入宗门：sect(action=\"join\", sect_name=\"{sect.name}\")",
+            "```",
+            "",
+            "### 复制 Discussion/PR 入宗帖",
+            "",
+            "```markdown",
+            f"## 邀请 @{candidate.username} 拜入宗门「{sect.name}」",
+            "",
+            f"- 宗门快照: {sect.member_count}/{grade.max_members} 人，宗门灵力 {sect.total_spirit_power}，等阶 {grade.symbol} {grade.name_cn}",
+            f"- 宗主: @{sect.master}",
+            f"- 候选人: @{candidate.username}（真实修仙者档案快照）",
+            f"- 候选人快照: 灵力 {candidate.spirit_power}，法宝 {candidate.agent_count}，境界 {candidate_realm.symbol} {candidate_realm.name_cn}",
+            f"- 入宗试炼: `quest(action=\"post\", artifact_name=\"{trial_artifact}\", description=\"{trial_description}\")`",
+            f"- 拜入命令: `sect(action=\"join\", sect_name=\"{sect.name}\")`",
+            f"- 候选人名片: `my_realm(username=\"{candidate.username}\")`",
+            "- 宗门战报: `sect(action=\"leaderboard\")` / `leaderboard(type=\"sect\")`",
+            "- 安装: `pip install tiangong-mcp`",
+            "```",
+        ])
+    else:
+        lines.extend([
+            "- 候选人占位: 公开招募：未指定候选人；不要把 @candidate 当成真实修仙者档案。",
+            f"- 拜入宗门: `sect(action=\"join\", sect_name=\"{sect.name}\")`",
+            f"- 入宗试炼: `quest(action=\"post\", artifact_name=\"{trial_artifact}\", description=\"{trial_description}\")`",
+            "- 查看宗门战报: `sect(action=\"leaderboard\")`",
+            "- 冲击宗门战榜: `leaderboard(type=\"sect\")`",
+            f"- 查看宗主名片: `my_realm(username=\"{sect.master}\")`",
+            "",
+            "### 复制入宗招募",
+            "",
+            "```text",
+            f"我在 TianGong 看到宗门「{sect.name}」正在招募同门：宗门当前 {sect.member_count} 人，"
+            f"宗门灵力 {sect.total_spirit_power}，等阶 {grade.name_cn}。@candidate 可先完成入宗试炼，再拜入宗门。",
+            "加入修炼：pip install tiangong-mcp",
+            f"拜入宗门：sect(action=\"join\", sect_name=\"{sect.name}\")",
+            "```",
+            "",
+            "### 复制 Discussion/PR 入宗帖",
+            "",
+            "```markdown",
+            f"## 「{sect.name}」公开招募同门",
+            "",
+            f"- 宗门快照: {sect.member_count}/{grade.max_members} 人，宗门灵力 {sect.total_spirit_power}，等阶 {grade.symbol} {grade.name_cn}",
+            f"- 宗主: @{sect.master}",
+            "- 候选人: @candidate（占位符，请替换为真实 GitHub 用户名；不要把占位符当成真实档案）",
+            f"- 入宗试炼: `quest(action=\"post\", artifact_name=\"{trial_artifact}\", description=\"{trial_description}\")`",
+            f"- 拜入命令: `sect(action=\"join\", sect_name=\"{sect.name}\")`",
+            "- 宗门战报: `sect(action=\"leaderboard\")` / `leaderboard(type=\"sect\")`",
+            "- 安装: `pip install tiangong-mcp`",
+            "```",
+        ])
 
     return "\n".join(line for line in lines if line is not None)
 

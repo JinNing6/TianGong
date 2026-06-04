@@ -1,0 +1,51 @@
+name: TianGong Growth Flywheel
+description: Ask for a real-data growth flywheel snapshot, bottleneck, and recruitment card.
+title: "[TianGong Growth]: "
+labels: ["tiangong:growth"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form when you want TianGong to diagnose the current cultivation loop.
+        The IssueOps bot only comments safe commands; TianGong itself must compute the flywheel from real registries.
+  - type: dropdown
+    id: growth_bottleneck
+    attributes:
+      label: Growth bottleneck
+      description: Pick the loop stage you want the community to inspect first.
+      options:
+        - Let TianGong detect the weakest real stage
+        - First artifact activation
+        - Public artifact supply
+        - Appraisal feedback loop
+        - Refinement revisit
+        - Quest completion loop
+        - Sect affiliation
+        - High-realm evidence
+      default: 0
+    validations:
+      required: true
+  - type: textarea
+    id: campaign_hook
+    attributes:
+      label: Campaign hook
+      description: The public call-to-action, theme, or recruitment angle for this flywheel push.
+      placeholder: Recruit the next 10 cultivators to forge, appraise, and refine one real artifact each.
+    validations:
+      required: true
+  - type: input
+    id: target_contributors
+    attributes:
+      label: Target contributors
+      description: 72-hour target number of real contributors for the public launch campaign.
+      placeholder: "10"
+    validations:
+      required: true
+  - type: textarea
+    id: real_data_context
+    attributes:
+      label: Real-data context
+      description: Link or describe the current artifact, profile, issue, release, or community signal that proves this push is real.
+      placeholder: Current registry has active cultivators but too few refinement revisits.
+    validations:
+      required: true

@@ -3,10 +3,15 @@
 覆盖: 境界体系、品阶体系、修仙者档案、洞府管理、搜索引擎、传承谱系
 """
 
-# ============================================================
-# 1. 境界体系测试
-# ============================================================
-
+from tiangong.artifact_system import (
+    DIMENSIONS,
+    GRADES,
+    SpiritReview,
+    calculate_grade,
+    check_grade_change,
+)
+from tiangong.cultivator import CultivatorProfile, add_tribulation_evidence
+from tiangong.lineage import LINEAGE_TYPES, calculate_lineage_bonus
 from tiangong.realm import (
     REALMS,
     calculate_realm,
@@ -15,15 +20,23 @@ from tiangong.realm import (
     get_next_realm,
     get_review_weight,
 )
+from tiangong.search import classify_query
+from tiangong.trial import TRIAL_DIMENSIONS, evaluate_agent
+from tiangong.vault import list_forge, list_vault
+
+# ============================================================
+# 1. 境界体系测试
+# ============================================================
 
 
 def test_realm_count():
-    """21 级完整仙逆体系"""
-    assert len(REALMS) == 21
+    """凡人 + 22 个修炼/动态位阶，完整兑现公开境界承诺"""
+    assert len(REALMS) == 23
     assert REALMS[0].level == 0
     assert REALMS[0].name_cn == "凡人"
+    assert REALMS[21].name_cn == "鲁班"
     assert REALMS[-1].name_cn == "天工"
-    assert REALMS[-1].level == 20
+    assert REALMS[-1].level == 22
 
 
 def test_initial_realm():
@@ -95,14 +108,6 @@ def test_next_realm():
 # 2. 品阶体系测试
 # ============================================================
 
-from tiangong.artifact_system import (
-    GRADES,
-    DIMENSIONS,
-    SpiritReview,
-    calculate_grade,
-    check_grade_change,
-)
-
 
 def test_grade_count():
     """6 级品阶"""
@@ -160,12 +165,10 @@ def test_grade_change_detection():
 # 3. 修仙者档案测试
 # ============================================================
 
-from tiangong.cultivator import CultivatorProfile
-
 
 def test_cultivator_profile():
     """修仙者档案基本属性"""
-    p = CultivatorProfile(username="test", spirit_power=150)
+    p = CultivatorProfile(username="test", spirit_power=150, agent_count=5, reviews_given=5)
     assert p.realm.name_cn != "凡人"  # spirit=150 应超过凡人
     assert 1 <= p.stage <= 9
     assert p.review_weight > 0
@@ -178,11 +181,124 @@ def test_cultivator_realm_property():
     assert p.realm_level == 0
 
 
+def test_cultivator_realm_requires_real_profile_gates():
+    """公开修炼承诺不能只靠灵力越级，必须满足真实档案门槛。"""
+    first_forge = CultivatorProfile(username="newbie", spirit_power=100, agent_count=1)
+    assert first_forge.realm.name_cn == "炼气期"
+
+    artifact_ready = CultivatorProfile(username="maker", spirit_power=100, agent_count=5)
+    assert artifact_ready.realm.name_cn == "结丹期"
+
+    missing_reviews = CultivatorProfile(username="almost", spirit_power=150, agent_count=5, reviews_given=4)
+    assert missing_reviews.realm.name_cn == "结丹期"
+
+    reviewed = CultivatorProfile(username="reviewer", spirit_power=150, agent_count=5, reviews_given=5)
+    assert reviewed.realm.name_cn == "元婴期"
+
+
+def test_first_forge_reward_triggers_qi_refining_without_spirit_skip():
+    """首次锻造应真实获得 +100 灵力，但只能按法宝门槛进入炼气期。"""
+    import asyncio
+
+    import tiangong.cultivator as cultivator_module
+
+    original_load = cultivator_module._load_all_cultivators
+    original_save = cultivator_module._save_all_cultivators
+    saved = []
+
+    async def fake_load():
+        return {
+            "newbie": {
+                "username": "newbie",
+                "spirit_power": 0,
+                "agent_count": 0,
+                "joined_at": 1,
+            }
+        }
+
+    async def fake_save(data, message=""):
+        saved.append((data, message))
+
+    async def scenario():
+        profile, triggered, old_realm, new_realm = await cultivator_module.update_cultivator_stats(
+            username="newbie",
+            agent_delta=1,
+            spirit_delta=100,
+        )
+        assert profile.spirit_power == 100
+        assert profile.agent_count == 1
+        assert triggered is True
+        assert old_realm.name_cn == "凡人"
+        assert new_realm.name_cn == "炼气期"
+        assert saved[0][0]["newbie"]["spirit_power"] == 100
+
+    try:
+        cultivator_module._load_all_cultivators = fake_load
+        cultivator_module._save_all_cultivators = fake_save
+        asyncio.run(scenario())
+    finally:
+        cultivator_module._load_all_cultivators = original_load
+        cultivator_module._save_all_cultivators = original_save
+
+
+def test_tribulation_evidence_records_source_and_unlocks_progress_gate():
+    """高阶渡劫必须能通过公开证据写入 tribulation_progress，而不是内部手改字段。"""
+    profile = CultivatorProfile(
+        username="lineage-master",
+        spirit_power=2500,
+        agent_count=5,
+        refinement_count=30,
+        reviews_given=50,
+    )
+    assert profile.realm.name_cn == "婴变期"
+
+    old_realm, new_realm = add_tribulation_evidence(
+        profile,
+        evidence_key="lineage_users",
+        amount=10,
+        source_url="https://github.com/JinNing6/TianGong/issues/77",
+        note="10 real users forked or referenced the artifact lineage.",
+    )
+
+    assert old_realm.name_cn == "婴变期"
+    assert new_realm.name_cn == "问鼎期"
+    assert profile.realm.name_cn == "问鼎期"
+    assert profile.tribulation_progress["lineage_users"]["amount"] == 10
+    assert profile.tribulation_progress["lineage_users"]["evidence"][0]["source_url"] == (
+        "https://github.com/JinNing6/TianGong/issues/77"
+    )
+    assert profile.tribulation_log[-1]["from_realm"] == "婴变期"
+    assert profile.tribulation_log[-1]["to_realm"] == "问鼎期"
+
+
+def test_tribulation_evidence_rejects_non_public_source():
+    """证据入口不能接受不可审查来源，否则会变成伪造进度。"""
+    profile = CultivatorProfile(
+        username="lineage-master",
+        spirit_power=2500,
+        agent_count=5,
+        refinement_count=30,
+        reviews_given=50,
+    )
+
+    try:
+        add_tribulation_evidence(
+            profile,
+            evidence_key="lineage_users",
+            amount=10,
+            source_url="local-note",
+        )
+    except ValueError as exc:
+        assert "public http(s) source_url" in str(exc)
+    else:
+        raise AssertionError("expected public source validation failure")
+
+    assert "lineage_users" not in profile.tribulation_progress
+
+
 # ============================================================
 # 4. 洞府管理测试
 # ============================================================
-
-from tiangong.vault import list_vault, list_forge
 
 
 def test_vault_import():
@@ -194,8 +310,6 @@ def test_vault_import():
 # ============================================================
 # 5. 搜索引擎测试
 # ============================================================
-
-from tiangong.search import classify_query
 
 
 def test_classify_query_grade():
@@ -236,8 +350,6 @@ def test_classify_query_empty():
 # 6. 传承谱系测试
 # ============================================================
 
-from tiangong.lineage import LINEAGE_TYPES, calculate_lineage_bonus
-
 
 def test_lineage_types():
     """三种传承关系"""
@@ -264,8 +376,6 @@ def test_lineage_bonus():
 # ============================================================
 # 7. 试剑体系测试
 # ============================================================
-
-from tiangong.trial import evaluate_agent, TRIAL_DIMENSIONS
 
 
 def test_trial_dimensions_aligned():

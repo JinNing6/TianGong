@@ -2,25 +2,22 @@
 ⚒️ 天工 TianGong — 宗门系统单元测试
 """
 import time
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
+import pytest
+
+from tiangong.cultivator import CultivatorProfile
 from tiangong.sect import (
-    SECT_GRADES,
-    ROLE_MASTER,
     ROLE_ELDER,
-    ROLE_INNER,
+    ROLE_MASTER,
     ROLE_OUTER,
-    SectProfile,
+    SECT_GRADES,
     calculate_sect_grade,
     create_sect,
     join_sect,
     leave_sect,
     manage_sect,
-    get_sect,
 )
-from tiangong.cultivator import CultivatorProfile
-from tiangong.config import config
 
 
 def test_sect_grades():
@@ -48,8 +45,8 @@ def test_calculate_sect_grade():
 @patch("tiangong.cultivator.save_cultivator")
 async def test_create_sect_success(mock_save_cult, mock_get_cult, mock_save_sects, mock_load_sects):
     """测试创建宗门成功"""
-    # 模拟创建者境界达到结丹（level >= 3 需要的灵力）
-    creator = CultivatorProfile(username="master_user", spirit_power=100)
+    # 模拟创建者满足结丹期真实档案门槛（灵力 + 法宝数）
+    creator = CultivatorProfile(username="master_user", spirit_power=100, agent_count=5)
     mock_get_cult.return_value = creator
     mock_load_sects.return_value = {}
 
@@ -86,7 +83,7 @@ async def test_create_sect_low_realm(mock_get_cult, mock_load_sects):
 @patch("tiangong.cultivator.get_cultivator")
 async def test_create_sect_duplicate_name(mock_get_cult, mock_load_sects):
     """测试宗门重名"""
-    creator = CultivatorProfile(username="master_user", spirit_power=100)
+    creator = CultivatorProfile(username="master_user", spirit_power=100, agent_count=5)
     mock_get_cult.return_value = creator
     # 模拟已有同名宗门
     mock_load_sects.return_value = {"同名宗门": {}}
@@ -105,7 +102,7 @@ async def test_join_sect_success(mock_save_cult, mock_get_cult, mock_save_sects,
     """测试加入宗门"""
     joiner = CultivatorProfile(username="newbie", spirit_power=10)
     mock_get_cult.return_value = joiner
-    
+
     mock_load_sects.return_value = {
         "测试宗门": {
             "name": "测试宗门",
@@ -118,7 +115,7 @@ async def test_join_sect_success(mock_save_cult, mock_get_cult, mock_save_sects,
     success, msg = await join_sect("测试宗门", "newbie")
     assert success is True
     assert "拜入宗门成功" in msg
-    
+
     saved_data = mock_save_sects.call_args[0][0]
     assert "newbie" in saved_data["测试宗门"]["members"]
     assert saved_data["测试宗门"]["members"]["newbie"]["role"] == ROLE_OUTER
@@ -134,7 +131,7 @@ async def test_leave_sect_success(mock_save_cult, mock_get_cult, mock_save_sects
     """测试退出宗门"""
     leaver = CultivatorProfile(username="user1", spirit_power=10, sect="测试宗门", sect_role=ROLE_OUTER)
     mock_get_cult.return_value = leaver
-    
+
     mock_load_sects.return_value = {
         "测试宗门": {
             "name": "测试宗门",
@@ -150,12 +147,12 @@ async def test_leave_sect_success(mock_save_cult, mock_get_cult, mock_save_sects
     success, msg = await leave_sect("user1")
     assert success is True
     assert "退出宗门" in msg
-    
+
     # 确认宗门成员移除且总灵力扣除
     saved_sects = mock_save_sects.call_args[0][0]
     assert "user1" not in saved_sects["测试宗门"]["members"]
     assert saved_sects["测试宗门"]["total_spirit_power"] == 100
-    
+
     # 确认个人档案更新了冷却期
     saved_profile = mock_save_cult.call_args[0][0]
     assert saved_profile.sect == ""
@@ -200,7 +197,7 @@ async def test_manage_sect_promote(mock_save_cult, mock_get_cult, mock_save_sect
     # 只有宗主可以任命长老
     success, msg = await manage_sect("测试宗门", "promote_elder", "target", "master_user")
     assert success is True
-    
+
     saved_sects = mock_save_sects.call_args[0][0]
     assert saved_sects["测试宗门"]["members"]["target"]["role"] == ROLE_ELDER
 

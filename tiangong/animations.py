@@ -12,16 +12,14 @@ from __future__ import annotations
 import random
 import sys
 import time
-import threading
 from typing import TextIO
 
-from rich.console import Console, Group
+from rich.console import Console
 from rich.layout import Layout
 from rich.live import Live
 from rich.panel import Panel
-from rich.text import Text
-from rich.align import Align
 from rich.table import Table
+from rich.text import Text
 
 # ============================================================
 # 基础工具
@@ -75,12 +73,12 @@ def __generate_radar_status(t: float) -> Table:
     table = Table.grid(padding=(0, 1))
     table.add_column("Indicator", style="bold cyan")
     table.add_column("Value")
-    
+
     # 模拟真实抖动的数据
     cpu = random.randint(10, 80) if t < 3.0 else random.randint(5, 15)
     mem = random.randint(40, 90) if t < 3.0 else random.randint(30, 45)
     spirit = int(min(100, (t / 3.5) * 100))
-    
+
     table.add_row("CPU 负荷", f"[{cpu:3d}%]")
     table.add_row("识海容量", f"[{mem:3d}%]")
     table.add_row("天地灵气", f"[{spirit:3d}%]")
@@ -90,7 +88,7 @@ def __generate_radar_status(t: float) -> Table:
 def play_full_boot_sequence() -> str:
     """
     完整启动序列动画 (全息仪表盘)。
-    
+
     返回: 静态 Logo 文本 (用于 fallback)
     """
     stream = _safe_stderr()
@@ -103,7 +101,7 @@ def play_full_boot_sequence() -> str:
         return _get_static_logo()
 
     console = Console(file=stream, force_terminal=True, color_system="256")
-    
+
     layout = Layout()
     layout.split_row(
         Layout(name="left", ratio=2),
@@ -113,20 +111,20 @@ def play_full_boot_sequence() -> str:
 
     start_time = time.time()
     duration = 4.5
-    
+
     logo_lines = _get_static_logo().strip("\n").split("\n")
 
     try:
         # Hide cursor and run at 20 FPS
-        with Live(layout, console=console, refresh_per_second=20, screen=False, transient=True) as live:
+        with Live(layout, console=console, refresh_per_second=20, screen=False, transient=True):
             while True:
                 t = time.time() - start_time
                 if t > duration:
                     break
-                
+
                 # 左侧：修仙功法与内存转储流
                 layout["left"].update(Panel(__generate_hex_dump(10), title="[bold green]MEMORY DUMP", border_style="dim green"))
-                
+
                 # 右侧：天道环境监控雷达
                 layout["right"].update(Panel(__generate_radar_status(t), title="[bold cyan]SYSTEM RADAR", border_style="cyan"))
 
@@ -159,7 +157,7 @@ def play_full_boot_sequence() -> str:
                     layout["main"].update(Panel(logo_text, title="[bold cyan]UPLINK COMPLETE", border_style="cyan"))
 
                 time.sleep(0.05)
-                
+
     except (OSError, UnicodeEncodeError, KeyboardInterrupt):
         pass
 
@@ -181,7 +179,7 @@ def play_tribulation_alert(old_realm_name: str, new_realm_name: str) -> None:
 
     console = Console(file=stream, force_terminal=True, color_system="256")
     start_time = time.time()
-    
+
     try:
         # Transient=True 表示结束时这块警报会被擦除，不破坏屏幕堆栈
         with Live(console=console, refresh_per_second=20, transient=True) as live:
@@ -189,7 +187,7 @@ def play_tribulation_alert(old_realm_name: str, new_realm_name: str) -> None:
                 t = time.time() - start_time
                 if t > 3.0:
                     break
-                    
+
                 if t < 1.8:
                     # 第一阶段：狂暴乱码与雷电（颜色和符号剧烈切换）
                     chars = "".join(random.choice(['⚡', '💥', '▓', '▒', '░', '?', '!']) for _ in range(40))
@@ -202,7 +200,7 @@ def play_tribulation_alert(old_realm_name: str, new_realm_name: str) -> None:
                     # 第二阶段：突破成功的刺眼金光
                     text = Text(f"\n\n【渡劫成功】\n\n境界跃迁：{old_realm_name} → {new_realm_name}\n\n「破而后立，涅槃重生」\n\n", justify="center", style="bold yellow")
                     live.update(Panel(text, border_style="yellow", title="[bold yellow] BREAKTHROUGH [/]"))
-                    
+
                 time.sleep(0.05)
     except Exception:
         pass
@@ -219,14 +217,14 @@ def play_grade_promotion_alert(agent_name: str, new_grade: str) -> None:
     console = Console(file=stream, force_terminal=True, color_system="256")
     start_time = time.time()
     duration = 3.5
-    
+
     try:
         with Live(console=console, refresh_per_second=20, transient=True) as live:
             while True:
                 t = time.time() - start_time
                 if t > duration:
                     break
-                
+
                 if t < 2.0:
                     # 第一阶段：灵力灌注（数字飙升）
                     progress = t / 2.0
@@ -241,7 +239,7 @@ def play_grade_promotion_alert(agent_name: str, new_grade: str) -> None:
                     blink_color = colors[int(t * 15) % len(colors)]
                     text = Text(f"\n\n【神兵出世】\n\n「{agent_name}」 品阶觉醒：{new_grade}\n\n天灵地宝，皆为我用！\n\n", justify="center", style=blink_color)
                     live.update(Panel(text, border_style=blink_color, title=f"[{blink_color}] ✨ ARTIFACT AWAKENED ✨ [/]"))
-                    
+
                 time.sleep(0.05)
     except Exception:
         pass
@@ -289,7 +287,7 @@ def render_lightning_field(width: int = 42) -> str:
     """生成雷电能量场"""
     line1 = "  " + "░" * width
     chars = []
-    for i in range(width):
+    for _ in range(width):
         if random.random() < 0.25:
             chars.append(random.choice(_LIGHTNING_CHARS))
         else:
@@ -307,10 +305,7 @@ def render_progress_bar(
     empty_char: str = "░",
 ) -> str:
     """渲染进度条"""
-    if maximum <= 0:
-        ratio = 0.0
-    else:
-        ratio = min(current / maximum, 1.0)
+    ratio = 0.0 if maximum <= 0 else min(current / maximum, 1.0)
     filled = int(ratio * width)
     empty = width - filled
     percent = int(ratio * 100)
@@ -351,9 +346,7 @@ def render_realm_chain(old_level: int, new_level: int, realms: list) -> str:
     """
     parts = []
     for r in realms:
-        if r.level < old_level:
-            parts.append(f"{r.symbol}")
-        elif r.level == old_level:
+        if r.level < old_level or r.level == old_level:
             parts.append(f"{r.symbol}")
         elif r.level == new_level:
             parts.append(f"【{r.symbol} {r.name_cn}】")

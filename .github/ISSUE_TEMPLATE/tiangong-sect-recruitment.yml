@@ -1,0 +1,34 @@
+name: TianGong Sect Recruitment
+description: Recruit a real candidate into a sect and route them to join, trial, and sect-war commands.
+title: "[TianGong Sect]: "
+labels: ["tiangong:sect"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to recruit a cultivator into a sect.
+        The bot reply is an invitation card; the actual sect snapshot, candidate profile, and sect-war ranking must be rendered by TianGong commands.
+  - type: input
+    id: sect_name
+    attributes:
+      label: Sect name
+      description: Exact sect name.
+      placeholder: Heavenly Sword Sect
+    validations:
+      required: true
+  - type: input
+    id: candidate_username
+    attributes:
+      label: Candidate username
+      description: GitHub username of the candidate. Use a real account, not a placeholder.
+      placeholder: new-cultivator
+    validations:
+      required: true
+  - type: textarea
+    id: admission_trial
+    attributes:
+      label: Admission trial
+      description: The real contribution that proves the candidate should join.
+      placeholder: Complete one refinement quest for a sect artifact and share the result.
+    validations:
+      required: true

@@ -37,12 +37,18 @@ desktop.ini
 
 # === Testing ===
 .pytest_cache/
+.pytest-tmp/
+.pytest-tmp*/
 htmlcov/
 .coverage
 .coverage.*
 
 # === Ruff ===
 .ruff_cache/
+
+# === Local Codex verification ===
+.build-tmp/
+.codex-test-venv/
 
 # === TianGong 数据 ===
 agents/*/data/

@@ -7,9 +7,7 @@ from __future__ import annotations
 
 import random
 
-from . import __version__
-from .animations import play_full_boot_sequence, _get_static_logo
-
+from .animations import play_full_boot_sequence
 
 # ============================================================
 # 启动动画

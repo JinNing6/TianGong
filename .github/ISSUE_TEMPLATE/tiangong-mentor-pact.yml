@@ -1,0 +1,34 @@
+name: TianGong Mentor Pact
+description: Pair a senior cultivator with an apprentice through real profile checks.
+title: "[TianGong Mentor]: "
+labels: ["tiangong:mentor"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form when a senior contributor wants to guide an apprentice.
+        The reply points to my_realm and quest commands; mentor eligibility must come from real TianGong profile fields.
+  - type: input
+    id: mentor_username
+    attributes:
+      label: Mentor username
+      description: GitHub username of the proposed mentor.
+      placeholder: senior-cultivator
+    validations:
+      required: true
+  - type: input
+    id: apprentice_username
+    attributes:
+      label: Apprentice username
+      description: GitHub username of the apprentice.
+      placeholder: new-contributor
+    validations:
+      required: true
+  - type: textarea
+    id: first_trial
+    attributes:
+      label: First trial
+      description: The apprentice's first real contribution task.
+      placeholder: Improve one artifact README and submit it through quest(action="submit").
+    validations:
+      required: true

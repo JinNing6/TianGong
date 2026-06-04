@@ -1,0 +1,52 @@
+name: TianGong Share Proof
+description: Bind a public contribution share URL back to the real TianGong growth loop.
+title: "[TianGong Share]: "
+labels: ["tiangong:share"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form when a real TianGong contribution has been shared publicly.
+        The IssueOps bot only comments safe commands; TianGong itself must record attribution through the local MCP ledger.
+  - type: dropdown
+    id: contribution_type
+    attributes:
+      label: Contribution type
+      description: Pick the real contribution that was shared.
+      options:
+        - forge
+        - refine
+        - publish
+        - summon
+        - infuse
+        - quest_post
+        - quest_claim
+        - quest_submit
+        - quest_verify
+      default: 0
+    validations:
+      required: true
+  - type: input
+    id: public_share_url
+    attributes:
+      label: Public share URL
+      description: Public GitHub Issue, PR, Discussion, release, or other reviewable http(s) URL for the share.
+      placeholder: https://github.com/JinNing6/TianGong/issues/1
+    validations:
+      required: true
+  - type: input
+    id: artifact_name
+    attributes:
+      label: Artifact name
+      description: Exact artifact name, artifact ID, or quest identifier tied to this share.
+      placeholder: dragon-forge
+    validations:
+      required: false
+  - type: textarea
+    id: campaign_hook
+    attributes:
+      label: Campaign hook
+      description: The public call-to-action or proof angle this share should reinforce.
+      placeholder: This share proves a real forge-to-share loop and recruits the next public contribution.
+    validations:
+      required: true
