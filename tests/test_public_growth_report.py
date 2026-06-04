@@ -845,6 +845,60 @@ def test_public_growth_report_fetch_failure_is_recovery_surface(tmp_path):
     assert "First External Contributor Path" in result
 
 
+def test_public_growth_report_fetch_failure_shows_local_recorded_proof(tmp_path):
+    """API rate limits should not hide proof URLs already written to the local ledger."""
+    from tiangong.activation import (
+        EVENT_ISSUEOPS_REFERRAL_RECORDED,
+        EVENT_SHARE_ATTRIBUTION_RECORDED,
+        ActivationEvent,
+    )
+    from tiangong.public_growth import format_public_growth_report
+
+    event_path = tmp_path / "activation-events.jsonl"
+    events = [
+        ActivationEvent(
+            schema_version=1,
+            event_type=EVENT_ISSUEOPS_REFERRAL_RECORDED,
+            actor="JinNing6",
+            timestamp=1.0,
+            metadata={
+                "route": "growth",
+                "source_url": "https://github.com/JinNing6/TianGong/issues/1",
+                "issue_number": 1,
+            },
+        ),
+        ActivationEvent(
+            schema_version=1,
+            event_type=EVENT_SHARE_ATTRIBUTION_RECORDED,
+            actor="JinNing6",
+            artifact_name="tiangong-mcp-v0.1.0",
+            timestamp=2.0,
+            metadata={
+                "contribution": "publish",
+                "share_url": "https://github.com/JinNing6/TianGong/issues/2",
+                "source_url": "https://github.com/JinNing6/TianGong/issues/1",
+                "issue_number": 2,
+            },
+        ),
+    ]
+
+    result = format_public_growth_report(
+        None,
+        activation_events=events,
+        source_path=event_path,
+        target_contributors=25,
+        fetch_error="GitHub API HTTP 403: rate limit exceeded",
+    )
+
+    assert "## Local Proof Already Recorded" in result
+    assert "local activation ledger" in result
+    assert "https://github.com/JinNing6/TianGong/issues/1" in result
+    assert "https://github.com/JinNing6/TianGong/issues/2" in result
+    assert "tiangong-mcp-v0.1.0" in result
+    assert "Do not open duplicate first-proof Issues" in result
+    assert "public_growth_report(record_snapshot=True, target_contributors=25)" in result
+
+
 def test_public_growth_report_fetch_failure_reuses_campaign_target(tmp_path):
     """Rate-limit recovery should keep the active 72h target instead of resetting the proof pack."""
     from tiangong.public_growth import format_public_growth_report

@@ -813,6 +813,80 @@ def _count_events(events: Sequence[ActivationEvent], event_type: str) -> int:
     return sum(1 for event in events if event.event_type == event_type)
 
 
+def _metadata_text(event: ActivationEvent, key: str) -> str:
+    value = event.metadata.get(key, "")
+    text = " ".join(str(value or "").split())
+    return text[:240]
+
+
+def _metadata_public_url(event: ActivationEvent, key: str) -> str:
+    value = _metadata_text(event, key)
+    if not value.startswith(("https://", "http://")):
+        return ""
+    if "<" in value or ">" in value:
+        return ""
+    return value
+
+
+def _format_local_recorded_proof_lines(
+    events: Sequence[ActivationEvent],
+    *,
+    target_contributors: int,
+) -> list[str]:
+    rows: list[tuple[float, str, str, str, str, str]] = []
+    seen: set[tuple[str, str, str, str]] = set()
+    for event in sorted(events, key=lambda item: item.timestamp, reverse=True):
+        if event.event_type == EVENT_ISSUEOPS_REFERRAL_RECORDED:
+            proof_url = _metadata_public_url(event, "source_url")
+            if not proof_url:
+                continue
+            route = _metadata_text(event, "route") or "growth"
+            row = ("Growth return", event.actor or "unknown", proof_url, f"route: {route}", event.artifact_name or "-")
+        elif event.event_type == EVENT_SHARE_ATTRIBUTION_RECORDED:
+            proof_url = _metadata_public_url(event, "share_url")
+            if not proof_url:
+                continue
+            source_url = _metadata_public_url(event, "source_url") or "-"
+            artifact = event.artifact_name or _metadata_text(event, "artifact_name") or "-"
+            row = ("Share attribution", event.actor or "unknown", proof_url, source_url, artifact)
+        else:
+            continue
+
+        key = (row[0], row[1], row[2], row[3])
+        if key in seen:
+            continue
+        seen.add(key)
+        rows.append((event.timestamp, *row))
+        if len(rows) >= 6:
+            break
+
+    if not rows:
+        return []
+
+    target = _safe_positive_int(target_contributors, fallback=10)
+    lines = [
+        "## Local Proof Already Recorded",
+        "",
+        "> These proof rows come from the local activation ledger only; external GitHub/PyPI metrics are still unverified while the public API snapshot is unavailable.",
+        "",
+        "| Proof | Actor | Public URL | Source bridge | Artifact |",
+        "|---|---|---|---|---|",
+    ]
+    for _, proof, actor, proof_url, source_bridge, artifact in rows:
+        lines.append(f"| {proof} | @{actor} | {proof_url} | {source_bridge} | {artifact} |")
+    lines.extend(
+        [
+            "",
+            "- Do not open duplicate first-proof Issues unless a new public proof event is needed.",
+            f"- Recheck public proof after API recovery: `public_growth_report(record_snapshot=True, target_contributors={target})`",
+            "- Inspect local activation: `activation_funnel()`",
+            "- Inspect public share proof: `share_attribution_report()`",
+            "",
+        ]
+    )
+    return lines
+
+
 def _snapshot_entry_from_dict(data: dict[str, Any]) -> PublicGrowthHistoryEntry | None:
     try:
         return PublicGrowthHistoryEntry(
@@ -1913,6 +1987,7 @@ def format_public_growth_report(
                 f"- Fetch error: {fetch_error or 'missing public GitHub snapshot'}",
                 "- Current proof status: external traction is unproven until the public GitHub API snapshot is available.",
                 "",
+                *_format_local_recorded_proof_lines(events, target_contributors=recovery_target),
                 "## Recovery Commands",
                 "",
                 f"- Run launch preflight: `{preflight_recheck}`",
