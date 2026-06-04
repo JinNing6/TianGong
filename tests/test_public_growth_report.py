@@ -829,11 +829,11 @@ def test_public_growth_report_fetch_failure_is_recovery_surface(tmp_path):
     assert "External GitHub metrics were not fetched" in result
     assert "HTTP 403: rate limited" in result
     assert "does not invent downloads, retention, repost counts, referral conversions, or rewards" in result
-    assert "`growth_campaign()`" in result
+    assert "`growth_campaign(target_contributors=10)`" in result
     assert "`share_attribution_report()`" in result
-    assert "`public_growth_report()`" in result
-    assert "`public_launch_preflight()`" in result
-    assert "`public_proof_pack()`" in result
+    assert "`public_growth_report(record_snapshot=True, target_contributors=10)`" in result
+    assert "`public_launch_preflight(target_contributors=10)`" in result
+    assert "`public_proof_pack(target_contributors=10)`" in result
     assert "`tiangong-mcp public-proof-pack --target-contributors 10`" in result
     assert "## No-Network First Proof Pack" in result
     assert "TianGong First Public Proof Pack" in result
@@ -859,6 +859,9 @@ def test_public_growth_report_fetch_failure_reuses_campaign_target(tmp_path):
     )
 
     assert "tiangong-mcp public-proof-pack --target-contributors 6" in result
+    assert "public_launch_preflight(target_contributors=6)" in result
+    assert "public_proof_pack(target_contributors=6)" in result
+    assert "public_growth_report(record_snapshot=True, target_contributors=6)" in result
     assert "target_contributors=6" in result
     assert "target_contributors=10" not in result
 
@@ -909,6 +912,58 @@ def test_public_launch_preflight_fetch_failure_reuses_campaign_target(tmp_path):
     assert "public_growth_report(record_snapshot=True, target_contributors=25)" in result
     assert "target_contributors=10" not in result
     assert "--target-contributors 10" not in result
+
+
+def test_public_launch_preflight_pypi_runbook_reuses_campaign_target(tmp_path):
+    """Trusted Publisher recovery should preserve the active launch target."""
+    from tiangong.public_growth import (
+        PublicDistributionReadiness,
+        PublicGrowthIssueMetrics,
+        PublicGrowthSnapshot,
+        PublicReleaseReadiness,
+        PublicRepoMetrics,
+        format_public_launch_preflight,
+    )
+
+    event_path = tmp_path / "activation-events.jsonl"
+    snapshot = PublicGrowthSnapshot(
+        repo=PublicRepoMetrics(
+            full_name="octo-org/octo-repo",
+            html_url="https://github.com/octo-org/octo-repo",
+            stargazers=4,
+            forks=0,
+            watchers=4,
+            subscribers=0,
+            open_issues=0,
+            pushed_at="2026-06-01T00:00:00Z",
+            updated_at="2026-06-02T00:00:00Z",
+            api_url="https://api.github.com/repos/octo-org/octo-repo",
+        ),
+        growth_issues=PublicGrowthIssueMetrics("tiangong:growth", 0, 0, 0),
+        share_issues=PublicGrowthIssueMetrics("tiangong:share", 0, 0, 0),
+        release_readiness=PublicReleaseReadiness(
+            local_version="0.1.0",
+            expected_tag="v0.1.0",
+            status="missing",
+        ),
+        distribution_readiness=PublicDistributionReadiness(
+            package_name="tiangong-mcp",
+            local_version="0.1.0",
+            published_version="0.0.1",
+            status="stale",
+        ),
+    )
+
+    result = format_public_launch_preflight(
+        snapshot,
+        activation_events=[],
+        source_path=event_path,
+        target_contributors=30,
+    )
+
+    assert "Recheck install loop: `public_growth_report(record_snapshot=True, target_contributors=30)`" in result
+    assert "public_proof_pack(target_contributors=30)" in result
+    assert "target_contributors=10" not in result
 
 
 def test_public_growth_snapshot_history_records_jsonl_and_reports_velocity(tmp_path):

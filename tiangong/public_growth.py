@@ -1095,13 +1095,18 @@ def _format_distribution_readiness_lines(distribution: PublicDistributionReadine
     return lines
 
 
-def _format_pypi_trusted_publisher_runbook_lines(snapshot: PublicGrowthSnapshot) -> list[str]:
+def _format_pypi_trusted_publisher_runbook_lines(
+    snapshot: PublicGrowthSnapshot,
+    *,
+    target_contributors: int = 10,
+) -> list[str]:
     distribution = snapshot.distribution_readiness
     if distribution.status not in {"stale", "unverified"}:
         return []
 
     owner, repo = _repo_owner_name(snapshot.repo.full_name)
     release_tag = snapshot.release_readiness.expected_tag or f"v{distribution.local_version or 'current-local-version'}"
+    target = _safe_positive_int(target_contributors, fallback=10)
     lines = [
         "## PyPI Trusted Publisher Setup Runbook",
         "",
@@ -1131,7 +1136,7 @@ def _format_pypi_trusted_publisher_runbook_lines(snapshot: PublicGrowthSnapshot)
         "",
         "- Re-run failed release job, or manually dispatch the workflow with tag "
         f"`{release_tag}` from the Actions page above.",
-        "- Recheck install loop: `public_growth_report(record_snapshot=True, target_contributors=10)`",
+        f"- Recheck install loop: `public_growth_report(record_snapshot=True, target_contributors={target})`",
         f"- Expected proof: PyPI JSON latest version becomes `{distribution.local_version or 'current-local-version'}`.",
         "",
     ]
@@ -1439,7 +1444,7 @@ def format_public_launch_preflight(
                 local_shares=local_shares,
                 target_contributors=target,
             ),
-            *_format_pypi_trusted_publisher_runbook_lines(snapshot),
+            *_format_pypi_trusted_publisher_runbook_lines(snapshot, target_contributors=target),
             "## First Public Proof Entrypoints",
             "",
             "> Use the form URLs only to create public Issues. Use created Issue URLs, not `issues/new?...` form URLs, for ledger commands.",
@@ -1896,6 +1901,10 @@ def format_public_growth_report(
 
     if snapshot is None:
         recovery_target = _safe_positive_int(target_contributors, fallback=10)
+        preflight_recheck = f"public_launch_preflight(target_contributors={recovery_target})"
+        proof_pack_recheck = f"public_proof_pack(target_contributors={recovery_target})"
+        proof_recheck = f"public_growth_report(record_snapshot=True, target_contributors={recovery_target})"
+        campaign_recheck = f"growth_campaign(target_contributors={recovery_target})"
         lines.extend(
             [
                 "## External Fetch Status",
@@ -1906,21 +1915,21 @@ def format_public_growth_report(
                 "",
                 "## Recovery Commands",
                 "",
-                "- Run launch preflight: `public_launch_preflight()`",
+                f"- Run launch preflight: `{preflight_recheck}`",
                 f"- Generate no-network first proof pack: `tiangong-mcp public-proof-pack --target-contributors {recovery_target}`",
-                "- Generate MCP first proof pack: `public_proof_pack()`",
-                "- Retry public proof: `public_growth_report()`",
-                "- Launch a 72h campaign: `growth_campaign()`",
+                f"- Generate MCP first proof pack: `{proof_pack_recheck}`",
+                f"- Retry public proof: `{proof_recheck}`",
+                f"- Launch a 72h campaign: `{campaign_recheck}`",
                 "- Inspect local activation: `activation_funnel()`",
                 "- Inspect public share proof: `share_attribution_report()`",
                 "",
                 "```text",
                 "TianGong public growth proof is currently blocked on a real GitHub API snapshot. "
                 "No downloads, retention, reposts, referrals, or rewards were invented.",
-                "Preflight: public_launch_preflight()",
+                f"Preflight: {preflight_recheck}",
                 f"Proof pack: tiangong-mcp public-proof-pack --target-contributors {recovery_target}",
-                "MCP proof pack: public_proof_pack()",
-                "Retry: public_growth_report()",
+                f"MCP proof pack: {proof_pack_recheck}",
+                f"Retry: {proof_recheck}",
                 "```",
                 "",
                 "## No-Network First Proof Pack",
@@ -1959,7 +1968,7 @@ def format_public_growth_report(
             *_format_issueops_readiness_lines(snapshot.issueops_readiness),
             *_format_release_readiness_lines(snapshot.release_readiness),
             *_format_distribution_readiness_lines(snapshot.distribution_readiness),
-            *_format_pypi_trusted_publisher_runbook_lines(snapshot),
+            *_format_pypi_trusted_publisher_runbook_lines(snapshot, target_contributors=target_contributors),
             *_format_public_launch_closure_checklist_lines(
                 snapshot,
                 local_referrals=local_referrals,
