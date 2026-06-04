@@ -1089,10 +1089,12 @@ def _format_release_readiness_lines(release: PublicReleaseReadiness) -> list[str
                 "- Publishing this Release triggers PyPI Trusted Publishing for the current package version.",
                 (
                     f"- If release creation is unavailable but tag `{expected_tag}` already exists, use the protected "
+                    f"tag-push fallback: push tag `{expected_tag}` to trigger `.github/workflows/publish-pypi.yml` "
+                    f"by running `git push origin {expected_tag}`; if the tag push cannot be repeated, use the protected "
                     f"manual workflow dispatch for `.github/workflows/publish-pypi.yml` with tag `{expected_tag}` to "
-                    "publish the install loop while release proof remains open."
+                    "publish the install loop while GitHub Release proof remains open."
                 ),
-                "- The manual workflow checks out the tag, verifies it is reachable from `origin/main`, and verifies `pyproject.toml` version equals the tag.",
+                "- The tag-push/manual workflow checks out the tag, verifies it is reachable from `origin/main`, and verifies `pyproject.toml` version equals the tag.",
                 "- Recheck release proof: `public_growth_report()`",
                 "- Do not claim the install loop can refresh until the matching published release exists.",
                 "",
@@ -1147,6 +1149,7 @@ def _format_distribution_readiness_lines(distribution: PublicDistributionReadine
                 "- Build release artifacts: `python -m build`",
                 "- Check release artifacts: `python -m twine check dist/*`",
                 "- Create a GitHub Release after PyPI Trusted Publishing is configured; the release workflow will publish without storing a PyPI API token.",
+                "- If GitHub Release creation is unavailable, push the verified `v*` tag to trigger the same workflow after quality gates pass.",
                 "- If GitHub Release creation is unavailable, manually dispatch `.github/workflows/publish-pypi.yml` with the existing `v*` tag after quality gates pass.",
                 "- Recheck distribution proof: `public_growth_report()`",
                 "- Do not claim the install loop reaches current growth tools while PyPI is stale.",
@@ -1208,8 +1211,8 @@ def _format_pypi_trusted_publisher_runbook_lines(
         "",
         "## After PyPI Setup",
         "",
-        "- Re-run failed release job, or manually dispatch the workflow with tag "
-        f"`{release_tag}` from the Actions page above.",
+        f"- Re-run failed release job, push tag `{release_tag}` to trigger the workflow, or manually dispatch the workflow "
+        f"with tag `{release_tag}` from the Actions page above.",
         f"- Recheck install loop: `public_growth_report(record_snapshot=True, target_contributors={target})`",
         f"- Expected proof: PyPI JSON latest version becomes `{distribution.local_version or 'current-local-version'}`.",
         "",
@@ -1264,7 +1267,7 @@ def _format_public_launch_closure_checklist_lines(
                 (
                     f"Run `gh release create {tag} --generate-notes` after quality gates pass; if GitHub CLI is "
                     f"unavailable, open {release_draft_url}, Select existing tag `{tag}`, generate notes, and publish "
-                    "the Release. If release creation is unavailable, manually dispatch "
+                    f"the Release. If release creation is unavailable, push tag `{tag}` to trigger the publish workflow, or manually dispatch "
                     f"`.github/workflows/publish-pypi.yml` with tag `{tag}` as an install-loop fallback."
                 ),
                 f"`public_growth_report()` shows GitHub Release `{tag}` as published.",
@@ -1394,8 +1397,9 @@ def format_public_launch_preflight(
                 f"- Open GitHub web release page: {release_draft_url}",
                 f"- Select existing tag `{release_tag}`, generate notes, and publish the Release.",
                 (
-                    f"- If Release creation is unavailable, open Actions manual workflow page: {publish_workflow_url} "
-                    f"and run workflow_dispatch tag `{release_tag}`."
+                    f"- If Release creation is unavailable, run `git push origin {release_tag}` to trigger the tag-push "
+                    f"publish workflow, or open Actions manual workflow page: {publish_workflow_url} and run "
+                    f"workflow_dispatch tag `{release_tag}`."
                 ),
                 "",
                 "## Optional GitHub REST Release Command",
@@ -1568,6 +1572,7 @@ def format_public_launch_preflight(
                 f"- Actions manual workflow page: {publish_workflow_url} - run workflow_dispatch tag `{release_tag}` "
                 "after the tag is on `origin/main` if Release creation is unavailable."
             ),
+            f"- Tag-push publish fallback: `git push origin {release_tag}` after the tag points to a commit reachable from `origin/main`.",
             "- PyPI publishing should happen through `.github/workflows/publish-pypi.yml` and PyPI Trusted Publishing/OIDC.",
             "- The publish workflow validates the tag, checks that it is reachable from `origin/main`, and verifies `pyproject.toml` version before upload.",
             "- Do not use a stored `PYPI_TOKEN` for this release path.",

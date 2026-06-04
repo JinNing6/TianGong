@@ -39,9 +39,14 @@ REQUIRED_WORKFLOW_COMMANDS = (
 REQUIRED_PUBLISH_WORKFLOW_FEATURES = (
     "release:",
     "types: [published]",
+    "push:",
+    "tags:",
+    '"v*"',
     "workflow_dispatch:",
-    "github.event.release.tag_name || inputs.tag",
+    "github.event.release.tag_name || github.ref_name || inputs.tag",
     "Resolve release tag",
+    'github.event_name }}" == "push"',
+    'tag="${GITHUB_REF_NAME}"',
     "Release tag must look like v0.1.0",
     "ref: ${{ steps.release.outputs.tag }}",
     "fetch-depth: 0",
@@ -298,7 +303,7 @@ def _workflow_checks(root: Path) -> list[ReleaseBoundaryCheck]:
             "ready" if not missing else "blocked",
             (
                 "quality and publish workflows run launch assets plus release boundary; "
-                "publish workflow verifies release tags and supports protected manual tag dispatch"
+                "publish workflow verifies release tags and supports protected tag push plus manual tag dispatch"
             )
             if not missing
             else f"missing {', '.join(missing)}",

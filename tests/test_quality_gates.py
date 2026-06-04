@@ -75,11 +75,16 @@ def test_pypi_publish_workflow_uses_trusted_publishing_after_release_gates():
     assert "pull_request_target" not in workflow
     assert "release:" in workflow
     assert "types: [published]" in workflow
+    assert "push:" in workflow
+    assert "tags:" in workflow
+    assert '"v*"' in workflow or "'v*'" in workflow
     assert "workflow_dispatch:" in workflow
     assert "inputs:" in workflow
     assert "tag:" in workflow
     assert "Existing v* tag" in workflow
-    assert "github.event.release.tag_name || inputs.tag" in workflow
+    assert "github.event.release.tag_name || github.ref_name || inputs.tag" in workflow
+    assert 'github.event_name }}" == "push"' in workflow
+    assert 'tag="${GITHUB_REF_NAME}"' in workflow
     assert "contents: read" in workflow
     assert "id-token: write" in workflow
     assert "environment: pypi" in workflow
@@ -121,6 +126,7 @@ def test_readmes_document_one_command_dev_install_and_quality_gate():
         assert ".github/workflows/quality-gates.yml" in text
         assert ".github/workflows/publish-pypi.yml" in text
         assert "Trusted Publishing" in text
+        assert "tag push" in text or "tag 推送" in text
         assert "workflow_dispatch" in text
         assert "origin/main" in text
         assert "pyproject.toml" in text

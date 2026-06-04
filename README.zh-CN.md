@@ -217,7 +217,7 @@ tiangong-mcp public-release-boundary
 
 `.github/workflows/quality-gates.yml` 会在 push 和 pull request 中安装同一个 dev extra，并用只读仓库权限执行 lint、测试、构建和包元数据检查。
 
-`.github/workflows/publish-pypi.yml` 会在 GitHub Release 发布时向 PyPI 发版；如果当前无法创建 Release，也支持对一个已存在的 `v*` tag 使用受保护的手动 `workflow_dispatch` 兜底。workflow 会检出该 tag，校验 tag commit 已经能从 `origin/main` 追溯，校验 `pyproject.toml` 版本与 tag 一致，重新执行 lint、测试、本地 launch asset audit、构建、`twine check` 和 public release-boundary check，然后通过 `pypa/gh-action-pypi-publish@release/v1` 使用 PyPI Trusted Publishing 和 job 级 `id-token: write` 发布，因此发版路径不需要保存 `PYPI_TOKEN`。
+`.github/workflows/publish-pypi.yml` 会在 GitHub Release 发布时向 PyPI 发版；如果当前无法创建 Release，也支持对一个已存在的 `v*` tag 使用受保护的 tag 推送触发以及手动 `workflow_dispatch` 兜底。workflow 会检出该 tag，校验 tag commit 已经能从 `origin/main` 追溯，校验 `pyproject.toml` 版本与 tag 一致，重新执行 lint、测试、本地 launch asset audit、构建、`twine check` 和 public release-boundary check，然后通过 `pypa/gh-action-pypi-publish@release/v1` 使用 PyPI Trusted Publishing 和 job 级 `id-token: write` 发布，因此发版路径不需要保存 `PYPI_TOKEN`。
 
 `tiangong-mcp` 的 PyPI Trusted Publisher 配置必须与 release workflow 精确匹配：owner `JinNing6`，repository `TianGong`，workflow filename `publish-pypi.yml`，workflow path `.github/workflows/publish-pypi.yml`，environment `pypi`。如果 PyPI 返回 `invalid-publisher`，重新运行 `tiangong-mcp public-launch-preflight --target-contributors 10`，使用其中生成的 Trusted Publisher runbook，不要改用长期上传 token。
 
@@ -413,7 +413,7 @@ sect(action="leaderboard")         # 宗门战报 — 可复制分享
 - ✅ 增长战役中的 `issues/new?...` 只作为表单入口；`record_growth_referral()` 和 `record_share_attribution(..., source_url=...)` 会拒绝表单入口和占位 URL，必须使用创建后的公开 Issue/PR/Discussion URL 作为可审查证明
 - ✅ `public_growth_report()` 会抓取真实 GitHub 公开仓库和 IssueOps 指标，并与本地 MCP 激活账本同屏比较，指出最薄弱的外部证明桥；不会伪造下载量、留存、转发数、转介绍转化或奖励
 - ✅ `public_growth_report()` 还会通过 GitHub Contents API 检查远端 Growth Issue Form、Share Proof Issue Form 和 IssueOps workflow 是否已经在默认分支上线；缺失的 `.github` 文件会被标记为公开 launch blocker，而不会把本地未发布入口当成真实闭环
-- ✅ `public_growth_report()` 会通过 GitHub Releases API 检查当前本地版本对应的发布标签，例如 `v0.1.1`；如果缺少触发 PyPI Trusted Publishing 的 GitHub Release，会标记为公开安装闭环 launch blocker
+- ✅ `public_growth_report()` 会通过 GitHub Releases API 检查当前本地版本对应的发布标签，例如 `v0.1.1`；如果缺少触发 PyPI Trusted Publishing 的 GitHub Release，会标记为公开安装闭环 launch blocker；如果无法创建 Release，runbook 会给出受保护 tag 推送和 `workflow_dispatch` 发布兜底，但不会声称 Release proof 已闭合
 - ✅ `public_growth_report()` 会通过 PyPI JSON API 检查 `tiangong-mcp` 分发就绪状态，把真实 PyPI 最新版本与本地包元数据对齐比较；如果 PyPI 仍是旧版本，会标记为公开安装闭环 launch blocker
 - ✅ `public_growth_report()` 会把远端 IssueOps、PyPI Trusted Publisher、GitHub Release、PyPI 最新版本和首个公开证明断点合并成 `Public Launch Closure Checklist`；只有每一行都能从真实公开状态复查通过，才能声称公开飞轮闭合
 - ✅ `public_launch_preflight()` 是直接可调用的 MCP 发布预检战报：抓取同一份真实公开状态，输出本地质量门、Release 命令、PyPI Trusted Publishing 期望、闭环清单、Growth/Share Proof 表单 URL、创建 Issue 后的账本回填命令和复查命令，不伪造牵引力

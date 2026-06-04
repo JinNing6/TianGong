@@ -3,6 +3,9 @@ name: Publish TianGong to PyPI
 on:
   release:
     types: [published]
+  push:
+    tags:
+      - "v*"
   workflow_dispatch:
     inputs:
       tag:
@@ -14,7 +17,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: tiangong-pypi-publish-${{ github.event.release.tag_name || inputs.tag }}
+  group: tiangong-pypi-publish-${{ github.event.release.tag_name || github.ref_name || inputs.tag }}
   cancel-in-progress: false
 
 jobs:
@@ -30,9 +33,13 @@ jobs:
       - name: Resolve release tag
         id: release
         shell: bash
+        env:
+          GITHUB_REF_NAME: ${{ github.ref_name }}
         run: |
           if [[ "${{ github.event_name }}" == "release" ]]; then
             tag="${{ github.event.release.tag_name }}"
+          elif [[ "${{ github.event_name }}" == "push" ]]; then
+            tag="${GITHUB_REF_NAME}"
           else
             tag="${{ inputs.tag }}"
           fi

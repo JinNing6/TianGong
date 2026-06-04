@@ -428,9 +428,12 @@ def format_full_public_growth_release_handoff_lines(
             'git commit -m "Prepare TianGong public growth launch"',
             "git push origin main",
             f"gh release create {release_tag} --generate-notes",
+            f"# If release creation is unavailable and `{release_tag}` points to this commit:",
+            f"git push origin {release_tag}",
             "```",
             "",
             "> The release command should trigger `.github/workflows/publish-pypi.yml` through PyPI Trusted Publishing/OIDC.",
+            "> The tag push fallback triggers the same workflow after the tag is reachable from `origin/main` and the package version matches the tag.",
             "> Do not use a stored `PYPI_TOKEN`; wait for PyPI to publish the same version, then rerun public preflight.",
             "",
         ]

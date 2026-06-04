@@ -133,6 +133,9 @@ def _write_release_boundary_fixture(
             "on:",
             "  release:",
             "    types: [published]",
+            "  push:",
+            "    tags:",
+            "      - \"v*\"",
             "  workflow_dispatch:",
             "    inputs:",
             "      tag:",
@@ -140,7 +143,7 @@ def _write_release_boundary_fixture(
             "permissions:",
             "  contents: read",
             "concurrency:",
-            "  group: tiangong-pypi-publish-${{ github.event.release.tag_name || inputs.tag }}",
+            "  group: tiangong-pypi-publish-${{ github.event.release.tag_name || github.ref_name || inputs.tag }}",
             "jobs:",
             "  publish:",
             "    environment: pypi",
@@ -149,7 +152,17 @@ def _write_release_boundary_fixture(
             "      id-token: write",
             "    steps:",
             "      - name: Resolve release tag",
-            "        run: echo 'Release tag must look like v0.1.0'",
+            "        env:",
+            "          GITHUB_REF_NAME: ${{ github.ref_name }}",
+            "        run: |",
+            "          if [[ \"${{ github.event_name }}\" == \"release\" ]]; then",
+            "            tag=\"${{ github.event.release.tag_name }}\"",
+            "          elif [[ \"${{ github.event_name }}\" == \"push\" ]]; then",
+            "            tag=\"${GITHUB_REF_NAME}\"",
+            "          else",
+            "            tag=\"${{ inputs.tag }}\"",
+            "          fi",
+            "          echo 'Release tag must look like v0.1.0'",
             "      - uses: actions/checkout@v6",
             "        with:",
             "          ref: ${{ steps.release.outputs.tag }}",
@@ -296,6 +309,7 @@ def test_cli_public_launch_preflight_inlines_full_release_handoff(monkeypatch, t
     assert "git add tests/test_cli.py" in output
     assert 'git commit -m "Prepare TianGong public growth launch"' in output
     assert "gh release create v0.1.1 --generate-notes" in output
+    assert "git push origin v0.1.1" in output
 
 
 def test_cli_public_launch_assets_prints_local_push_manifest():
@@ -331,6 +345,7 @@ def test_cli_public_launch_assets_prints_local_push_manifest():
     assert "| review separately | `.github/workflows/issueops-onboarding.yml` |" not in output
     assert 'git commit -m "Prepare TianGong public growth launch"' in output
     assert "gh release create v0.1.1 --generate-notes" in output
+    assert "git push origin v0.1.1" in output
     assert "tiangong-mcp public-launch-preflight --target-contributors 10" in output
 
 
@@ -600,6 +615,7 @@ def test_cli_public_release_boundary_prints_package_boundary(tmp_path):
     assert "Source distribution | ready" in output
     assert "Documentation commands | ready" in output
     assert "Workflow release-boundary steps | ready" in output
+    assert "tag push" in output
     assert "tiangong-mcp public-release-boundary" in output
     assert "Local Release Boundary Status" in output
     assert "blocked" not in output

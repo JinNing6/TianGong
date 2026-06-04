@@ -478,6 +478,7 @@ def test_public_growth_report_flags_stale_pypi_distribution(tmp_path):
     assert "Do not claim the install loop reaches current growth tools while PyPI is stale." in result
     assert ".github/workflows/publish-pypi.yml" in result
     assert "Create a GitHub Release after PyPI Trusted Publishing is configured" in result
+    assert "push the verified `v*` tag to trigger the same workflow" in result
     assert "manually dispatch `.github/workflows/publish-pypi.yml` with the existing `v*` tag" in result
     assert "## PyPI Trusted Publisher Setup Runbook" in result
     assert "https://pypi.org/manage/project/tiangong-mcp/settings/publishing/" in result
@@ -543,6 +544,7 @@ def test_public_growth_report_flags_missing_release_trigger(tmp_path):
     assert "| `0.1.0` | `v0.1.0` | missing |" in result
     assert "## GitHub Release Launch Blocker" in result
     assert "Create and publish GitHub Release `v0.1.0` after quality gates pass." in result
+    assert "push tag `v0.1.0` to trigger `.github/workflows/publish-pypi.yml`" in result
     assert "protected manual workflow dispatch for `.github/workflows/publish-pypi.yml` with tag `v0.1.0`" in result
     assert "verifies it is reachable from `origin/main`" in result
     assert "verifies `pyproject.toml` version equals the tag" in result
@@ -629,6 +631,7 @@ def test_public_growth_report_outputs_public_launch_closure_checklist(tmp_path):
     assert "path `.github/workflows/publish-pypi.yml`" in result
     assert "environment `pypi`" in result
     assert "| 3 | GitHub Release trigger | Run `gh release create v0.1.0 --generate-notes`" in result
+    assert "push tag `v0.1.0` to trigger the publish workflow" in result
     assert "manually dispatch `.github/workflows/publish-pypi.yml` with tag `v0.1.0`" in result
     assert "| 4 | PyPI latest version | Wait for `.github/workflows/publish-pypi.yml`" in result
     assert "| 5 | First public proof | Open the Growth Issue Form and Share Proof Issue Form" in result
@@ -1308,6 +1311,7 @@ def test_public_launch_preflight_formats_ordered_release_runbook(tmp_path):
     assert "https://github.com/octo-org/octo-repo/releases/new" in result
     assert "Select existing tag `v0.1.0`" in result
     assert "https://github.com/octo-org/octo-repo/actions/workflows/publish-pypi.yml" in result
+    assert "git push origin v0.1.0" in result
     assert "workflow_dispatch tag `v0.1.0`" in result
     assert "verifies `pyproject.toml` version before upload" in result
     assert "public_growth_report(record_snapshot=True, target_contributors=10)" in result
