@@ -1177,13 +1177,16 @@ def _format_public_launch_closure_checklist_lines(
 
     if release_blocked:
         tag = snapshot.release_readiness.expected_tag or f"v{snapshot.distribution_readiness.local_version}"
+        owner, repo = _repo_owner_name(snapshot.repo.full_name)
+        release_draft_url = f"https://github.com/{owner}/{repo}/releases/new"
         rows.append(
             (
                 "GitHub Release trigger",
                 (
-                    f"Run `gh release create {tag} --generate-notes` after quality gates pass; if release creation is "
-                    f"unavailable, manually dispatch `.github/workflows/publish-pypi.yml` with tag `{tag}` as an "
-                    "install-loop fallback."
+                    f"Run `gh release create {tag} --generate-notes` after quality gates pass; if GitHub CLI is "
+                    f"unavailable, open {release_draft_url}, Select existing tag `{tag}`, generate notes, and publish "
+                    "the Release. If release creation is unavailable, manually dispatch "
+                    f"`.github/workflows/publish-pypi.yml` with tag `{tag}` as an install-loop fallback."
                 ),
                 f"`public_growth_report()` shows GitHub Release `{tag}` as published.",
             )
@@ -1280,6 +1283,12 @@ def format_public_launch_preflight(
     ]
 
     if snapshot is None:
+        local_version = get_local_package_version(PACKAGE_NAME)
+        release_tag = f"v{local_version or 'current-local-version'}"
+        owner = config.GITHUB_REPO_OWNER
+        repo = config.GITHUB_REPO_NAME
+        release_draft_url = f"https://github.com/{owner}/{repo}/releases/new"
+        publish_workflow_url = f"https://github.com/{owner}/{repo}/actions/workflows/{PYPI_TRUSTED_PUBLISHER_WORKFLOW_FILENAME}"
         lines.extend(
             [
                 "## External Fetch Status",
@@ -1293,6 +1302,12 @@ def format_public_launch_preflight(
                 "- Audit local launch assets: `tiangong-mcp public-launch-assets`",
                 "- Generate no-network first proof pack: `tiangong-mcp public-proof-pack --target-contributors 10`",
                 "- Generate MCP first proof pack: `public_proof_pack()`",
+                f"- Open GitHub web release page: {release_draft_url}",
+                f"- Select existing tag `{release_tag}`, generate notes, and publish the Release.",
+                (
+                    f"- If Release creation is unavailable, open Actions manual workflow page: {publish_workflow_url} "
+                    f"and run workflow_dispatch tag `{release_tag}`."
+                ),
                 "- Retry preflight: `public_launch_preflight()`",
                 "- Retry proof report: `public_growth_report()`",
                 "- Run local quality gates before any release attempt:",
@@ -1320,6 +1335,8 @@ def format_public_launch_preflight(
     first_proof_blocked = not first_proof_ready
     release_tag = snapshot.release_readiness.expected_tag or f"v{snapshot.distribution_readiness.local_version}"
     owner, repo = _repo_owner_name(snapshot.repo.full_name)
+    release_draft_url = f"https://github.com/{owner}/{repo}/releases/new"
+    publish_workflow_url = f"https://github.com/{owner}/{repo}/actions/workflows/{PYPI_TRUSTED_PUBLISHER_WORKFLOW_FILENAME}"
     real_data_context = (
         f"Public launch preflight: {snapshot.growth_issues.total} Growth issues, "
         f"{snapshot.share_issues.total} Share Proof issues, {snapshot.pull_requests.total} pull requests, "
@@ -1440,8 +1457,12 @@ def format_public_launch_preflight(
             "",
             f"- GitHub CLI release command: `gh release create {release_tag} --generate-notes`",
             (
-                f"- Manual publish fallback: run `.github/workflows/publish-pypi.yml` with workflow_dispatch tag "
-                f"`{release_tag}` after the tag is on `origin/main`."
+                f"- GitHub web release page: {release_draft_url} - Select existing tag `{release_tag}`, "
+                "generate notes, and publish the Release."
+            ),
+            (
+                f"- Actions manual workflow page: {publish_workflow_url} - run workflow_dispatch tag `{release_tag}` "
+                "after the tag is on `origin/main` if Release creation is unavailable."
             ),
             "- PyPI publishing should happen through `.github/workflows/publish-pypi.yml` and PyPI Trusted Publishing/OIDC.",
             "- The publish workflow validates the tag, checks that it is reachable from `origin/main`, and verifies `pyproject.toml` version before upload.",

@@ -266,6 +266,9 @@ def test_cli_public_launch_preflight_prints_ordered_release_runbook(monkeypatch,
     assert "template=tiangong-growth-flywheel.yml" in output
     assert "template=tiangong-share-proof.yml" in output
     assert "gh release create v0.1.1 --generate-notes" in output
+    assert "https://github.com/octo-org/octo-repo/releases/new" in output
+    assert "Select existing tag `v0.1.1`" in output
+    assert "https://github.com/octo-org/octo-repo/actions/workflows/publish-pypi.yml" in output
     assert "public_growth_report(record_snapshot=True, target_contributors=10)" in output
     assert "After Submission CLI Ledger Commands" in output
     assert "tiangong-mcp record-growth-referral --route growth" in output

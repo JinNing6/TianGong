@@ -863,6 +863,28 @@ def test_public_growth_report_fetch_failure_reuses_campaign_target(tmp_path):
     assert "target_contributors=10" not in result
 
 
+def test_public_launch_preflight_fetch_failure_includes_release_fallbacks(tmp_path):
+    """API rate limits should not hide the no-network release and publish paths."""
+    from tiangong.public_growth import format_public_launch_preflight
+
+    event_path = tmp_path / "activation-events.jsonl"
+    result = format_public_launch_preflight(
+        None,
+        activation_events=[],
+        source_path=event_path,
+        target_contributors=10,
+        fetch_error="GitHub API HTTP 403: rate limit exceeded",
+    )
+
+    assert "External Fetch Status" in result
+    assert "GitHub API HTTP 403: rate limit exceeded" in result
+    assert "https://github.com/JinNing6/TianGong/releases/new" in result
+    assert "Select existing tag `v0.1.1`" in result
+    assert "https://github.com/JinNing6/TianGong/actions/workflows/publish-pypi.yml" in result
+    assert "workflow_dispatch tag `v0.1.1`" in result
+    assert "tiangong-mcp public-proof-pack --target-contributors 10" in result
+
+
 def test_public_growth_snapshot_history_records_jsonl_and_reports_velocity(tmp_path):
     """Public traction needs real velocity history, not just a static snapshot."""
     from tiangong.activation import (
@@ -1148,6 +1170,9 @@ def test_public_launch_preflight_formats_ordered_release_runbook(tmp_path):
     assert "Use created Issue URLs, not `issues/new?...` form URLs, for ledger commands." in result
     assert "tiangong-mcp public-launch-assets" in result
     assert "gh release create v0.1.0 --generate-notes" in result
+    assert "https://github.com/octo-org/octo-repo/releases/new" in result
+    assert "Select existing tag `v0.1.0`" in result
+    assert "https://github.com/octo-org/octo-repo/actions/workflows/publish-pypi.yml" in result
     assert "workflow_dispatch tag `v0.1.0`" in result
     assert "verifies `pyproject.toml` version before upload" in result
     assert "public_growth_report(record_snapshot=True, target_contributors=10)" in result
@@ -1204,6 +1229,9 @@ async def test_mcp_public_launch_preflight_exposes_release_runbook(monkeypatch, 
     assert "template=tiangong-growth-flywheel.yml" in result
     assert "template=tiangong-share-proof.yml" in result
     assert "gh release create v0.1.0 --generate-notes" in result
+    assert "https://github.com/octo-org/octo-repo/releases/new" in result
+    assert "Select existing tag `v0.1.0`" in result
+    assert "https://github.com/octo-org/octo-repo/actions/workflows/publish-pypi.yml" in result
     assert "workflow_dispatch tag `v0.1.0`" in result
     assert "public_growth_report(record_snapshot=True, target_contributors=10)" in result
     assert "public_proof_pack(target_contributors=10)" in result
