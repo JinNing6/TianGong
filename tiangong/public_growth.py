@@ -1265,6 +1265,7 @@ def format_public_launch_preflight(
     path = Path(source_path) if source_path is not None else Path(config.CAVE_LOGS_DIR) / "activation-events.jsonl"
     target = _safe_positive_int(target_contributors, fallback=10)
     proof_recheck = f"public_growth_report(record_snapshot=True, target_contributors={target})"
+    proof_pack_recheck = f"public_proof_pack(target_contributors={target})"
     no_fake_line = "This preflight does not invent downloads, retention, repost counts, referral conversions, or rewards."
     no_side_effect_line = "This preflight does not execute git, publish releases, or claim public traction."
 
@@ -1291,6 +1292,7 @@ def format_public_launch_preflight(
                 "",
                 "- Audit local launch assets: `tiangong-mcp public-launch-assets`",
                 "- Generate no-network first proof pack: `tiangong-mcp public-proof-pack --target-contributors 10`",
+                "- Generate MCP first proof pack: `public_proof_pack()`",
                 "- Retry preflight: `public_launch_preflight()`",
                 "- Retry proof report: `public_growth_report()`",
                 "- Run local quality gates before any release attempt:",
@@ -1404,6 +1406,7 @@ def format_public_launch_preflight(
             f"- Share Proof Issue Form: {share_issue_url}",
             f"- Created Growth Issue placeholder: {growth_proof_url}",
             f"- Created Share Proof Issue placeholder: {share_proof_url}",
+            f"- MCP Proof Pack: `{proof_pack_recheck}`",
             "",
             "## After Submission CLI Ledger Commands",
             "",
@@ -1447,6 +1450,7 @@ def format_public_launch_preflight(
             "## Recheck Commands",
             "",
             f"- Record and recheck public proof: `{proof_recheck}`",
+            f"- Generate first public proof pack: `{proof_pack_recheck}`",
             "- Recheck install loop: `public_growth_report()`",
             "- Recheck local activation: `activation_funnel()`",
             f"- Launch next campaign sprint: `growth_campaign(target_contributors={target})`",
@@ -1463,6 +1467,7 @@ def format_public_launch_preflight(
                 "No downloads, retention, repost counts, referral conversions, or rewards are invented."
             ),
             f"Recheck: {proof_recheck}",
+            f"Proof pack: {proof_pack_recheck}",
             "```",
             "",
         ]
@@ -1573,6 +1578,9 @@ def _format_first_public_proof_action_lines(
         f'artifact_name="first-growth-artifact", source_url="{growth_proof_url}", '
         'actor="your_github_username")'
     )
+    proof_pack_command = (
+        f"public_proof_pack(target_contributors={target})" if target else "public_proof_pack()"
+    )
     missing_files = snapshot.issueops_readiness.missing_files
     missing_paths = ", ".join(f"`{file.path}`" for file in missing_files)
     readiness_steps = []
@@ -1596,6 +1604,7 @@ def _format_first_public_proof_action_lines(
         f"| 2 | After submission, record the created Growth Issue: `{mcp_growth_command}` |",
         f"| 3 | Open Share Proof Issue Form: {share_issue_url} |",
         f"| 4 | After submission, record the created Share Proof Issue: `{mcp_share_command}` |",
+        f"| 5 | Recreate this no-network proof pack: `{proof_pack_command}` |",
         "",
         "## After Submission CLI Ledger Commands",
         "",
@@ -1628,6 +1637,7 @@ def _format_first_public_proof_action_lines(
         f"CLI Record Share proof: {cli_share_command}",
         f"Record Growth return: {mcp_growth_command}",
         f"Record Share proof: {mcp_share_command}",
+        f"Proof pack: {proof_pack_command}",
         "Install: pip install tiangong-mcp",
         "```",
         "",
@@ -1852,6 +1862,7 @@ def format_public_growth_report(
                 "",
                 "- Run launch preflight: `public_launch_preflight()`",
                 f"- Generate no-network first proof pack: `tiangong-mcp public-proof-pack --target-contributors {recovery_target}`",
+                "- Generate MCP first proof pack: `public_proof_pack()`",
                 "- Retry public proof: `public_growth_report()`",
                 "- Launch a 72h campaign: `growth_campaign()`",
                 "- Inspect local activation: `activation_funnel()`",
@@ -1862,6 +1873,7 @@ def format_public_growth_report(
                 "No downloads, retention, reposts, referrals, or rewards were invented.",
                 "Preflight: public_launch_preflight()",
                 f"Proof pack: tiangong-mcp public-proof-pack --target-contributors {recovery_target}",
+                "MCP proof pack: public_proof_pack()",
                 "Retry: public_growth_report()",
                 "```",
                 "",
@@ -1968,6 +1980,7 @@ def format_public_growth_report(
             "",
             "- Run launch preflight: `public_launch_preflight()`",
             "- Retry this public proof: `public_growth_report()`",
+            "- Generate first public proof pack: `public_proof_pack()`",
             "- Recheck local activation: `activation_funnel()`",
             "- Recheck product flywheel: `growth_flywheel()`",
             "- Launch the next 72h campaign: `growth_campaign()`",
@@ -1986,6 +1999,7 @@ def format_public_growth_report(
             "No downloads, retention, repost counts, referral conversions, or rewards are invented.",
             "Preflight: public_launch_preflight()",
             "Retry: public_growth_report()",
+            "Proof pack: public_proof_pack()",
             "Launch: growth_campaign()",
             "```",
         ]

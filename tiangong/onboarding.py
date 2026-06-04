@@ -77,6 +77,7 @@ def format_start_cultivation(username: str = "", artifact_name: str = "") -> str
         "- 发起 72 小时爆发战役: `growth_campaign()`",
         "- 验证公开牵引力: `public_growth_report()`",
         "- 公开发布预检: `public_launch_preflight()`",
+        "- 生成首个公开证明包: `public_proof_pack()`",
         f"- 打开增长招募 Issue: {growth_issue_url}",
         placeholder_warning,
         "",
@@ -93,6 +94,7 @@ def format_start_cultivation(username: str = "", artifact_name: str = "") -> str
         "发起战役: growth_campaign()",
         "验证公开证明: public_growth_report()",
         "公开发布预检: public_launch_preflight()",
+        "首个公开证明包: public_proof_pack()",
         f"增长招募: {growth_issue_url}",
         "```",
         "",
@@ -103,6 +105,7 @@ def format_start_cultivation(username: str = "", artifact_name: str = "") -> str
         "- 发起战役: `growth_campaign()`",
         "- 验证公开证明: `public_growth_report()`",
         "- 公开发布预检: `public_launch_preflight()`",
+        "- 首个公开证明包: `public_proof_pack()`",
         f"- 重新生成此卡: `start_cultivation(username=\"{normalized_username}\", artifact_name=\"{first_artifact}\")`",
     ]
 

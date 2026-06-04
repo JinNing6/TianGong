@@ -60,6 +60,7 @@ def test_growth_flywheel_snapshot_uses_real_current_fields():
     assert "`growth_flywheel()`" in result
     assert "`growth_campaign()`" in result
     assert "`public_growth_report()`" in result
+    assert "`public_proof_pack()`" in result
     assert "https://github.com/JinNing6/TianGong/issues/new?" in result
     assert "template=tiangong-growth-flywheel.yml" in result
     assert "growth_bottleneck=" in result
@@ -116,6 +117,7 @@ def test_empty_growth_flywheel_recruits_first_cultivator_without_fake_metrics():
     assert "`activation_funnel()`" in result
     assert "`growth_campaign()`" in result
     assert "`public_growth_report()`" in result
+    assert "`public_proof_pack()`" in result
     assert "tiangong-growth-flywheel.yml" in result
     assert "pip install tiangong-mcp" in result
 
@@ -202,6 +204,7 @@ def test_growth_campaign_turns_bottleneck_into_72h_public_launch_card(tmp_path):
     assert "`leaderboard(type=\"share\")`" in result
     assert "`growth_campaign()`" in result
     assert "`public_growth_report()`" in result
+    assert "`public_proof_pack()`" in result
     assert "不伪造下载量、留存、转发数、转介绍或灵力奖励" in result
     assert "pip install tiangong-mcp" in result
 
@@ -220,6 +223,7 @@ def test_empty_growth_campaign_recruits_first_public_cultivator_without_fake_met
     assert "template=tiangong-growth-flywheel.yml" in result
     assert "template=tiangong-share-proof.yml" in result
     assert "https://github.com/JinNing6/TianGong/issues/<opened-growth-issue-number>" in result
+    assert "`public_proof_pack()`" in result
     assert 'source_url="https://github.com/JinNing6/TianGong/issues/new?' not in result
     assert "不伪造下载量" in result
 
@@ -264,6 +268,7 @@ async def test_mcp_growth_flywheel_exposes_current_snapshot(monkeypatch, tmp_pat
     assert "当前真实快照" in result
     assert "| 首件法宝激活 | 1/2 | 50.0% |" in result
     assert "`growth_flywheel()`" in result
+    assert "`public_proof_pack()`" in result
     assert "leaderboard(type=\"share\")" in result
     assert "TianGong" in result
 
@@ -309,4 +314,5 @@ async def test_mcp_growth_campaign_exposes_public_launch_card(monkeypatch, tmp_p
     assert "template=tiangong-share-proof.yml" in result
     assert "`growth_campaign()`" in result
     assert "`public_growth_report()`" in result
+    assert "`public_proof_pack()`" in result
     assert "TianGong" in result

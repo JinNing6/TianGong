@@ -94,6 +94,7 @@ jobs:
                     `growth_campaign(campaign_name="${hook}", target_contributors=${targetContributors})`,
                     `public_growth_report(record_snapshot=True, target_contributors=${targetContributors})`,
                     `public_launch_preflight(target_contributors=${targetContributors})`,
+                    `public_proof_pack(target_contributors=${targetContributors})`,
                     'leaderboard(type="growth")',
                     'share_attribution_report()',
                     'leaderboard(type="share")',
@@ -184,6 +185,7 @@ jobs:
                     'activation_funnel()',
                     'growth_flywheel()',
                     'public_launch_preflight()',
+                    'public_proof_pack()',
                   ];
                 },
                 share: () => 'This route binds one reviewable public share URL to a real TianGong contribution. It does not claim downloads, retention, repost counts, referrals, or Spirit Power.'
@@ -208,6 +210,7 @@ jobs:
                 `record_growth_referral(route="${route.key}", source_url="${issueUrl}", actor="${issueActor}", issue_number=${issue.number})`,
                 ...route.commands(),
                 'activation_funnel()',
+                'public_proof_pack()',
               ]),
               '',
               '### Share',

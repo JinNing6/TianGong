@@ -256,6 +256,7 @@ def test_public_growth_report_combines_github_metrics_and_local_ledger_without_f
     assert "record_share_attribution(" in result
     assert "`public_growth_report()`" in result
     assert "`public_launch_preflight()`" in result
+    assert "`public_proof_pack()`" in result
     assert "`growth_campaign()`" in result
     assert "does not invent downloads, retention, repost counts, referral conversions, or rewards" in result
 
@@ -332,6 +333,7 @@ def test_public_growth_report_gives_first_public_proof_action_for_cold_start(tmp
     )
     assert "Replace placeholder URLs with the created public Issue URLs before running ledger commands." in result
     assert "## Copy First Public Proof Post" in result
+    assert "`public_proof_pack(target_contributors=10)`" in result
     assert "TianGong public proof sprint" in result
     assert "0 Growth IssueOps issues, 0 Share Proof issues, 0 Pull Requests" in result
     assert "Open Growth proof:" in result
@@ -426,6 +428,7 @@ def test_public_growth_report_flags_missing_remote_issueops_routes(tmp_path):
     assert "Publish remote IssueOps routes first" in result
     assert "commit and push `.github/ISSUE_TEMPLATE/tiangong-growth-flywheel.yml`" in result
     assert "public_growth_report()" in result
+    assert "public_proof_pack()" in result
 
 
 def test_public_growth_report_flags_stale_pypi_distribution(tmp_path):
@@ -830,6 +833,7 @@ def test_public_growth_report_fetch_failure_is_recovery_surface(tmp_path):
     assert "`share_attribution_report()`" in result
     assert "`public_growth_report()`" in result
     assert "`public_launch_preflight()`" in result
+    assert "`public_proof_pack()`" in result
     assert "`tiangong-mcp public-proof-pack --target-contributors 10`" in result
     assert "## No-Network First Proof Pack" in result
     assert "TianGong First Public Proof Pack" in result
@@ -1147,6 +1151,7 @@ def test_public_launch_preflight_formats_ordered_release_runbook(tmp_path):
     assert "workflow_dispatch tag `v0.1.0`" in result
     assert "verifies `pyproject.toml` version before upload" in result
     assert "public_growth_report(record_snapshot=True, target_contributors=10)" in result
+    assert "public_proof_pack(target_contributors=10)" in result
     assert "does not invent downloads, retention, repost counts, referral conversions, or rewards" in result
 
 
@@ -1201,6 +1206,7 @@ async def test_mcp_public_launch_preflight_exposes_release_runbook(monkeypatch, 
     assert "gh release create v0.1.0 --generate-notes" in result
     assert "workflow_dispatch tag `v0.1.0`" in result
     assert "public_growth_report(record_snapshot=True, target_contributors=10)" in result
+    assert "public_proof_pack(target_contributors=10)" in result
     assert "TianGong" in result
 
 

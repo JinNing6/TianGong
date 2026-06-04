@@ -21,6 +21,7 @@ def test_start_cultivation_card_turns_install_into_first_action():
     assert '`growth_campaign()`' in result
     assert '`public_growth_report()`' in result
     assert '`public_launch_preflight()`' in result
+    assert '`public_proof_pack()`' in result
     assert "https://github.com/JinNing6/TianGong/issues/new?" in result
     assert "template=tiangong-growth-flywheel.yml" in result
     assert "start_cultivation(username=\"newbie\"" in result
@@ -39,6 +40,7 @@ def test_start_cultivation_sanitizes_empty_inputs_without_fake_identity():
     assert "growth_campaign()" in result
     assert "public_growth_report()" in result
     assert "public_launch_preflight()" in result
+    assert "public_proof_pack()" in result
 
 
 @pytest.mark.asyncio
@@ -56,4 +58,5 @@ async def test_mcp_start_cultivation_exposes_first_session_card(monkeypatch):
     assert "`growth_campaign()`" in result
     assert "`public_growth_report()`" in result
     assert "`public_launch_preflight()`" in result
+    assert "`public_proof_pack()`" in result
     assert "TianGong" in result

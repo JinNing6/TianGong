@@ -83,6 +83,7 @@ def test_issueops_workflow_routes_forms_to_real_public_tools():
         'target_contributors=${targetContributors}',
         'public_growth_report(record_snapshot=True, target_contributors=${targetContributors})',
         'public_launch_preflight(target_contributors=${targetContributors})',
+        'public_proof_pack(target_contributors=${targetContributors})',
         'leaderboard(type="growth")',
         'share_attribution_report()',
         'leaderboard(type="share")',
@@ -112,6 +113,7 @@ def test_issueops_workflow_records_external_return_before_next_commands():
     assert "growth_campaign(campaign_name=" in workflow
     assert "public_growth_report(record_snapshot=True, target_contributors=${targetContributors})" in workflow
     assert "public_launch_preflight(target_contributors=${targetContributors})" in workflow
+    assert "public_proof_pack(target_contributors=${targetContributors})" in workflow
     assert "readPositiveIntegerField('Target contributors', 10)" in workflow
     assert "const targetContributors" in workflow
     assert 'share_url="${shareUrl}"' in workflow
@@ -137,6 +139,7 @@ def test_issueops_docs_expose_public_forms_and_workflow():
         assert "growth_campaign" in text
         assert "public_growth_report" in text
         assert "public_launch_preflight" in text
+        assert "public_proof_pack" in text
         assert "Growth/Share Proof" in text
         assert "onboarding" in text.lower()
         assert "activation" in text.lower() or "激活" in text

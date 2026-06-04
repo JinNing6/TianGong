@@ -790,6 +790,7 @@ def format_activation_funnel(
             "- 发起 72 小时爆发战役: `growth_campaign()`",
             "- 验证公开牵引力: `public_growth_report()`",
             "- 公开发布预检: `public_launch_preflight()`",
+            "- 生成首个公开证明包: `public_proof_pack()`",
             "- 查看赛季追赶: `leaderboard(type=\"season\")`",
             "",
             "## 复制激活战报",
@@ -805,6 +806,7 @@ def format_activation_funnel(
             "发起战役: growth_campaign()",
             "验证公开证明: public_growth_report()",
             "公开发布预检: public_launch_preflight()",
+            "首个公开证明包: public_proof_pack()",
             "```",
         ]
     )

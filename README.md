@@ -189,7 +189,7 @@ Once the MCP server is connected, ask your client to run:
 start_cultivation(username="your_github_username")
 ```
 
-It returns the MCP config, first `forge_agent` command, `activation_funnel()` check, `growth_flywheel()` check, `public_launch_preflight()` check, GitHub Growth Issue URL, and a paste-ready first-session share card without fabricating Spirit Power or registration.
+It returns the MCP config, first `forge_agent` command, `activation_funnel()` check, `growth_flywheel()` check, `public_launch_preflight()` check, `public_proof_pack()` first-proof kit, GitHub Growth Issue URL, and a paste-ready first-session share card without fabricating Spirit Power or registration.
 
 ---
 
@@ -400,7 +400,7 @@ leaderboard(type="share")          # Share Proof Rankings from real public contr
 - ✅ `share_attribution_report()` and `leaderboard(type="share")` now include a public GitHub Share Proof Issue URL, so a public post can loop back into `tiangong:share` without needing privileged labels or fabricated referral metrics
 - ✅ `activation_funnel()` reads the local `activation-events.jsonl` MCP event ledger, counts first-session exposure, forge, publish, appraisal, and refine conversion, and discloses missing history instead of inventing downloads or retention
 - ✅ `growth_flywheel()` evaluates the full cultivation growth loop from current real registry fields, names the weakest loop stage, and returns the next executable command, social/Discussion copy, and a GitHub Growth Issue URL without fabricating history
-- ✅ First-session onboarding, activation funnels, and public proof reports route back to `public_launch_preflight()`, so the launch runbook is visible from the actual user path instead of only from README
+- ✅ First-session onboarding, activation funnels, public proof reports, and IssueOps comments route back to `public_launch_preflight()` and `public_proof_pack()`, so the launch runbook plus first-proof kit are visible from the actual user path instead of only from README
 - ✅ `growth_campaign()` turns the current real bottleneck into a 72-hour public launch card with target contributors, Growth Issue URL, Share Proof Issue URL, commands, and copy-ready social/Discussion posts; the Growth Issue Form can prefill `target_contributors` and IssueOps safely turns it into `growth_campaign(campaign_name=..., target_contributors=...)`
 - ✅ Growth campaign ledger commands treat `issues/new?...` as the form entrypoint only; `record_growth_referral()` and `record_share_attribution(..., source_url=...)` reject form entrypoints and placeholder URLs, requiring the created public Issue/PR/Discussion URL as reviewable proof
 - ✅ `public_growth_report()` fetches real GitHub public repository and IssueOps metrics, compares them with the local MCP activation ledger, names the weakest external proof bridge, and refuses to invent downloads, retention, repost counts, referral conversions, or rewards

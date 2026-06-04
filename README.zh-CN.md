@@ -196,7 +196,7 @@ MCP Server 接入后，在你的客户端里运行：
 start_cultivation(username="your_github_username")
 ```
 
-它会返回 MCP 配置、第一条 `forge_agent` 命令、`activation_funnel()` 复查、`growth_flywheel()` 复查、`public_launch_preflight()` 复查、GitHub Growth Issue 回流 URL，以及可复制首会话入门战书；不会伪造灵力或注册成功。
+它会返回 MCP 配置、第一条 `forge_agent` 命令、`activation_funnel()` 复查、`growth_flywheel()` 复查、`public_launch_preflight()` 复查、`public_proof_pack()` 首证明套件、GitHub Growth Issue 回流 URL，以及可复制首会话入门战书；不会伪造灵力或注册成功。
 
 ---
 
@@ -408,7 +408,7 @@ sect(action="leaderboard")         # 宗门战报 — 可复制分享
 - ✅ `share_attribution_report()` 和 `leaderboard(type="share")` 会返回公开 GitHub Share Proof Issue URL，让公开帖子直接回流到 `tiangong:share`，不需要特权 labels，也不伪造转介绍指标
 - ✅ `activation_funnel()` 会读取本地 `activation-events.jsonl` MCP 事件账本，统计首会话曝光、开炉、发布、鉴定、淬炼转化；历史缺失时明确披露，不伪造下载量或留存
 - ✅ `growth_flywheel()` 会用当前真实 registry 字段评估完整修炼增长飞轮，指出最薄弱环节，并返回下一条可执行命令、社交/Discussion 复盘和 GitHub Growth Issue 回流 URL，不伪造历史数据
-- ✅ 首会话 onboarding、激活漏斗和公开证明报告都会回到 `public_launch_preflight()`，让发布预检战报从真实用户路径可见，而不是只藏在 README
+- ✅ 首会话 onboarding、激活漏斗、公开证明报告和 IssueOps 评论都会回到 `public_launch_preflight()` 与 `public_proof_pack()`，让发布预检战报和首证明套件从真实用户路径可见，而不是只藏在 README
 - ✅ `growth_campaign()` 会把当前真实瓶颈转成 72 小时公开爆发战役卡：目标贡献者、Growth Issue、Share Proof Issue、可执行命令、社交帖和 Discussion 战役帖一次生成；Growth Issue Form 可以预填 `target_contributors`，IssueOps 会安全转成 `growth_campaign(campaign_name=..., target_contributors=...)`
 - ✅ 增长战役中的 `issues/new?...` 只作为表单入口；`record_growth_referral()` 和 `record_share_attribution(..., source_url=...)` 会拒绝表单入口和占位 URL，必须使用创建后的公开 Issue/PR/Discussion URL 作为可审查证明
 - ✅ `public_growth_report()` 会抓取真实 GitHub 公开仓库和 IssueOps 指标，并与本地 MCP 激活账本同屏比较，指出最薄弱的外部证明桥；不会伪造下载量、留存、转发数、转介绍转化或奖励

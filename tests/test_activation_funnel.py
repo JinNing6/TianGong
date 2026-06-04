@@ -109,6 +109,7 @@ def test_activation_funnel_formats_real_conversion_without_fake_metrics(tmp_path
     assert "`growth_campaign()`" in result
     assert "`public_growth_report()`" in result
     assert "`public_launch_preflight()`" in result
+    assert "`public_proof_pack()`" in result
     assert "pip install tiangong-mcp" in result
 
 
@@ -147,6 +148,7 @@ def test_empty_activation_funnel_discloses_missing_history(tmp_path):
     assert "`growth_campaign()`" in result
     assert "`public_growth_report()`" in result
     assert "`public_launch_preflight()`" in result
+    assert "`public_proof_pack()`" in result
 
 def test_share_attribution_report_scores_public_share_urls(tmp_path):
     """Public share attribution should become a concrete growth proof surface."""
