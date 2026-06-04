@@ -921,6 +921,7 @@ def _format_growth_referral_source_help(route: str, source_url: str) -> str:
             "- 查看增长飞轮: `growth_flywheel()`",
             "- 发起 72 小时爆发战役: `growth_campaign()`",
             "- 验证公开牵引力: `public_growth_report()`",
+            "- Invite next external contributor: `public_proof_pack()`",
             "",
             "## 📣 复制回流纠错",
             "",
@@ -991,6 +992,7 @@ async def record_growth_referral(
                     "- 查看增长飞轮: `growth_flywheel()`",
                     "- 发起 72 小时爆发战役: `growth_campaign()`",
                     "- 验证公开牵引力: `public_growth_report()`",
+                    "- Invite next external contributor: `public_proof_pack()`",
                     "",
                     "## 📣 复制回流恢复",
                     "",
@@ -1020,6 +1022,7 @@ async def record_growth_referral(
         "- 查看增长飞轮: `growth_flywheel()`",
         "- 发起 72 小时爆发战役: `growth_campaign()`",
         "- 验证公开牵引力: `public_growth_report()`",
+        "- Invite next external contributor: `public_proof_pack()`",
         '- 首件法宝激活: `forge_agent(name="your-first-artifact", description="...")`',
         '- 发布增长悬赏: `quest(action="post", artifact_name="growth-referral-bounty", description="把这次 IssueOps 回流转成真实贡献")`',
         "- 查看赛季追赶: `leaderboard(type=\"season\")`",
@@ -1036,6 +1039,7 @@ async def record_growth_referral(
         "复查飞轮: growth_flywheel()",
         "发起战役: growth_campaign()",
         "验证公开证明: public_growth_report()",
+        "Next contributor invite: public_proof_pack()",
         "```",
     ]
     return append_brand_footer("\n".join(lines))
@@ -1066,6 +1070,7 @@ def _format_share_attribution_source_help(contribution: str, share_url: str, sou
             "- 查看激活漏斗: `activation_funnel()`",
             "- 查看增长飞轮: `growth_flywheel()`",
             "- 验证公开牵引力: `public_growth_report()`",
+            "- Invite next external contributor: `public_proof_pack()`",
             "",
             "## 📣 复制分享纠错",
             "",
@@ -1151,6 +1156,7 @@ async def record_share_attribution(
                     "- 查看真实激活漏斗: `activation_funnel()`",
                     "- 查看增长飞轮: `growth_flywheel()`",
                     "- 验证公开牵引力: `public_growth_report()`",
+                    "- Invite next external contributor: `public_proof_pack()`",
                     "",
                     "## 📣 复制分享恢复",
                     "",
@@ -1181,6 +1187,7 @@ async def record_share_attribution(
         "- 查看真实激活漏斗: `activation_funnel()`",
         "- 查看增长飞轮: `growth_flywheel()`",
         "- 验证公开牵引力: `public_growth_report()`",
+        "- Invite next external contributor: `public_proof_pack()`",
         "- 继续公开贡献: `quest(action=\"browse\")`",
         "- 查看赛季追赶: `leaderboard(type=\"season\")`",
         "",
@@ -1194,6 +1201,7 @@ async def record_share_attribution(
         "加入修炼: pip install tiangong-mcp",
         "复查激活: activation_funnel()",
         "复查飞轮: growth_flywheel()",
+        "Next contributor invite: public_proof_pack()",
         "```",
     ]
     return append_brand_footer("\n".join(lines))

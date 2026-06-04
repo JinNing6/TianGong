@@ -287,6 +287,7 @@ def _format_record_growth_referral_command(args: argparse.Namespace) -> str:
                 "- MCP activation report: `activation_funnel()`",
                 "- MCP growth flywheel: `growth_flywheel()`",
                 "- Terminal public proof report: `tiangong-mcp public-growth-report --record-snapshot --target-contributors 10`",
+                "- Terminal proof pack: `tiangong-mcp public-proof-pack --target-contributors 10`",
                 "- Terminal launch preflight: `tiangong-mcp public-launch-preflight --target-contributors 10`",
                 "- Next share proof: `tiangong-mcp record-share-attribution --contribution forge --share-url \"https://github.com/owner/repo/issues/2\" --source-url \""
                 + source_url
@@ -378,6 +379,7 @@ def _format_record_share_attribution_command(args: argparse.Namespace) -> str:
                 "- MCP activation report: `activation_funnel()`",
                 "- MCP growth flywheel: `growth_flywheel()`",
                 "- Terminal public proof report: `tiangong-mcp public-growth-report --record-snapshot --target-contributors 10`",
+                "- Terminal proof pack: `tiangong-mcp public-proof-pack --target-contributors 10`",
                 "- Terminal launch preflight: `tiangong-mcp public-launch-preflight --target-contributors 10`",
             ]
         )

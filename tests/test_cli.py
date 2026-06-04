@@ -420,6 +420,7 @@ def test_cli_record_growth_referral_writes_public_proof_to_local_ledger(monkeypa
     assert "activation_funnel()" in output
     assert "growth_flywheel()" in output
     assert "tiangong-mcp public-growth-report --record-snapshot --target-contributors 10" in output
+    assert "tiangong-mcp public-proof-pack --target-contributors 10" in output
     assert events[0].event_type == EVENT_ISSUEOPS_REFERRAL_RECORDED
     assert events[0].actor == "maintainer"
     assert events[0].metadata["route"] == "growth"
@@ -502,6 +503,7 @@ def test_cli_record_share_attribution_writes_public_share_to_local_ledger(monkey
     assert "share_attribution_report()" in output
     assert "leaderboard(type=\"share\")" in output
     assert "activation_funnel()" in output
+    assert "tiangong-mcp public-proof-pack --target-contributors 10" in output
     assert events[0].event_type == EVENT_SHARE_ATTRIBUTION_RECORDED
     assert events[0].actor == "maintainer"
     assert events[0].artifact_name == "dragon-forge"

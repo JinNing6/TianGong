@@ -430,6 +430,7 @@ async def test_record_growth_referral_turns_issueops_return_into_event(monkeypat
     assert "`activation_funnel()`" in result
     assert "`growth_flywheel()`" in result
     assert "`growth_campaign()`" in result
+    assert "`public_proof_pack()`" in result
     assert "`forge_agent(name=\"your-first-artifact\"" in result
     assert recorded[0][0][0] == EVENT_ISSUEOPS_REFERRAL_RECORDED
     assert recorded[0][1]["actor"] == "newbie"
@@ -527,6 +528,7 @@ async def test_record_share_attribution_turns_public_share_into_event(monkeypatc
     assert "贡献分享已记录" in result
     assert "`activation_funnel()`" in result
     assert "`growth_flywheel()`" in result
+    assert "`public_proof_pack()`" in result
     assert recorded[0][0][0] == EVENT_SHARE_ATTRIBUTION_RECORDED
     assert recorded[0][1]["actor"] == "newbie"
     assert recorded[0][1]["artifact_name"] == "dragon-forge"
