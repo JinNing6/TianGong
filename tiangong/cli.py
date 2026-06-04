@@ -26,8 +26,10 @@ from .config import config
 from .launch_assets import format_public_launch_assets
 from .proof_pack import format_public_proof_pack
 from .public_growth import (
+    fetch_public_distribution_readiness,
     fetch_public_growth_snapshot,
     format_public_growth_report,
+    format_public_install_command,
     format_public_launch_preflight,
     get_public_growth_snapshot_path,
     load_public_growth_snapshots,
@@ -210,6 +212,11 @@ def _format_public_launch_assets_command(args: argparse.Namespace) -> str:
 
 def _format_public_release_boundary_command(args: argparse.Namespace) -> str:
     return format_public_release_boundary(root=args.root, dist=args.dist)
+
+
+def _format_public_install_command(args: argparse.Namespace) -> str:
+    distribution = fetch_public_distribution_readiness()
+    return append_brand_footer(format_public_install_command(distribution))
 
 
 def _format_public_proof_pack_command(args: argparse.Namespace) -> str:
@@ -440,6 +447,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="Distribution directory containing wheel and sdist artifacts.",
     )
     release_boundary.set_defaults(handler=_format_public_release_boundary_command)
+
+    public_install = subparsers.add_parser(
+        "public-install-command",
+        help="Print the current public install command based on real PyPI readiness.",
+    )
+    public_install.set_defaults(handler=_format_public_install_command)
 
     proof_pack = subparsers.add_parser(
         "public-proof-pack",

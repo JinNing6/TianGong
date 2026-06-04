@@ -542,6 +542,59 @@ def test_public_growth_report_bridges_unverified_pypi_distribution(tmp_path):
     assert "This bridge keeps contributors on the current tag while PyPI is stale or unverified; it does not close the PyPI install loop." in result
 
 
+def test_public_install_command_bridges_stale_pypi_distribution():
+    """The shortest install surface should keep contributors off stale PyPI builds."""
+    from tiangong.public_growth import PublicDistributionReadiness, format_public_install_command
+
+    result = format_public_install_command(
+        PublicDistributionReadiness(
+            package_name="tiangong-mcp",
+            local_version="0.1.1",
+            published_version="0.0.1",
+            status="stale",
+            api_url="https://pypi.org/pypi/tiangong-mcp/json",
+            project_url="https://pypi.org/project/tiangong-mcp/",
+            reason="PyPI latest version differs from the local package metadata",
+        ),
+        repo_owner="octo-org",
+        repo_name="octo-repo",
+    )
+
+    assert "# TianGong Public Install Command" in result
+    assert "| `tiangong-mcp` | `0.1.1` | `0.0.1` | stale |" in result
+    assert "## Current Candidate Git Tag Install Bridge" in result
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/octo-org/octo-repo.git@v0.1.1"' in result
+    assert "Canonical install after PyPI latest is current: `pip install -U tiangong-mcp`" in result
+    assert 'start_cultivation(username="your_github_username")' in result
+    assert 'forge_agent(name="first-growth-artifact"' in result
+    assert "does not close the PyPI install loop" in result
+
+
+def test_public_install_command_uses_pypi_when_distribution_is_current():
+    """Once PyPI latest matches local metadata, the short install surface should prefer PyPI."""
+    from tiangong.public_growth import PublicDistributionReadiness, format_public_install_command
+
+    result = format_public_install_command(
+        PublicDistributionReadiness(
+            package_name="tiangong-mcp",
+            local_version="0.1.1",
+            published_version="0.1.1",
+            status="current",
+            api_url="https://pypi.org/pypi/tiangong-mcp/json",
+            project_url="https://pypi.org/project/tiangong-mcp/",
+            reason="PyPI latest version matches the local package metadata",
+        ),
+        repo_owner="octo-org",
+        repo_name="octo-repo",
+    )
+
+    assert "# TianGong Public Install Command" in result
+    assert "## Recommended Public Install" in result
+    assert "`pip install -U tiangong-mcp`" in result
+    assert "Git Tag Install Bridge" not in result
+    assert 'start_cultivation(username="your_github_username")' in result
+
+
 def test_public_growth_report_flags_missing_release_trigger(tmp_path):
     """A stale install loop should also prove whether the release-triggered PyPI workflow can run."""
     from tiangong.public_growth import (
@@ -1218,6 +1271,35 @@ async def test_mcp_public_growth_report_exposes_external_snapshot(monkeypatch, t
     assert "| Stars | 7 |" in result
     assert "`public_growth_report()`" in result
     assert "TianGong" in result
+
+
+@pytest.mark.asyncio
+async def test_mcp_public_install_command_exposes_current_install_bridge(monkeypatch):
+    """MCP users should get the same short install bridge without using the terminal CLI."""
+    from tiangong import mcp_server
+    from tiangong.public_growth import PublicDistributionReadiness
+
+    monkeypatch.setattr(
+        mcp_server,
+        "fetch_public_distribution_readiness",
+        lambda: PublicDistributionReadiness(
+            package_name="tiangong-mcp",
+            local_version="0.1.1",
+            published_version="0.0.1",
+            status="stale",
+            api_url="https://pypi.org/pypi/tiangong-mcp/json",
+            project_url="https://pypi.org/project/tiangong-mcp/",
+            reason="PyPI latest version differs from the local package metadata",
+        ),
+    )
+
+    result = await mcp_server.public_install_command()
+
+    assert "TianGong Public Install Command" in result
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.1"' in result
+    assert "Canonical install after PyPI latest is current: `pip install -U tiangong-mcp`" in result
+    assert 'start_cultivation(username="your_github_username")' in result
+    assert "does not close the PyPI install loop" in result
 
 
 @pytest.mark.asyncio

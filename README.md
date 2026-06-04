@@ -201,6 +201,7 @@ Before a new quest, realm rule, or public growth surface is promoted, install th
 python -m pip install -e ".[dev]"
 python -m ruff check .
 python -m pytest -q
+tiangong-mcp public-install-command
 tiangong-mcp public-launch-assets
 python -m build
 python -m twine check dist/*
@@ -371,12 +372,14 @@ activation_funnel()                # Activation funnel — real local MCP event 
 growth_flywheel()                  # Growth flywheel — current real loop snapshot, bottleneck, and next command
 growth_campaign()                  # Growth campaign — 72h public launch card from the real bottleneck
 public_growth_report()             # Public growth proof — GitHub public traction + local MCP ledger
+public_install_command()           # Public install command — PyPI-current install or Git tag candidate bridge
 public_launch_preflight()          # Public launch preflight — ordered IssueOps/Release/PyPI/first-proof runbook
 public_proof_pack()                # Public proof pack — no-network Growth/Share Issue kit and External Contributor invite
 public_growth_report(record_snapshot=True) # Public growth velocity — record a real GitHub traction snapshot for delta tracking
 public_growth_report(record_snapshot=True, target_contributors=10) # Campaign progress + recap — count real Issue/PR/local contributors and generate the next sprint target
 # Terminal launch gates outside an MCP client:
 # tiangong-mcp public-launch-assets
+# tiangong-mcp public-install-command
 # tiangong-mcp public-launch-preflight --target-contributors 10
 # tiangong-mcp public-growth-report --record-snapshot --target-contributors 10
 # tiangong-mcp public-proof-pack --target-contributors 10
@@ -409,6 +412,7 @@ leaderboard(type="share")          # Share Proof Rankings from real public contr
 - ✅ `public_growth_report()` also checks GitHub Contents API readiness for the remote Growth Issue Form, Share Proof Issue Form, and IssueOps workflow, then marks missing default-branch `.github` files as a public launch blocker instead of treating local-only routes as live
 - ✅ `public_growth_report()` checks GitHub Releases API readiness for the current local version tag, such as `v0.1.1`, so a missing release-trigger for PyPI Trusted Publishing is marked as a public install-loop launch blocker; if release creation is unavailable, the runbook exposes the protected tag push and `workflow_dispatch` publish fallbacks without claiming Release proof is closed
 - ✅ `public_growth_report()` checks PyPI JSON API distribution readiness for `tiangong-mcp`, compares the real latest PyPI version with local package metadata, and marks stale PyPI releases as a public install-loop launch blocker
+- ✅ `public_install_command()` is the shortest shareable install surface: it uses real PyPI readiness to choose either `pip install -U tiangong-mcp` or the current Git tag candidate bridge without claiming the PyPI install loop is closed
 - ✅ `public_growth_report()` collapses remote IssueOps, PyPI Trusted Publisher, GitHub Release, PyPI latest-version, and first-proof blockers into a `Public Launch Closure Checklist`, so the public flywheel is not claimed closed until every row is rechecked from real public state
 - ✅ `public_launch_preflight()` is the direct MCP release runbook: it fetches the same real public state, prints local quality gates, release command, PyPI Trusted Publishing expectations, closure checklist, Growth/Share Proof form URLs, created-Issue ledger commands, and recheck commands without inventing traction
 - ✅ `public_proof_pack()` is directly callable from MCP: it prints the no-network Growth/Share Issue proof kit, terminal ledger commands, and an External Contributor invite without switching to `tiangong-mcp public-proof-pack`; it does not invent traction
@@ -542,6 +546,7 @@ Configure TianGong into your IDE (Cursor / VSCode) or chat client (Claude) and c
 | `growth_flywheel` | 🌀 Growth Flywheel — Current real loop snapshot, bottleneck, and next action |
 | `growth_campaign` | 🚀 Growth Campaign — 72h public launch card from the real bottleneck |
 | `public_growth_report` | 📈 Public Growth Proof — GitHub public traction, PR contributor proof, campaign target progress, local MCP ledger, and optional velocity snapshot history without fake virality |
+| `public_install_command` | ⚒️ Public Install Command — PyPI-current install or Git tag candidate bridge without claiming a closed install loop |
 | `public_launch_preflight` | 🚀 Public Launch Preflight — Ordered IssueOps, release, PyPI, and first-proof runbook before claiming flywheel closure |
 | `public_proof_pack` | 📣 Public Proof Pack — No-network Growth/Share Issue kit and External Contributor invite without fake virality |
 | `leaderboard` | 🏆 Celestial Leaderboard — artifact, cultivator, season, tournament, recap, and sect-war rankings |

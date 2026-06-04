@@ -496,6 +496,7 @@ def format_public_launch_assets(root: str | Path | None = None, *, target_contri
         "## Recheck Commands",
         "",
         f"- Local asset audit: `tiangong-mcp public-launch-assets --target-contributors {target}`",
+        "- Public install command: `tiangong-mcp public-install-command`",
         f"- Public preflight: `tiangong-mcp public-launch-preflight --target-contributors {target}`",
         f"- Public proof report: `tiangong-mcp public-growth-report --record-snapshot --target-contributors {target}`",
         "",

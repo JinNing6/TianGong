@@ -120,6 +120,7 @@ def test_readmes_document_one_command_dev_install_and_quality_gate():
         assert "python -m ruff check ." in text
         assert "python -m pytest -q" in text
         assert "tiangong-mcp public-launch-assets" in text
+        assert "tiangong-mcp public-install-command" in text
         assert "python -m build" in text
         assert "python -m twine check dist/*" in text
         assert "tiangong-mcp public-release-boundary" in text
@@ -144,6 +145,8 @@ def test_readmes_document_mcp_public_proof_pack_tool():
         text = (ROOT / filename).read_text(encoding="utf-8")
 
         assert "`public_proof_pack`" in text
+        assert "`public_install_command`" in text
         assert "public-proof-pack" in text
+        assert "public-install-command" in text
         assert "External Contributor" in text or "外部贡献者" in text
         assert "does not invent" in text or "不伪造" in text

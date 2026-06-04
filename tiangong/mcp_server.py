@@ -71,8 +71,10 @@ from .marketplace import summon_artifact as _summon
 from .onboarding import format_start_cultivation
 from .proof_pack import format_public_proof_pack
 from .public_growth import (
+    fetch_public_distribution_readiness,
     fetch_public_growth_snapshot,
     format_public_growth_report,
+    format_public_install_command,
     format_public_launch_preflight,
     get_public_growth_snapshot_path,
     load_public_growth_snapshots,
@@ -866,6 +868,15 @@ async def public_growth_report(record_snapshot: bool = False, target_contributor
             target_contributors=target_contributors,
         )
     )
+
+
+@mcp.tool()
+async def public_install_command() -> str:
+    """
+    Public Install Command - shortest current install path based on real PyPI readiness.
+    """
+    distribution = fetch_public_distribution_readiness()
+    return append_brand_footer(format_public_install_command(distribution))
 
 
 @mcp.tool()

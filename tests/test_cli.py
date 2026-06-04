@@ -100,6 +100,7 @@ def _write_release_boundary_fixture(
     )
     readme_lines = [
         "tiangong-mcp public-launch-assets",
+        "tiangong-mcp public-install-command",
         "tiangong-mcp public-launch-preflight --target-contributors 10",
         "tiangong-mcp public-growth-report --record-snapshot --target-contributors 10",
         "tiangong-mcp public-proof-pack --target-contributors 10",
@@ -187,6 +188,7 @@ def _write_release_boundary_fixture(
         "tiangong/activation.py",
         "tiangong/cli.py",
         "tiangong/growth.py",
+        "tiangong/install_bridge.py",
         "tiangong/launch_assets.py",
         "tiangong/onboarding.py",
         "tiangong/proof_pack.py",
@@ -205,7 +207,19 @@ def _write_release_boundary_fixture(
                     "tiangong-mcp record-growth-referral\ntiangong-mcp record-share-attribution\n",
                 )
             elif module == "tiangong/mcp_server.py" and include_mcp_public_proof_pack:
-                archive.writestr(module, "@mcp.tool()\nasync def public_proof_pack():\n    return format_public_proof_pack()\n")
+                archive.writestr(
+                    module,
+                    "\n".join(
+                        [
+                            "@mcp.tool()",
+                            "async def public_proof_pack():",
+                            "    return format_public_proof_pack()",
+                            "@mcp.tool()",
+                            "async def public_install_command():",
+                            "    return format_public_install_command()",
+                        ]
+                    ),
+                )
             else:
                 archive.writestr(module, "# packaged\n")
         archive.writestr("tiangong_mcp-0.1.0.dist-info/METADATA", "Name: tiangong-mcp\nVersion: 0.1.0\n")
@@ -233,7 +247,16 @@ def _write_release_boundary_fixture(
                     )
                 elif relative == "tiangong/mcp_server.py" and include_mcp_public_proof_pack:
                     source.write_text(
-                        "@mcp.tool()\nasync def public_proof_pack():\n    return format_public_proof_pack()\n",
+                        "\n".join(
+                            [
+                                "@mcp.tool()",
+                                "async def public_proof_pack():",
+                                "    return format_public_proof_pack()",
+                                "@mcp.tool()",
+                                "async def public_install_command():",
+                                "    return format_public_install_command()",
+                            ]
+                        ),
                         encoding="utf-8",
                     )
                 else:
@@ -360,9 +383,40 @@ def test_cli_public_launch_assets_preserves_campaign_target():
 
     output = stdout.getvalue()
     assert "tiangong-mcp public-launch-assets --target-contributors 25" in output
+    assert "tiangong-mcp public-install-command" in output
     assert "tiangong-mcp public-launch-preflight --target-contributors 25" in output
     assert "tiangong-mcp public-growth-report --record-snapshot --target-contributors 25" in output
     assert "--target-contributors 10" not in output
+
+
+def test_cli_public_install_command_prints_current_candidate_bridge(monkeypatch):
+    """Release operators need one short command to share the correct install path."""
+    from tiangong import cli
+    from tiangong.public_growth import PublicDistributionReadiness
+
+    monkeypatch.setattr(
+        cli,
+        "fetch_public_distribution_readiness",
+        lambda: PublicDistributionReadiness(
+            package_name="tiangong-mcp",
+            local_version="0.1.1",
+            published_version="0.0.1",
+            status="stale",
+            api_url="https://pypi.org/pypi/tiangong-mcp/json",
+            project_url="https://pypi.org/project/tiangong-mcp/",
+            reason="PyPI latest version differs from the local package metadata",
+        ),
+    )
+
+    stdout = StringIO()
+    assert cli.main(["public-install-command"], stdout=stdout) == 0
+
+    output = stdout.getvalue()
+    assert "TianGong Public Install Command" in output
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.1"' in output
+    assert "Canonical install after PyPI latest is current: `pip install -U tiangong-mcp`" in output
+    assert 'start_cultivation(username="your_github_username")' in output
+    assert "does not close the PyPI install loop" in output
 
 
 def test_cli_public_proof_pack_prints_no_network_first_proof_runbook():
@@ -616,11 +670,12 @@ def test_cli_public_release_boundary_prints_package_boundary(tmp_path):
     assert "Wheel entry point | ready" in output
     assert "Growth modules in wheel | ready" in output
     assert "Proof ledger CLI routes | ready" in output
-    assert "Public proof MCP route | ready" in output
+    assert "Public recovery MCP routes | ready" in output
     assert "Source distribution | ready" in output
     assert "Documentation commands | ready" in output
     assert "Workflow release-boundary steps | ready" in output
     assert "tag push" in output
+    assert "tiangong-mcp public-install-command" in output
     assert "tiangong-mcp public-release-boundary" in output
     assert "Local Release Boundary Status" in output
     assert "blocked" not in output
@@ -695,8 +750,8 @@ def test_cli_public_release_boundary_blocks_missing_terminal_ledger_commands(tmp
     assert "Local Release Boundary Blockers" in output
 
 
-def test_cli_public_release_boundary_blocks_missing_mcp_public_proof_pack(tmp_path):
-    """Release boundary should fail if a package drops the MCP proof-pack route."""
+def test_cli_public_release_boundary_blocks_missing_mcp_public_recovery_routes(tmp_path):
+    """Release boundary should fail if a package drops MCP public recovery routes."""
     from tiangong import cli
 
     project_root, dist_dir = _write_release_boundary_fixture(tmp_path, include_mcp_public_proof_pack=False)
@@ -705,8 +760,9 @@ def test_cli_public_release_boundary_blocks_missing_mcp_public_proof_pack(tmp_pa
     assert cli.main(["public-release-boundary", "--root", str(project_root), "--dist", str(dist_dir)], stdout=stdout) == 0
 
     output = stdout.getvalue()
-    assert "Public proof MCP route | blocked" in output
+    assert "Public recovery MCP routes | blocked" in output
     assert "public_proof_pack" in output
+    assert "public_install_command" in output
     assert "Local Release Boundary Blockers" in output
 
 
@@ -734,6 +790,7 @@ def test_readmes_document_terminal_public_launch_gate():
         text = (ROOT / filename).read_text(encoding="utf-8")
 
         assert "tiangong-mcp public-launch-assets" in text
+        assert "tiangong-mcp public-install-command" in text
         assert "tiangong-mcp public-launch-preflight --target-contributors 10" in text
         assert "tiangong-mcp public-growth-report --record-snapshot --target-contributors 10" in text
         assert "tiangong-mcp public-proof-pack --target-contributors 10" in text

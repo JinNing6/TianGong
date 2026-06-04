@@ -12,6 +12,7 @@ REQUIRED_WHEEL_MODULES = (
     "tiangong/activation.py",
     "tiangong/cli.py",
     "tiangong/growth.py",
+    "tiangong/install_bridge.py",
     "tiangong/launch_assets.py",
     "tiangong/onboarding.py",
     "tiangong/proof_pack.py",
@@ -23,6 +24,7 @@ REQUIRED_WHEEL_MODULES = (
 
 REQUIRED_DOC_COMMANDS = (
     "tiangong-mcp public-launch-assets",
+    "tiangong-mcp public-install-command",
     "tiangong-mcp public-launch-preflight --target-contributors 10",
     "tiangong-mcp public-growth-report --record-snapshot --target-contributors 10",
     "tiangong-mcp public-proof-pack --target-contributors 10",
@@ -63,9 +65,11 @@ REQUIRED_PROOF_LEDGER_ROUTES = (
     ("record-share-attribution", "tiangong-mcp record-share-attribution"),
 )
 
-REQUIRED_MCP_PUBLIC_PROOF_ROUTE = (
+REQUIRED_MCP_PUBLIC_ROUTES = (
     "public_proof_pack",
     "format_public_proof_pack",
+    "public_install_command",
+    "format_public_install_command",
 )
 
 
@@ -206,8 +210,8 @@ def _proof_ledger_cli_checks(dist: Path, expected_version: str) -> list[ReleaseB
     ]
 
 
-def _mcp_public_proof_pack_checks(dist: Path, expected_version: str) -> list[ReleaseBoundaryCheck]:
-    """Verify built artifacts expose the MCP proof-pack route for client-side launch recovery."""
+def _mcp_public_route_checks(dist: Path, expected_version: str) -> list[ReleaseBoundaryCheck]:
+    """Verify built artifacts expose MCP launch recovery routes for client-side users."""
     missing: list[str] = []
     wheel = _find_one(dist, "tiangong_mcp-*.whl", expected_version)
     if wheel is None:
@@ -215,7 +219,7 @@ def _mcp_public_proof_pack_checks(dist: Path, expected_version: str) -> list[Rel
     else:
         with zipfile.ZipFile(wheel) as archive:
             mcp_text = _zip_member_text(archive, "tiangong/mcp_server.py")
-        for marker in REQUIRED_MCP_PUBLIC_PROOF_ROUTE:
+        for marker in REQUIRED_MCP_PUBLIC_ROUTES:
             if marker not in mcp_text:
                 missing.append(f"wheel mcp route marker `{marker}`")
 
@@ -225,16 +229,16 @@ def _mcp_public_proof_pack_checks(dist: Path, expected_version: str) -> list[Rel
     else:
         with tarfile.open(sdist, "r:gz") as archive:
             mcp_text = _tar_member_text(archive, "tiangong/mcp_server.py")
-        for marker in REQUIRED_MCP_PUBLIC_PROOF_ROUTE:
+        for marker in REQUIRED_MCP_PUBLIC_ROUTES:
             if marker not in mcp_text:
                 missing.append(f"sdist mcp route marker `{marker}`")
 
     return [
         ReleaseBoundaryCheck(
-            "Public proof MCP route",
+            "Public recovery MCP routes",
             "ready" if not missing else "blocked",
             (
-                "wheel and sdist expose `public_proof_pack` for MCP clients"
+                "wheel and sdist expose `public_proof_pack` and `public_install_command` for MCP clients"
                 if not missing
                 else f"missing {', '.join(missing)}"
             ),
@@ -330,7 +334,7 @@ def format_public_release_boundary(root: str | Path | None = None, dist: str | P
         *_wheel_checks(dist_dir, version),
         *_sdist_checks(dist_dir, version),
         *_proof_ledger_cli_checks(dist_dir, version),
-        *_mcp_public_proof_pack_checks(dist_dir, version),
+        *_mcp_public_route_checks(dist_dir, version),
         *_documentation_checks(project_root),
         *_workflow_checks(project_root),
     ]
@@ -352,6 +356,7 @@ def format_public_release_boundary(root: str | Path | None = None, dist: str | P
         "",
         "```bash",
         "tiangong-mcp public-launch-assets",
+        "tiangong-mcp public-install-command",
         "python -m build",
         "python -m twine check dist/*",
         "tiangong-mcp public-release-boundary",

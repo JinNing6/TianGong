@@ -735,6 +735,22 @@ def _fetch_distribution_readiness(
     )
 
 
+def fetch_public_distribution_readiness(
+    *,
+    package_name: str = PACKAGE_NAME,
+    local_version: str | None = None,
+    timeout: float = 10.0,
+    urlopen: Callable[..., Any] = _urlopen,
+) -> PublicDistributionReadiness:
+    """Fetch the PyPI install-loop status without requiring a GitHub API snapshot."""
+    return _fetch_distribution_readiness(
+        package_name=package_name,
+        local_version=local_version,
+        timeout=timeout,
+        urlopen=urlopen,
+    )
+
+
 def fetch_public_growth_snapshot(
     *,
     repo_owner: str | None = None,
@@ -1196,6 +1212,83 @@ def _format_distribution_readiness_lines(
     else:
         lines.extend(["- PyPI latest version matches the local package metadata.", ""])
     return lines
+
+
+def _clean_public_install_arg(value: str, fallback: str) -> str:
+    text = " ".join(str(value or "").split())[:160]
+    return text or fallback
+
+
+def format_public_install_command(
+    distribution: PublicDistributionReadiness,
+    *,
+    repo_owner: str = "",
+    repo_name: str = "",
+) -> str:
+    """Format the shortest current install command for public launch sharing."""
+    owner = _clean_public_install_arg(repo_owner, config.GITHUB_REPO_OWNER)
+    repo = _clean_public_install_arg(repo_name, config.GITHUB_REPO_NAME)
+    package = _clean_public_install_arg(distribution.package_name, PACKAGE_NAME)
+    local_version = distribution.local_version or get_local_package_version(package) or "current-local-version"
+    published_version = distribution.published_version or "unknown"
+    source = distribution.project_url or distribution.api_url or "not checked"
+    reason = f" - {distribution.reason}" if distribution.reason and distribution.status != "current" else ""
+    release_tag = f"v{local_version}" if not str(local_version).startswith("v") else str(local_version)
+    lines = [
+        "# TianGong Public Install Command",
+        "",
+        "> Data source: PyPI JSON API latest version plus local package metadata.",
+        "> This command does not install packages, publish releases, or claim public traction.",
+        "> It does not invent downloads, retention, repost counts, referral conversions, or rewards.",
+        "",
+        "## PyPI Install Readiness",
+        "",
+        "| Package | Local version | PyPI latest | Status | Source |",
+        "|---|---:|---:|---|---|",
+        f"| `{package}` | `{local_version}` | `{published_version}` | {distribution.status} | {source}{reason} |",
+        "",
+    ]
+
+    if distribution.status == "current":
+        lines.extend(
+            [
+                "## Recommended Public Install",
+                "",
+                f"- Install current public package: `pip install -U {package}`",
+                "- PyPI latest matches local package metadata, so the canonical package install path is current.",
+                "",
+            ]
+        )
+    else:
+        lines.extend(
+            format_current_candidate_install_bridge_lines(
+                repo_owner=owner,
+                repo_name=repo,
+                version_or_tag=release_tag,
+                package_name=package,
+            )
+        )
+
+    lines.extend(
+        [
+            "## First Cultivation Steps",
+            "",
+            '1. Start cultivation in an MCP client: `start_cultivation(username="your_github_username")`',
+            (
+                "2. Forge the first public artifact: "
+                '`forge_agent(name="first-growth-artifact", description="A TianGong artifact opening the first public proof loop")`'
+            ),
+            "3. Share reviewable proof through `public_proof_pack()` or `tiangong-mcp public-proof-pack --target-contributors 10`.",
+            "",
+            "## Recheck Commands",
+            "",
+            "- Short install surface: `tiangong-mcp public-install-command`",
+            "- Public preflight: `tiangong-mcp public-launch-preflight --target-contributors 10`",
+            "- Public proof report: `tiangong-mcp public-growth-report --record-snapshot --target-contributors 10`",
+            "",
+        ]
+    )
+    return "\n".join(lines)
 
 
 def _format_pypi_trusted_publisher_runbook_lines(
