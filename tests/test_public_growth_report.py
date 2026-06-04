@@ -475,6 +475,7 @@ def test_public_growth_report_flags_stale_pypi_distribution(tmp_path):
     assert "Do not claim the install loop reaches current growth tools while PyPI is stale." in result
     assert ".github/workflows/publish-pypi.yml" in result
     assert "Create a GitHub Release after PyPI Trusted Publishing is configured" in result
+    assert "manually dispatch `.github/workflows/publish-pypi.yml` with the existing `v*` tag" in result
     assert "python -m build" in result
     assert "python -m twine check dist/*" in result
 
@@ -531,6 +532,9 @@ def test_public_growth_report_flags_missing_release_trigger(tmp_path):
     assert "| `0.1.0` | `v0.1.0` | missing |" in result
     assert "## GitHub Release Launch Blocker" in result
     assert "Create and publish GitHub Release `v0.1.0` after quality gates pass." in result
+    assert "protected manual workflow dispatch for `.github/workflows/publish-pypi.yml` with tag `v0.1.0`" in result
+    assert "verifies it is reachable from `origin/main`" in result
+    assert "verifies `pyproject.toml` version equals the tag" in result
     assert ".github/workflows/publish-pypi.yml" in result
     assert "PyPI Trusted Publishing" in result
     assert "public_growth_report()" in result
@@ -613,6 +617,7 @@ def test_public_growth_report_outputs_public_launch_closure_checklist(tmp_path):
     assert "workflow `.github/workflows/publish-pypi.yml`" in result
     assert "environment `pypi`" in result
     assert "| 3 | GitHub Release trigger | Run `gh release create v0.1.0 --generate-notes`" in result
+    assert "manually dispatch `.github/workflows/publish-pypi.yml` with tag `v0.1.0`" in result
     assert "| 4 | PyPI latest version | Wait for `.github/workflows/publish-pypi.yml`" in result
     assert "| 5 | First public proof | Open the Growth Issue Form and Share Proof Issue Form" in result
     assert "record_growth_referral(" in result
@@ -1126,6 +1131,8 @@ def test_public_launch_preflight_formats_ordered_release_runbook(tmp_path):
     assert "Use created Issue URLs, not `issues/new?...` form URLs, for ledger commands." in result
     assert "tiangong-mcp public-launch-assets" in result
     assert "gh release create v0.1.0 --generate-notes" in result
+    assert "workflow_dispatch tag `v0.1.0`" in result
+    assert "verifies `pyproject.toml` version before upload" in result
     assert "public_growth_report(record_snapshot=True, target_contributors=10)" in result
     assert "does not invent downloads, retention, repost counts, referral conversions, or rewards" in result
 
@@ -1178,5 +1185,6 @@ async def test_mcp_public_launch_preflight_exposes_release_runbook(monkeypatch, 
     assert "template=tiangong-growth-flywheel.yml" in result
     assert "template=tiangong-share-proof.yml" in result
     assert "gh release create v0.1.0 --generate-notes" in result
+    assert "workflow_dispatch tag `v0.1.0`" in result
     assert "public_growth_report(record_snapshot=True, target_contributors=10)" in result
     assert "TianGong" in result

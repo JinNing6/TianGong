@@ -74,13 +74,25 @@ def test_pypi_publish_workflow_uses_trusted_publishing_after_release_gates():
     assert "pull_request_target" not in workflow
     assert "release:" in workflow
     assert "types: [published]" in workflow
-    assert "workflow_dispatch" not in workflow
+    assert "workflow_dispatch:" in workflow
+    assert "inputs:" in workflow
+    assert "tag:" in workflow
+    assert "Existing v* tag" in workflow
+    assert "github.event.release.tag_name || inputs.tag" in workflow
     assert "contents: read" in workflow
     assert "id-token: write" in workflow
     assert "environment: pypi" in workflow
+    assert "Resolve release tag" in workflow
+    assert "Release tag must look like v0.1.0" in workflow
     assert "actions/checkout@" in workflow
+    assert "ref: ${{ steps.release.outputs.tag }}" in workflow
+    assert "fetch-depth: 0" in workflow
     assert "actions/setup-python@" in workflow
     assert "python -m pip install -e \".[dev]\"" in workflow
+    assert "Verify release tag and package version" in workflow
+    assert "git fetch --force origin main:refs/remotes/origin/main --tags" in workflow
+    assert "git merge-base --is-ancestor" in workflow
+    assert "pyproject.toml version" in workflow
     assert "python -m ruff check ." in workflow
     assert "python -m pytest -q" in workflow
     assert "tiangong-mcp public-launch-assets" in workflow
@@ -108,3 +120,6 @@ def test_readmes_document_one_command_dev_install_and_quality_gate():
         assert ".github/workflows/quality-gates.yml" in text
         assert ".github/workflows/publish-pypi.yml" in text
         assert "Trusted Publishing" in text
+        assert "workflow_dispatch" in text
+        assert "origin/main" in text
+        assert "pyproject.toml" in text

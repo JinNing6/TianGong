@@ -123,7 +123,46 @@ def _write_release_boundary_fixture(root: Path, *, include_terminal_ledger_comma
         ]
     )
     (workflow_dir / "quality-gates.yml").write_text(workflow_text, encoding="utf-8")
-    (workflow_dir / "publish-pypi.yml").write_text(workflow_text, encoding="utf-8")
+    publish_workflow_text = "\n".join(
+        [
+            "on:",
+            "  release:",
+            "    types: [published]",
+            "  workflow_dispatch:",
+            "    inputs:",
+            "      tag:",
+            "        description: Existing v* tag to publish, for example v0.1.0",
+            "permissions:",
+            "  contents: read",
+            "concurrency:",
+            "  group: tiangong-pypi-publish-${{ github.event.release.tag_name || inputs.tag }}",
+            "jobs:",
+            "  publish:",
+            "    environment: pypi",
+            "    permissions:",
+            "      contents: read",
+            "      id-token: write",
+            "    steps:",
+            "      - name: Resolve release tag",
+            "        run: echo 'Release tag must look like v0.1.0'",
+            "      - uses: actions/checkout@v6",
+            "        with:",
+            "          ref: ${{ steps.release.outputs.tag }}",
+            "          fetch-depth: 0",
+            "      - name: Verify release tag and package version",
+            "        run: |",
+            "          git fetch --force origin main:refs/remotes/origin/main --tags",
+            "          git merge-base --is-ancestor HEAD origin/main",
+            "          echo 'pyproject.toml version'",
+            "      - run: tiangong-mcp public-launch-assets",
+            "      - run: python -m build",
+            "      - run: python -m twine check dist/*",
+            "      - run: tiangong-mcp public-release-boundary",
+            "      - uses: pypa/gh-action-pypi-publish@release/v1",
+            "",
+        ]
+    )
+    (workflow_dir / "publish-pypi.yml").write_text(publish_workflow_text, encoding="utf-8")
 
     wheel = dist_dir / "tiangong_mcp-0.1.0-py3-none-any.whl"
     required_modules = [

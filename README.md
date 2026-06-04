@@ -210,7 +210,7 @@ tiangong-mcp public-release-boundary
 
 `.github/workflows/quality-gates.yml` runs the same dev extra, lint, tests, local launch asset audit, build, package metadata check, and public release-boundary check on push and pull request with read-only repository permissions.
 
-`.github/workflows/publish-pypi.yml` publishes to PyPI only when a GitHub Release is published. It reruns lint, tests, local launch asset audit, build, `twine check`, and public release-boundary check, then uses PyPI Trusted Publishing through `pypa/gh-action-pypi-publish@release/v1` with job-level `id-token: write`, so the release path does not require a stored `PYPI_TOKEN`.
+`.github/workflows/publish-pypi.yml` publishes to PyPI when a GitHub Release is published, and also has a protected manual `workflow_dispatch` fallback for an existing `v*` tag when release creation is unavailable. The workflow checks out the tag, verifies that the tag commit is reachable from `origin/main`, verifies that `pyproject.toml` matches the tag version, reruns lint, tests, local launch asset audit, build, `twine check`, and public release-boundary check, then uses PyPI Trusted Publishing through `pypa/gh-action-pypi-publish@release/v1` with job-level `id-token: write`, so the release path does not require a stored `PYPI_TOKEN`.
 
 `tiangong-mcp public-launch-assets` also prints a full public growth release handoff: docs, package metadata, Issue Forms, workflows, public growth modules, user-facing growth surfaces, and tests to stage before creating the `v0.1.0` GitHub Release.
 

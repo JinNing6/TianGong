@@ -35,6 +35,23 @@ REQUIRED_WORKFLOW_COMMANDS = (
     "tiangong-mcp public-release-boundary",
 )
 
+REQUIRED_PUBLISH_WORKFLOW_FEATURES = (
+    "release:",
+    "types: [published]",
+    "workflow_dispatch:",
+    "github.event.release.tag_name || inputs.tag",
+    "Resolve release tag",
+    "Release tag must look like v0.1.0",
+    "ref: ${{ steps.release.outputs.tag }}",
+    "fetch-depth: 0",
+    "Verify release tag and package version",
+    "git fetch --force origin main:refs/remotes/origin/main --tags",
+    "git merge-base --is-ancestor",
+    "pyproject.toml version",
+    "id-token: write",
+    "pypa/gh-action-pypi-publish@release/v1",
+)
+
 REQUIRED_PROOF_LEDGER_ROUTES = (
     ("record-growth-referral", "tiangong-mcp record-growth-referral"),
     ("record-share-attribution", "tiangong-mcp record-share-attribution"),
@@ -224,13 +241,21 @@ def _workflow_checks(root: Path) -> list[ReleaseBoundaryCheck]:
         for command in REQUIRED_WORKFLOW_COMMANDS
         if not all(command in _read_text(path) for path in workflows)
     ]
+    publish_workflow = _read_text(root / ".github" / "workflows" / "publish-pypi.yml")
+    missing_publish_features = [
+        feature for feature in REQUIRED_PUBLISH_WORKFLOW_FEATURES if feature not in publish_workflow
+    ]
+    missing = [*missing_commands, *missing_publish_features]
     return [
         ReleaseBoundaryCheck(
             "Workflow release-boundary steps",
-            "ready" if not missing_commands else "blocked",
-            "quality and publish workflows run launch assets plus release boundary"
-            if not missing_commands
-            else f"missing {', '.join(missing_commands)}",
+            "ready" if not missing else "blocked",
+            (
+                "quality and publish workflows run launch assets plus release boundary; "
+                "publish workflow verifies release tags and supports protected manual tag dispatch"
+            )
+            if not missing
+            else f"missing {', '.join(missing)}",
         )
     ]
 
