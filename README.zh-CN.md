@@ -219,6 +219,8 @@ tiangong-mcp public-release-boundary
 
 `.github/workflows/publish-pypi.yml` 会在 GitHub Release 发布时向 PyPI 发版；如果当前无法创建 Release，也支持对一个已存在的 `v*` tag 使用受保护的手动 `workflow_dispatch` 兜底。workflow 会检出该 tag，校验 tag commit 已经能从 `origin/main` 追溯，校验 `pyproject.toml` 版本与 tag 一致，重新执行 lint、测试、本地 launch asset audit、构建、`twine check` 和 public release-boundary check，然后通过 `pypa/gh-action-pypi-publish@release/v1` 使用 PyPI Trusted Publishing 和 job 级 `id-token: write` 发布，因此发版路径不需要保存 `PYPI_TOKEN`。
 
+`tiangong-mcp` 的 PyPI Trusted Publisher 配置必须与 release workflow 精确匹配：owner `JinNing6`，repository `TianGong`，workflow filename `publish-pypi.yml`，workflow path `.github/workflows/publish-pypi.yml`，environment `pypi`。如果 PyPI 返回 `invalid-publisher`，重新运行 `tiangong-mcp public-launch-preflight --target-contributors 10`，使用其中生成的 Trusted Publisher runbook，不要改用长期上传 token。
+
 `tiangong-mcp public-launch-assets` 还会输出完整公开增长 release handoff：创建 `v0.1.0` GitHub Release 之前需要 staging 的文档、包元数据、Issue Forms、workflows、公开增长模块、用户可见增长表面和测试。
 
 ---

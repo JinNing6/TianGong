@@ -476,6 +476,14 @@ def test_public_growth_report_flags_stale_pypi_distribution(tmp_path):
     assert ".github/workflows/publish-pypi.yml" in result
     assert "Create a GitHub Release after PyPI Trusted Publishing is configured" in result
     assert "manually dispatch `.github/workflows/publish-pypi.yml` with the existing `v*` tag" in result
+    assert "## PyPI Trusted Publisher Setup Runbook" in result
+    assert "https://pypi.org/manage/project/tiangong-mcp/settings/publishing/" in result
+    assert "| Repository owner | `octo-org` | `repository_owner`: `octo-org` |" in result
+    assert "| Repository name | `octo-repo` | `repository`: `octo-org/octo-repo` |" in result
+    assert "| Workflow filename | `publish-pypi.yml` |" in result
+    assert "| Workflow path | `.github/workflows/publish-pypi.yml` |" in result
+    assert "| Environment | `pypi` | `environment`: `pypi`" in result
+    assert "Do not add a stored `PYPI_TOKEN`" in result
     assert "python -m build" in result
     assert "python -m twine check dist/*" in result
 
@@ -614,7 +622,8 @@ def test_public_growth_report_outputs_public_launch_closure_checklist(tmp_path):
     assert "| 1 | Remote IssueOps routes | `tiangong-mcp public-launch-assets` verifies" in result
     assert ".github/ISSUE_TEMPLATE/tiangong-growth-flywheel.yml" in result
     assert "| 2 | PyPI Trusted Publisher | Configure PyPI project `tiangong-mcp`" in result
-    assert "workflow `.github/workflows/publish-pypi.yml`" in result
+    assert "workflow filename `publish-pypi.yml`" in result
+    assert "path `.github/workflows/publish-pypi.yml`" in result
     assert "environment `pypi`" in result
     assert "| 3 | GitHub Release trigger | Run `gh release create v0.1.0 --generate-notes`" in result
     assert "manually dispatch `.github/workflows/publish-pypi.yml` with tag `v0.1.0`" in result
@@ -1117,6 +1126,10 @@ def test_public_launch_preflight_formats_ordered_release_runbook(tmp_path):
     assert "python -m build" in result
     assert "python -m twine check dist/*" in result
     assert "## Public Launch Closure Checklist" in result
+    assert "## PyPI Trusted Publisher Setup Runbook" in result
+    assert "https://pypi.org/manage/project/tiangong-mcp/settings/publishing/" in result
+    assert "| Workflow filename | `publish-pypi.yml` |" in result
+    assert "| Environment | `pypi` | `environment`: `pypi`" in result
     assert "## First Public Proof Entrypoints" in result
     assert "template=tiangong-growth-flywheel.yml" in result
     assert "template=tiangong-share-proof.yml" in result
@@ -1181,6 +1194,7 @@ async def test_mcp_public_launch_preflight_exposes_release_runbook(monkeypatch, 
 
     assert "TianGong Public Launch Preflight" in result
     assert "Public Launch Closure Checklist" in result
+    assert "PyPI Trusted Publisher Setup Runbook" in result
     assert "First Public Proof Entrypoints" in result
     assert "template=tiangong-growth-flywheel.yml" in result
     assert "template=tiangong-share-proof.yml" in result

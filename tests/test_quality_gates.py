@@ -123,3 +123,7 @@ def test_readmes_document_one_command_dev_install_and_quality_gate():
         assert "workflow_dispatch" in text
         assert "origin/main" in text
         assert "pyproject.toml" in text
+        assert "publish-pypi.yml" in text
+        assert "environment `pypi`" in text
+        assert "invalid-publisher" in text
+        assert "PYPI_TOKEN" in text

@@ -35,6 +35,10 @@ ISSUEOPS_WORKFLOW_PATH = ".github/workflows/issueops-onboarding.yml"
 PACKAGE_NAME = "tiangong-mcp"
 PYPI_JSON_URL = f"https://pypi.org/pypi/{PACKAGE_NAME}/json"
 PYPI_PROJECT_URL = f"https://pypi.org/project/{PACKAGE_NAME}/"
+PYPI_PROJECT_PUBLISHING_URL = f"https://pypi.org/manage/project/{PACKAGE_NAME}/settings/publishing/"
+PYPI_TRUSTED_PUBLISHER_WORKFLOW_FILENAME = "publish-pypi.yml"
+PYPI_TRUSTED_PUBLISHER_WORKFLOW_PATH = f".github/workflows/{PYPI_TRUSTED_PUBLISHER_WORKFLOW_FILENAME}"
+PYPI_TRUSTED_PUBLISHER_ENVIRONMENT = "pypi"
 
 
 @dataclass(frozen=True)
@@ -1091,6 +1095,49 @@ def _format_distribution_readiness_lines(distribution: PublicDistributionReadine
     return lines
 
 
+def _format_pypi_trusted_publisher_runbook_lines(snapshot: PublicGrowthSnapshot) -> list[str]:
+    distribution = snapshot.distribution_readiness
+    if distribution.status not in {"stale", "unverified"}:
+        return []
+
+    owner, repo = _repo_owner_name(snapshot.repo.full_name)
+    release_tag = snapshot.release_readiness.expected_tag or f"v{distribution.local_version or 'current-local-version'}"
+    lines = [
+        "## PyPI Trusted Publisher Setup Runbook",
+        "",
+        "> Use this when PyPI Trusted Publishing fails with `invalid-publisher` after lint, tests, build, `twine check`, and `public-release-boundary` passed.",
+        "> PyPI's troubleshooting docs define `invalid-publisher` as a valid OIDC token that does not match any configured publisher claims.",
+        "> Do not add a stored `PYPI_TOKEN`; keep the install loop on Trusted Publishing/OIDC.",
+        "",
+        f"- PyPI project publishing settings: {PYPI_PROJECT_PUBLISHING_URL}",
+        f"- GitHub workflow run: `.github/workflows/{PYPI_TRUSTED_PUBLISHER_WORKFLOW_FILENAME}`",
+        f"- Re-run release workflow after setup: https://github.com/{owner}/{repo}/actions/workflows/{PYPI_TRUSTED_PUBLISHER_WORKFLOW_FILENAME}",
+        "",
+        "| PyPI Trusted Publisher field | Value to configure | Evidence / failed-run claim |",
+        "|---|---|---|",
+        f"| Repository owner | `{owner}` | `repository_owner`: `{owner}` |",
+        f"| Repository name | `{repo}` | `repository`: `{owner}/{repo}` |",
+        (
+            f"| Workflow filename | `{PYPI_TRUSTED_PUBLISHER_WORKFLOW_FILENAME}` | "
+            f"`workflow_ref`: `{owner}/{repo}/{PYPI_TRUSTED_PUBLISHER_WORKFLOW_PATH}@refs/tags/{release_tag}` |"
+        ),
+        (
+            f"| Workflow path | `{PYPI_TRUSTED_PUBLISHER_WORKFLOW_PATH}` | GitHub Actions workflow file on default branch |"
+        ),
+        f"| Environment | `{PYPI_TRUSTED_PUBLISHER_ENVIRONMENT}` | `environment`: `{PYPI_TRUSTED_PUBLISHER_ENVIRONMENT}` and `sub`: `repo:{owner}/{repo}:environment:{PYPI_TRUSTED_PUBLISHER_ENVIRONMENT}` |",
+        f"| Package | `{distribution.package_name}` | PyPI latest `{distribution.published_version or 'unknown'}` vs local `{distribution.local_version or 'unknown'}` |",
+        "",
+        "## After PyPI Setup",
+        "",
+        "- Re-run failed release job, or manually dispatch the workflow with tag "
+        f"`{release_tag}` from the Actions page above.",
+        "- Recheck install loop: `public_growth_report(record_snapshot=True, target_contributors=10)`",
+        f"- Expected proof: PyPI JSON latest version becomes `{distribution.local_version or 'current-local-version'}`.",
+        "",
+    ]
+    return lines
+
+
 def _format_public_launch_closure_checklist_lines(
     snapshot: PublicGrowthSnapshot,
     *,
@@ -1121,7 +1168,8 @@ def _format_public_launch_closure_checklist_lines(
                 "PyPI Trusted Publisher",
                 (
                     f"Configure PyPI project `{snapshot.distribution_readiness.package_name}` with repository "
-                    f"`{snapshot.repo.full_name}`, workflow `.github/workflows/publish-pypi.yml`, environment `pypi`."
+                    f"`{snapshot.repo.full_name}`, workflow filename `{PYPI_TRUSTED_PUBLISHER_WORKFLOW_FILENAME}` "
+                    f"(path `{PYPI_TRUSTED_PUBLISHER_WORKFLOW_PATH}`), environment `{PYPI_TRUSTED_PUBLISHER_ENVIRONMENT}`."
                 ),
                 "PyPI Trusted Publishing settings match the release workflow.",
             )
@@ -1347,6 +1395,7 @@ def format_public_launch_preflight(
                 local_shares=local_shares,
                 target_contributors=target,
             ),
+            *_format_pypi_trusted_publisher_runbook_lines(snapshot),
             "## First Public Proof Entrypoints",
             "",
             "> Use the form URLs only to create public Issues. Use created Issue URLs, not `issues/new?...` form URLs, for ledger commands.",
@@ -1852,6 +1901,7 @@ def format_public_growth_report(
             *_format_issueops_readiness_lines(snapshot.issueops_readiness),
             *_format_release_readiness_lines(snapshot.release_readiness),
             *_format_distribution_readiness_lines(snapshot.distribution_readiness),
+            *_format_pypi_trusted_publisher_runbook_lines(snapshot),
             *_format_public_launch_closure_checklist_lines(
                 snapshot,
                 local_referrals=local_referrals,
