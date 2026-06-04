@@ -44,6 +44,7 @@ PUBLIC_GROWTH_CODE_ASSETS = (
     "tiangong/artifact_system.py",
     "tiangong/cli.py",
     "tiangong/growth.py",
+    "tiangong/install_bridge.py",
     "tiangong/launch_assets.py",
     "tiangong/onboarding.py",
     "tiangong/proof_pack.py",

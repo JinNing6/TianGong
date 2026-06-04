@@ -221,6 +221,8 @@ tiangong-mcp public-release-boundary
 
 `tiangong-mcp` 的 PyPI Trusted Publisher 配置必须与 release workflow 精确匹配：owner `JinNing6`，repository `TianGong`，workflow filename `publish-pypi.yml`，workflow path `.github/workflows/publish-pypi.yml`，environment `pypi`。如果 PyPI 返回 `invalid-publisher`，重新运行 `tiangong-mcp public-launch-preflight --target-contributors 10`，使用其中生成的 Trusted Publisher runbook，不要改用长期上传 token。
 
+当 public preflight 显示 PyPI latest stale 或 unverified 时，只能把生成的 Current Candidate Git Tag Install Bridge 当作临时候选贡献者路径，例如 `python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.1"`。这不代表 PyPI 安装闭环已经闭合；必须用 `public_growth_report()` 复查 PyPI JSON latest 后才能宣布公开安装就绪。
+
 `tiangong-mcp public-launch-assets` 还会输出完整公开增长 release handoff：创建当前本地版本 GitHub Release（例如 `v0.1.1`）之前需要 staging 的文档、包元数据、Issue Forms、workflows、公开增长模块、用户可见增长表面和测试。
 
 ---

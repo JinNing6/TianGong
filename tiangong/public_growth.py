@@ -22,6 +22,7 @@ from .activation import (
 )
 from .config import config
 from .growth import build_growth_issue_url
+from .install_bridge import format_current_candidate_install_bridge_lines
 from .launch_assets import format_full_public_growth_release_handoff_lines
 from .proof_pack import format_public_proof_pack
 
@@ -1116,7 +1117,12 @@ def _format_release_readiness_lines(release: PublicReleaseReadiness) -> list[str
     return lines
 
 
-def _format_distribution_readiness_lines(distribution: PublicDistributionReadiness) -> list[str]:
+def _format_distribution_readiness_lines(
+    distribution: PublicDistributionReadiness,
+    *,
+    repo_full_name: str = "",
+    release_tag: str = "",
+) -> list[str]:
     source = distribution.project_url or distribution.api_url or "not checked"
     local_version = distribution.local_version or "unknown"
     published_version = distribution.published_version or "unknown"
@@ -1137,6 +1143,8 @@ def _format_distribution_readiness_lines(distribution: PublicDistributionReadine
     ]
 
     if distribution.status == "stale":
+        owner, repo = _repo_owner_name(repo_full_name)
+        candidate_tag = release_tag or f"v{distribution.local_version or 'current-local-version'}"
         lines.extend(
             [
                 "## PyPI Release Launch Blocker",
@@ -1156,7 +1164,17 @@ def _format_distribution_readiness_lines(distribution: PublicDistributionReadine
                 "",
             ]
         )
+        lines.extend(
+            format_current_candidate_install_bridge_lines(
+                repo_owner=owner,
+                repo_name=repo,
+                version_or_tag=candidate_tag,
+                package_name=distribution.package_name,
+            )
+        )
     elif distribution.status == "unverified":
+        owner, repo = _repo_owner_name(repo_full_name)
+        candidate_tag = release_tag or f"v{distribution.local_version or 'current-local-version'}"
         lines.extend(
             [
                 "## PyPI Distribution Verification Warning",
@@ -1166,6 +1184,14 @@ def _format_distribution_readiness_lines(distribution: PublicDistributionReadine
                 "- Do not claim the install loop is proven until PyPI latest version is verified.",
                 "",
             ]
+        )
+        lines.extend(
+            format_current_candidate_install_bridge_lines(
+                repo_owner=owner,
+                repo_name=repo,
+                version_or_tag=candidate_tag,
+                package_name=distribution.package_name,
+            )
         )
     else:
         lines.extend(["- PyPI latest version matches the local package metadata.", ""])
@@ -2047,7 +2073,11 @@ def format_public_growth_report(
             "",
             *_format_issueops_readiness_lines(snapshot.issueops_readiness),
             *_format_release_readiness_lines(snapshot.release_readiness),
-            *_format_distribution_readiness_lines(snapshot.distribution_readiness),
+            *_format_distribution_readiness_lines(
+                snapshot.distribution_readiness,
+                repo_full_name=snapshot.repo.full_name,
+                release_tag=snapshot.release_readiness.expected_tag,
+            ),
             *_format_pypi_trusted_publisher_runbook_lines(snapshot, target_contributors=target_contributors),
             *_format_public_launch_closure_checklist_lines(
                 snapshot,

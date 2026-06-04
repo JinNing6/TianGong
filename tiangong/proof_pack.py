@@ -5,6 +5,7 @@ from __future__ import annotations
 from .activation import build_share_proof_issue_url
 from .config import config
 from .growth import build_growth_issue_url
+from .install_bridge import DEFAULT_PACKAGE_NAME, git_tag_install_command, local_package_version
 
 
 def _safe_positive_int(value: int | str | None, fallback: int = 10) -> int:
@@ -44,6 +45,13 @@ def format_public_proof_pack(
     normalized_actor = _clean_arg(actor, "your_github_username")
     artifact = _clean_arg(artifact_name, "first-growth-artifact")
     normalized_contribution = _clean_arg(contribution, "forge")
+    bridge_version = local_package_version(DEFAULT_PACKAGE_NAME)
+    install_bridge_command = git_tag_install_command(
+        repo_owner=owner,
+        repo_name=repo,
+        version_or_tag=bridge_version,
+        package_name=DEFAULT_PACKAGE_NAME,
+    )
     real_data_context = (
         "No-network first proof pack: public API metrics were not fetched in this command. "
         "Run public launch preflight after pushing IssueOps routes to verify real public state."
@@ -119,6 +127,14 @@ def format_public_proof_pack(
             f"4. Open Share Proof Issue Form: {share_issue_url}",
             f"5. After submission, replace `{share_proof_url}` with the created Issue URL before recording proof.",
             "",
+            "## Git Tag Candidate Install Bridge",
+            "",
+            "> Use this only when public preflight reports PyPI latest is stale or unverified.",
+            "> This lets contributors evaluate the current tag; it does not close the PyPI install loop.",
+            "",
+            f"- Candidate install: `{install_bridge_command}`",
+            "- Canonical install after PyPI latest is current: `pip install -U tiangong-mcp`",
+            "",
             "## After Submission CLI Ledger Commands",
             "",
             "```bash",
@@ -152,6 +168,7 @@ def format_public_proof_pack(
                 f"artifact_name=\"{artifact_arg}\", source_url=\"{growth_proof_url}\", actor=\"{actor_arg}\")"
             ),
             "Install: pip install tiangong-mcp",
+            f"PyPI stale candidate install bridge: {install_bridge_command}",
             "```",
             "",
             "## Copy External Contributor Invite",
@@ -159,6 +176,7 @@ def format_public_proof_pack(
             "```text",
             f"I want to be counted in the TianGong 72h launch for {owner}/{repo}.",
             "Install current public package: pip install -U tiangong-mcp",
+            f"If public preflight reports PyPI latest is stale or unverified, install current tag candidate: {install_bridge_command}",
             'Start: start_cultivation(username="your_github_username")',
             (
                 f'Forge: forge_agent(name="{artifact}", '

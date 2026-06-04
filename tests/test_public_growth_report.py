@@ -480,6 +480,9 @@ def test_public_growth_report_flags_stale_pypi_distribution(tmp_path):
     assert "Create a GitHub Release after PyPI Trusted Publishing is configured" in result
     assert "push the verified `v*` tag to trigger the same workflow" in result
     assert "manually dispatch `.github/workflows/publish-pypi.yml` with the existing `v*` tag" in result
+    assert "## Current Candidate Git Tag Install Bridge" in result
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/octo-org/octo-repo.git@v0.1.0"' in result
+    assert "This bridge keeps contributors on the current tag while PyPI is stale or unverified; it does not close the PyPI install loop." in result
     assert "## PyPI Trusted Publisher Setup Runbook" in result
     assert "https://pypi.org/manage/project/tiangong-mcp/settings/publishing/" in result
     assert "| Repository owner | `octo-org` | `repository_owner`: `octo-org` |" in result
@@ -490,6 +493,53 @@ def test_public_growth_report_flags_stale_pypi_distribution(tmp_path):
     assert "Do not add a stored `PYPI_TOKEN`" in result
     assert "python -m build" in result
     assert "python -m twine check dist/*" in result
+
+
+def test_public_growth_report_bridges_unverified_pypi_distribution(tmp_path):
+    """When PyPI cannot be verified, contributors still need a bounded current-tag install bridge."""
+    from tiangong.public_growth import (
+        PublicDistributionReadiness,
+        PublicGrowthIssueMetrics,
+        PublicGrowthSnapshot,
+        PublicReleaseReadiness,
+        PublicRepoMetrics,
+        format_public_growth_report,
+    )
+
+    event_path = tmp_path / "activation-events.jsonl"
+    snapshot = PublicGrowthSnapshot(
+        repo=PublicRepoMetrics(
+            full_name="octo-org/octo-repo",
+            html_url="https://github.com/octo-org/octo-repo",
+            stargazers=4,
+            forks=0,
+            watchers=4,
+            subscribers=0,
+            open_issues=0,
+            pushed_at="2026-06-01T00:00:00Z",
+            updated_at="2026-06-02T00:00:00Z",
+            api_url="https://api.github.com/repos/octo-org/octo-repo",
+        ),
+        growth_issues=PublicGrowthIssueMetrics("tiangong:growth", 0, 0, 0),
+        share_issues=PublicGrowthIssueMetrics("tiangong:share", 0, 0, 0),
+        release_readiness=PublicReleaseReadiness(local_version="0.1.0", expected_tag="v0.1.0"),
+        distribution_readiness=PublicDistributionReadiness(
+            package_name="tiangong-mcp",
+            local_version="0.1.0",
+            published_version="",
+            status="unverified",
+            api_url="https://pypi.org/pypi/tiangong-mcp/json",
+            project_url="https://pypi.org/project/tiangong-mcp/",
+            reason="PyPI JSON API could not be reached",
+        ),
+    )
+
+    result = format_public_growth_report(snapshot, activation_events=[], source_path=event_path)
+
+    assert "## PyPI Distribution Verification Warning" in result
+    assert "## Current Candidate Git Tag Install Bridge" in result
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/octo-org/octo-repo.git@v0.1.0"' in result
+    assert "This bridge keeps contributors on the current tag while PyPI is stale or unverified; it does not close the PyPI install loop." in result
 
 
 def test_public_growth_report_flags_missing_release_trigger(tmp_path):
@@ -1398,6 +1448,9 @@ async def test_mcp_public_proof_pack_exposes_external_contributor_invite():
     assert "First External Contributor Path" in result
     assert "Copy External Contributor Invite" in result
     assert "pip install -U tiangong-mcp" in result
+    assert "Git Tag Candidate Install Bridge" in result
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/octo-org/octo-repo.git@v0.1.1"' in result
+    assert "Use this only when public preflight reports PyPI latest is stale or unverified." in result
     assert 'start_cultivation(username="your_github_username")' in result
     assert 'forge_agent(name="first-growth-artifact"' in result
     assert "tiangong-mcp record-growth-referral" in result

@@ -133,6 +133,8 @@ def test_readmes_document_one_command_dev_install_and_quality_gate():
         assert "publish-pypi.yml" in text
         assert "environment `pypi`" in text
         assert "invalid-publisher" in text
+        assert "Current Candidate Git Tag Install Bridge" in text
+        assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.1"' in text
         assert "PYPI_TOKEN" in text
 
 

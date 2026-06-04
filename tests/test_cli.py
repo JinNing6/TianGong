@@ -337,12 +337,14 @@ def test_cli_public_launch_assets_prints_local_push_manifest():
     assert "template config: ready" in output
     assert "git add tiangong/activation.py" in output
     assert "tiangong/artifact_system.py" in output
+    assert "tiangong/install_bridge.py" in output
     assert "git add tests/test_cli.py" in output
     assert "\ngit add .\n" not in output
     assert "\ngit add . " not in output
     assert "Working Tree Release Coverage" in output
     assert "| review separately | `.github/` |" not in output
     assert "| review separately | `.github/workflows/issueops-onboarding.yml` |" not in output
+    assert "| review separately | `tiangong/install_bridge.py` |" not in output
     assert 'git commit -m "Prepare TianGong public growth launch"' in output
     assert "gh release create v0.1.1 --generate-notes" in output
     assert "git push origin v0.1.1" in output
@@ -408,6 +410,9 @@ def test_cli_public_proof_pack_prints_no_network_first_proof_runbook():
     assert "First External Contributor Path" in output
     assert "Use after public preflight shows remote IssueOps live and PyPI latest current." in output
     assert "pip install -U tiangong-mcp" in output
+    assert "Git Tag Candidate Install Bridge" in output
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/octo-org/octo-repo.git@v0.1.1"' in output
+    assert "Use this only when public preflight reports PyPI latest is stale or unverified." in output
     assert 'start_cultivation(username="your_github_username")' in output
     assert 'forge_agent(name="first-growth-artifact"' in output
     assert "Only public Growth/Share Issue authors, public PR authors, and local ledger actors count" in output
