@@ -1428,6 +1428,12 @@ def format_public_launch_preflight(
                     f"workflow_dispatch tag `{release_tag}`."
                 ),
                 "",
+                *format_current_candidate_install_bridge_lines(
+                    repo_owner=owner,
+                    repo_name=repo,
+                    version_or_tag=release_tag,
+                    package_name=PACKAGE_NAME,
+                ),
                 "## Optional GitHub REST Release Command",
                 "",
                 "> Requires a `GITHUB_TOKEN` with permission to create releases. This command is not run by preflight.",

@@ -997,6 +997,10 @@ def test_public_launch_preflight_fetch_failure_includes_release_fallbacks(tmp_pa
     assert '"tag_name":"v0.1.1"' in result
     assert '"generate_release_notes":true' in result
     assert "tiangong-mcp public-proof-pack --target-contributors 10" in result
+    assert "## Current Candidate Git Tag Install Bridge" in result
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.1"' in result
+    assert "Canonical install after PyPI latest is current: `pip install -U tiangong-mcp`" in result
+    assert "does not close the PyPI install loop" in result
 
 
 def test_public_launch_preflight_fetch_failure_reuses_campaign_target(tmp_path):
