@@ -44,6 +44,7 @@ def test_runtime_version_matches_project_metadata():
 
     project_version = _pyproject()["project"]["version"]
 
+    assert project_version == "0.1.1"
     assert tiangong.__version__ == project_version
     assert metadata.version("tiangong-mcp") == project_version
 

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
@@ -116,6 +117,14 @@ class LaunchAssetAudit:
 
 def _read_text(root: Path, path: str) -> str:
     return (root / path).read_text(encoding="utf-8")
+
+
+def _project_version(root: Path) -> str:
+    pyproject = root / "pyproject.toml"
+    if not pyproject.exists():
+        return ""
+    match = re.search(r'(?m)^version\s*=\s*"([^"]+)"', pyproject.read_text(encoding="utf-8"))
+    return match.group(1).strip() if match else ""
 
 
 def _yaml_status(root: Path, path: str) -> tuple[str, object | None]:
@@ -249,8 +258,9 @@ def _pyproject_audit(root: Path) -> LaunchAssetAudit:
     if not full_path.exists():
         return LaunchAssetAudit(path, "missing", "file is absent")
     text = full_path.read_text(encoding="utf-8")
+    version = _project_version(root)
     checks = {
-        "version 0.1.0": 'version = "0.1.0"' in text,
+        "project version": bool(version),
         "cli entrypoint": 'tiangong-mcp = "tiangong.cli:main"' in text,
         "dev extra": "[project.optional-dependencies]" in text and "dev =" in text,
     }
@@ -385,7 +395,7 @@ def _format_table(rows: list[LaunchAssetAudit]) -> list[str]:
 
 def format_full_public_growth_release_handoff_lines(
     *,
-    release_tag: str = "v0.1.0",
+    release_tag: str = "v0.1.1",
     include_audit_instruction: bool = False,
 ) -> list[str]:
     """Return the complete release handoff commands without executing them."""
@@ -434,7 +444,7 @@ def format_public_launch_assets(root: str | Path | None = None) -> str:
     all_rows = remote_rows + release_rows + full_release_rows
     blocked = [row for row in all_rows if row.status != "ready"]
     minimum_add = " ".join(REMOTE_ACQUISITION_ASSETS)
-    release_tag = "v0.1.0"
+    release_tag = f"v{_project_version(project_root) or 'current-local-version'}"
 
     lines = [
         "# TianGong Public Launch Assets",

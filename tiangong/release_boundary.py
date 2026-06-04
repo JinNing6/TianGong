@@ -83,8 +83,12 @@ def _project_version(root: Path) -> str:
     return match.group(1) if match else ""
 
 
-def _find_one(path: Path, pattern: str) -> Path | None:
+def _find_one(path: Path, pattern: str, expected_version: str = "") -> Path | None:
     matches = sorted(path.glob(pattern))
+    if expected_version:
+        matching_version = [candidate for candidate in matches if f"-{expected_version}" in candidate.name]
+        if matching_version:
+            return matching_version[0]
     return matches[0] if matches else None
 
 
@@ -115,7 +119,7 @@ def _proof_ledger_missing(*, cli_text: str, proof_pack_text: str, archive_label:
 
 
 def _wheel_checks(dist: Path, expected_version: str) -> list[ReleaseBoundaryCheck]:
-    wheel = _find_one(dist, "tiangong_mcp-*.whl")
+    wheel = _find_one(dist, "tiangong_mcp-*.whl", expected_version)
     if wheel is None:
         return [
             ReleaseBoundaryCheck("Wheel distribution", "missing", f"no `tiangong_mcp-*.whl` found in `{dist}`"),
@@ -155,10 +159,10 @@ def _wheel_checks(dist: Path, expected_version: str) -> list[ReleaseBoundaryChec
     ]
 
 
-def _proof_ledger_cli_checks(dist: Path) -> list[ReleaseBoundaryCheck]:
+def _proof_ledger_cli_checks(dist: Path, expected_version: str) -> list[ReleaseBoundaryCheck]:
     """Verify built artifacts expose terminal commands for recording public proof URLs."""
     missing: list[str] = []
-    wheel = _find_one(dist, "tiangong_mcp-*.whl")
+    wheel = _find_one(dist, "tiangong_mcp-*.whl", expected_version)
     if wheel is None:
         missing.append("wheel distribution")
     else:
@@ -171,7 +175,7 @@ def _proof_ledger_cli_checks(dist: Path) -> list[ReleaseBoundaryCheck]:
                 )
             )
 
-    sdist = _find_one(dist, "tiangong_mcp-*.tar.gz")
+    sdist = _find_one(dist, "tiangong_mcp-*.tar.gz", expected_version)
     if sdist is None:
         missing.append("source distribution")
     else:
@@ -197,10 +201,10 @@ def _proof_ledger_cli_checks(dist: Path) -> list[ReleaseBoundaryCheck]:
     ]
 
 
-def _mcp_public_proof_pack_checks(dist: Path) -> list[ReleaseBoundaryCheck]:
+def _mcp_public_proof_pack_checks(dist: Path, expected_version: str) -> list[ReleaseBoundaryCheck]:
     """Verify built artifacts expose the MCP proof-pack route for client-side launch recovery."""
     missing: list[str] = []
-    wheel = _find_one(dist, "tiangong_mcp-*.whl")
+    wheel = _find_one(dist, "tiangong_mcp-*.whl", expected_version)
     if wheel is None:
         missing.append("wheel distribution")
     else:
@@ -210,7 +214,7 @@ def _mcp_public_proof_pack_checks(dist: Path) -> list[ReleaseBoundaryCheck]:
             if marker not in mcp_text:
                 missing.append(f"wheel mcp route marker `{marker}`")
 
-    sdist = _find_one(dist, "tiangong_mcp-*.tar.gz")
+    sdist = _find_one(dist, "tiangong_mcp-*.tar.gz", expected_version)
     if sdist is None:
         missing.append("source distribution")
     else:
@@ -233,8 +237,8 @@ def _mcp_public_proof_pack_checks(dist: Path) -> list[ReleaseBoundaryCheck]:
     ]
 
 
-def _sdist_checks(dist: Path) -> list[ReleaseBoundaryCheck]:
-    sdist = _find_one(dist, "tiangong_mcp-*.tar.gz")
+def _sdist_checks(dist: Path, expected_version: str) -> list[ReleaseBoundaryCheck]:
+    sdist = _find_one(dist, "tiangong_mcp-*.tar.gz", expected_version)
     if sdist is None:
         return [ReleaseBoundaryCheck("Source distribution", "missing", f"no `tiangong_mcp-*.tar.gz` found in `{dist}`")]
 
@@ -319,9 +323,9 @@ def format_public_release_boundary(root: str | Path | None = None, dist: str | P
     version = _project_version(project_root)
     checks = [
         *_wheel_checks(dist_dir, version),
-        *_sdist_checks(dist_dir),
-        *_proof_ledger_cli_checks(dist_dir),
-        *_mcp_public_proof_pack_checks(dist_dir),
+        *_sdist_checks(dist_dir, version),
+        *_proof_ledger_cli_checks(dist_dir, version),
+        *_mcp_public_proof_pack_checks(dist_dir, version),
         *_documentation_checks(project_root),
         *_workflow_checks(project_root),
     ]

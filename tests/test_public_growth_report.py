@@ -107,10 +107,10 @@ def test_fetch_public_growth_snapshot_uses_github_public_endpoints_and_excludes_
             "path": ".github/workflows/issueops-onboarding.yml",
             "html_url": "https://github.com/octo-org/octo-repo/blob/main/.github/workflows/issueops-onboarding.yml",
         },
-        "https://api.github.com/repos/octo-org/octo-repo/releases/tags/v0.1.0": {
-            "tag_name": "v0.1.0",
-            "name": "TianGong 0.1.0",
-            "html_url": "https://github.com/octo-org/octo-repo/releases/tag/v0.1.0",
+        "https://api.github.com/repos/octo-org/octo-repo/releases/tags/v0.1.1": {
+            "tag_name": "v0.1.1",
+            "name": "TianGong 0.1.1",
+            "html_url": "https://github.com/octo-org/octo-repo/releases/tag/v0.1.1",
             "draft": False,
             "prerelease": False,
             "published_at": "2026-06-03T00:00:00Z",
@@ -118,7 +118,7 @@ def test_fetch_public_growth_snapshot_uses_github_public_endpoints_and_excludes_
         "https://pypi.org/pypi/tiangong-mcp/json": {
             "info": {
                 "name": "tiangong-mcp",
-                "version": "0.1.0",
+                "version": "0.1.1",
                 "project_url": "https://pypi.org/project/tiangong-mcp/",
             }
         },
@@ -154,13 +154,13 @@ def test_fetch_public_growth_snapshot_uses_github_public_endpoints_and_excludes_
     assert snapshot.issueops_readiness.growth_form.status == "live"
     assert snapshot.issueops_readiness.share_form.status == "live"
     assert snapshot.issueops_readiness.workflow.status == "live"
-    assert snapshot.release_readiness.local_version == "0.1.0"
-    assert snapshot.release_readiness.expected_tag == "v0.1.0"
+    assert snapshot.release_readiness.local_version == "0.1.1"
+    assert snapshot.release_readiness.expected_tag == "v0.1.1"
     assert snapshot.release_readiness.status == "published"
-    assert snapshot.release_readiness.html_url == "https://github.com/octo-org/octo-repo/releases/tag/v0.1.0"
+    assert snapshot.release_readiness.html_url == "https://github.com/octo-org/octo-repo/releases/tag/v0.1.1"
     assert snapshot.distribution_readiness.package_name == "tiangong-mcp"
-    assert snapshot.distribution_readiness.local_version == "0.1.0"
-    assert snapshot.distribution_readiness.published_version == "0.1.0"
+    assert snapshot.distribution_readiness.local_version == "0.1.1"
+    assert snapshot.distribution_readiness.published_version == "0.1.1"
     assert snapshot.distribution_readiness.status == "current"
     assert calls[0][0] == "https://api.github.com/repos/octo-org/octo-repo"
     assert any("labels=tiangong%3Agrowth" in call[0] for call in calls)
@@ -169,7 +169,7 @@ def test_fetch_public_growth_snapshot_uses_github_public_endpoints_and_excludes_
     assert any("/contents/.github/ISSUE_TEMPLATE/tiangong-growth-flywheel.yml" in call[0] for call in calls)
     assert any("/contents/.github/ISSUE_TEMPLATE/tiangong-share-proof.yml" in call[0] for call in calls)
     assert any("/contents/.github/workflows/issueops-onboarding.yml" in call[0] for call in calls)
-    assert any(call[0] == "https://api.github.com/repos/octo-org/octo-repo/releases/tags/v0.1.0" for call in calls)
+    assert any(call[0] == "https://api.github.com/repos/octo-org/octo-repo/releases/tags/v0.1.1" for call in calls)
     assert any(call[0] == "https://pypi.org/pypi/tiangong-mcp/json" for call in calls)
     github_calls = [call for call in calls if call[0].startswith("https://api.github.com/")]
     assert all(call[1] == "application/vnd.github+json" for call in github_calls)

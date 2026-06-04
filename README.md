@@ -214,7 +214,7 @@ tiangong-mcp public-release-boundary
 
 PyPI Trusted Publisher setup for `tiangong-mcp` must match the release workflow exactly: owner `JinNing6`, repository `TianGong`, workflow filename `publish-pypi.yml`, workflow path `.github/workflows/publish-pypi.yml`, and environment `pypi`. If PyPI returns `invalid-publisher`, rerun `tiangong-mcp public-launch-preflight --target-contributors 10` and use the generated Trusted Publisher runbook instead of adding a long-lived upload token.
 
-`tiangong-mcp public-launch-assets` also prints a full public growth release handoff: docs, package metadata, Issue Forms, workflows, public growth modules, user-facing growth surfaces, and tests to stage before creating the `v0.1.0` GitHub Release.
+`tiangong-mcp public-launch-assets` also prints a full public growth release handoff: docs, package metadata, Issue Forms, workflows, public growth modules, user-facing growth surfaces, and tests to stage before creating the current local version GitHub Release, such as `v0.1.1`.
 
 ---
 
@@ -405,7 +405,7 @@ leaderboard(type="share")          # Share Proof Rankings from real public contr
 - ✅ Growth campaign ledger commands treat `issues/new?...` as the form entrypoint only; `record_growth_referral()` and `record_share_attribution(..., source_url=...)` reject form entrypoints and placeholder URLs, requiring the created public Issue/PR/Discussion URL as reviewable proof
 - ✅ `public_growth_report()` fetches real GitHub public repository and IssueOps metrics, compares them with the local MCP activation ledger, names the weakest external proof bridge, and refuses to invent downloads, retention, repost counts, referral conversions, or rewards
 - ✅ `public_growth_report()` also checks GitHub Contents API readiness for the remote Growth Issue Form, Share Proof Issue Form, and IssueOps workflow, then marks missing default-branch `.github` files as a public launch blocker instead of treating local-only routes as live
-- ✅ `public_growth_report()` checks GitHub Releases API readiness for the current local version tag, such as `v0.1.0`, so a missing release-trigger for PyPI Trusted Publishing is marked as a public install-loop launch blocker
+- ✅ `public_growth_report()` checks GitHub Releases API readiness for the current local version tag, such as `v0.1.1`, so a missing release-trigger for PyPI Trusted Publishing is marked as a public install-loop launch blocker
 - ✅ `public_growth_report()` checks PyPI JSON API distribution readiness for `tiangong-mcp`, compares the real latest PyPI version with local package metadata, and marks stale PyPI releases as a public install-loop launch blocker
 - ✅ `public_growth_report()` collapses remote IssueOps, PyPI Trusted Publisher, GitHub Release, PyPI latest-version, and first-proof blockers into a `Public Launch Closure Checklist`, so the public flywheel is not claimed closed until every row is rechecked from real public state
 - ✅ `public_launch_preflight()` is the direct MCP release runbook: it fetches the same real public state, prints local quality gates, release command, PyPI Trusted Publishing expectations, closure checklist, Growth/Share Proof form URLs, created-Issue ledger commands, and recheck commands without inventing traction

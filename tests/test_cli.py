@@ -60,13 +60,13 @@ def _cold_launch_snapshot():
             ),
         ),
         release_readiness=PublicReleaseReadiness(
-            local_version="0.1.0",
-            expected_tag="v0.1.0",
+            local_version="0.1.1",
+            expected_tag="v0.1.1",
             status="missing",
         ),
         distribution_readiness=PublicDistributionReadiness(
             package_name="tiangong-mcp",
-            local_version="0.1.0",
+            local_version="0.1.1",
             published_version="0.0.1",
             status="stale",
         ),
@@ -265,7 +265,7 @@ def test_cli_public_launch_preflight_prints_ordered_release_runbook(monkeypatch,
     assert "First Public Proof Entrypoints" in output
     assert "template=tiangong-growth-flywheel.yml" in output
     assert "template=tiangong-share-proof.yml" in output
-    assert "gh release create v0.1.0 --generate-notes" in output
+    assert "gh release create v0.1.1 --generate-notes" in output
     assert "public_growth_report(record_snapshot=True, target_contributors=10)" in output
     assert "After Submission CLI Ledger Commands" in output
     assert "tiangong-mcp record-growth-referral --route growth" in output
@@ -292,7 +292,7 @@ def test_cli_public_launch_preflight_inlines_full_release_handoff(monkeypatch, t
     assert "git add tiangong/activation.py" in output
     assert "git add tests/test_cli.py" in output
     assert 'git commit -m "Prepare TianGong public growth launch"' in output
-    assert "gh release create v0.1.0 --generate-notes" in output
+    assert "gh release create v0.1.1 --generate-notes" in output
 
 
 def test_cli_public_launch_assets_prints_local_push_manifest():
@@ -327,7 +327,7 @@ def test_cli_public_launch_assets_prints_local_push_manifest():
     assert "| review separately | `.github/` |" not in output
     assert "| review separately | `.github/workflows/issueops-onboarding.yml` |" not in output
     assert 'git commit -m "Prepare TianGong public growth launch"' in output
-    assert "gh release create v0.1.0 --generate-notes" in output
+    assert "gh release create v0.1.1 --generate-notes" in output
     assert "tiangong-mcp public-launch-preflight --target-contributors 10" in output
 
 
@@ -586,6 +586,58 @@ def test_cli_public_release_boundary_prints_package_boundary(tmp_path):
     assert "tiangong-mcp public-release-boundary" in output
     assert "Local Release Boundary Status" in output
     assert "blocked" not in output
+
+
+def test_cli_public_release_boundary_prefers_current_version_artifacts(tmp_path):
+    """A stale dist file should not hide the current package artifact after a version bump."""
+    from tiangong import cli
+
+    project_root, dist_dir = _write_release_boundary_fixture(tmp_path)
+    (project_root / "pyproject.toml").write_text(
+        "\n".join(
+            [
+                "[project]",
+                'name = "tiangong-mcp"',
+                'version = "0.1.1"',
+                "",
+                "[project.scripts]",
+                'tiangong-mcp = "tiangong.cli:main"',
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    stale_wheel = dist_dir / "tiangong_mcp-0.1.0-py3-none-any.whl"
+    current_wheel = dist_dir / "tiangong_mcp-0.1.1-py3-none-any.whl"
+    with zipfile.ZipFile(stale_wheel) as source, zipfile.ZipFile(current_wheel, "w") as target:
+        for name in source.namelist():
+            if ".dist-info/" not in name:
+                target.writestr(name, source.read(name))
+        target.writestr("tiangong_mcp-0.1.1.dist-info/METADATA", "Name: tiangong-mcp\nVersion: 0.1.1\n")
+        target.writestr(
+            "tiangong_mcp-0.1.1.dist-info/entry_points.txt",
+            "[console_scripts]\ntiangong-mcp = tiangong.cli:main\n",
+        )
+
+    stale_sdist = dist_dir / "tiangong_mcp-0.1.0.tar.gz"
+    current_sdist = dist_dir / "tiangong_mcp-0.1.1.tar.gz"
+    with tarfile.open(stale_sdist, "r:gz") as source, tarfile.open(current_sdist, "w:gz") as target:
+        for member in source.getmembers():
+            extracted = source.extractfile(member)
+            if extracted is None:
+                continue
+            member.name = member.name.replace("tiangong_mcp-0.1.0/", "tiangong_mcp-0.1.1/", 1)
+            target.addfile(member, extracted)
+
+    stdout = StringIO()
+    assert cli.main(["public-release-boundary", "--root", str(project_root), "--dist", str(dist_dir)], stdout=stdout) == 0
+
+    output = stdout.getvalue()
+    assert "Wheel distribution | ready" in output
+    assert "tiangong_mcp-0.1.1-py3-none-any.whl" in output
+    assert "tiangong_mcp-0.1.0-py3-none-any.whl` version `0.1.0` vs local `0.1.1" not in output
+    assert "Local Release Boundary Status" in output
 
 
 def test_cli_public_release_boundary_blocks_missing_terminal_ledger_commands(tmp_path):
