@@ -334,6 +334,20 @@ def test_cli_public_launch_assets_prints_local_push_manifest():
     assert "tiangong-mcp public-launch-preflight --target-contributors 10" in output
 
 
+def test_cli_public_launch_assets_preserves_campaign_target():
+    """The local asset audit should not reset an active launch campaign target."""
+    from tiangong import cli
+
+    stdout = StringIO()
+    assert cli.main(["public-launch-assets", "--target-contributors", "25"], stdout=stdout) == 0
+
+    output = stdout.getvalue()
+    assert "tiangong-mcp public-launch-assets --target-contributors 25" in output
+    assert "tiangong-mcp public-launch-preflight --target-contributors 25" in output
+    assert "tiangong-mcp public-growth-report --record-snapshot --target-contributors 25" in output
+    assert "--target-contributors 10" not in output
+
+
 def test_cli_public_proof_pack_prints_no_network_first_proof_runbook():
     """The first public proof pack should work even when public APIs are rate-limited."""
     from tiangong import cli

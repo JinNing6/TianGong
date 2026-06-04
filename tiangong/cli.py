@@ -205,7 +205,7 @@ def _format_public_growth_report_command(args: argparse.Namespace) -> str:
 
 
 def _format_public_launch_assets_command(args: argparse.Namespace) -> str:
-    return format_public_launch_assets(root=args.root)
+    return format_public_launch_assets(root=args.root, target_contributors=args.target_contributors)
 
 
 def _format_public_release_boundary_command(args: argparse.Namespace) -> str:
@@ -416,6 +416,12 @@ def build_parser() -> argparse.ArgumentParser:
         "--root",
         default=".",
         help="Project root to audit. Defaults to the current working directory.",
+    )
+    launch_assets.add_argument(
+        "--target-contributors",
+        type=_positive_int,
+        default=10,
+        help="72-hour public campaign target used in recheck commands.",
     )
     launch_assets.set_defaults(handler=_format_public_launch_assets_command)
 

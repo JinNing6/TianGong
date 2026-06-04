@@ -127,6 +127,10 @@ def _project_version(root: Path) -> str:
     return match.group(1).strip() if match else ""
 
 
+def _safe_positive_int(value: int, fallback: int = 10) -> int:
+    return value if isinstance(value, int) and value > 0 else fallback
+
+
 def _yaml_status(root: Path, path: str) -> tuple[str, object | None]:
     full_path = root / path
     if not full_path.exists():
@@ -434,9 +438,10 @@ def format_full_public_growth_release_handoff_lines(
     return lines
 
 
-def format_public_launch_assets(root: str | Path | None = None) -> str:
+def format_public_launch_assets(root: str | Path | None = None, *, target_contributors: int = 10) -> str:
     """Format a local-only launch asset manifest for safe public release staging."""
     project_root = Path(root or Path.cwd()).resolve()
+    target = _safe_positive_int(target_contributors)
     remote_rows = [_audit_by_path(project_root, path) for path in REMOTE_ACQUISITION_ASSETS]
     form_rows = [_audit_by_path(project_root, path) for path in ISSUE_FORM_ASSETS]
     release_rows = [_audit_by_path(project_root, path) for path in RELEASE_AUTOMATION_ASSETS]
@@ -486,9 +491,9 @@ def format_public_launch_assets(root: str | Path | None = None) -> str:
         *format_full_public_growth_release_handoff_lines(release_tag=release_tag),
         "## Recheck Commands",
         "",
-        "- Local asset audit: `tiangong-mcp public-launch-assets`",
-        "- Public preflight: `tiangong-mcp public-launch-preflight --target-contributors 10`",
-        "- Public proof report: `tiangong-mcp public-growth-report --record-snapshot --target-contributors 10`",
+        f"- Local asset audit: `tiangong-mcp public-launch-assets --target-contributors {target}`",
+        f"- Public preflight: `tiangong-mcp public-launch-preflight --target-contributors {target}`",
+        f"- Public proof report: `tiangong-mcp public-growth-report --record-snapshot --target-contributors {target}`",
         "",
     ]
     if blocked:
