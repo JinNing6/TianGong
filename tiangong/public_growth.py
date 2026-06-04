@@ -1289,6 +1289,11 @@ def format_public_launch_preflight(
         repo = config.GITHUB_REPO_NAME
         release_draft_url = f"https://github.com/{owner}/{repo}/releases/new"
         publish_workflow_url = f"https://github.com/{owner}/{repo}/actions/workflows/{PYPI_TRUSTED_PUBLISHER_WORKFLOW_FILENAME}"
+        release_api_url = f"{GITHUB_API_BASE}/repos/{owner}/{repo}/releases"
+        release_api_payload = (
+            f'{{"tag_name":"{release_tag}","name":"{release_tag}",'
+            '"draft":false,"prerelease":false,"generate_release_notes":true}'
+        )
         lines.extend(
             [
                 "## External Fetch Status",
@@ -1302,12 +1307,28 @@ def format_public_launch_preflight(
                 "- Audit local launch assets: `tiangong-mcp public-launch-assets`",
                 "- Generate no-network first proof pack: `tiangong-mcp public-proof-pack --target-contributors 10`",
                 "- Generate MCP first proof pack: `public_proof_pack()`",
+                "- For authenticated verification, set `GITHUB_TOKEN` and retry `tiangong-mcp public-launch-preflight --target-contributors 10`.",
                 f"- Open GitHub web release page: {release_draft_url}",
                 f"- Select existing tag `{release_tag}`, generate notes, and publish the Release.",
                 (
                     f"- If Release creation is unavailable, open Actions manual workflow page: {publish_workflow_url} "
                     f"and run workflow_dispatch tag `{release_tag}`."
                 ),
+                "",
+                "## Optional GitHub REST Release Command",
+                "",
+                "> Requires a `GITHUB_TOKEN` with permission to create releases. This command is not run by preflight.",
+                "",
+                "```bash",
+                (
+                    'curl -L -X POST -H "Accept: application/vnd.github+json" '
+                    '-H "Authorization: Bearer $GITHUB_TOKEN" '
+                    f'-H "X-GitHub-Api-Version: {GITHUB_API_VERSION}" '
+                    f"{release_api_url} "
+                    f"-d '{release_api_payload}'"
+                ),
+                "```",
+                "",
                 "- Retry preflight: `public_launch_preflight()`",
                 "- Retry proof report: `public_growth_report()`",
                 "- Run local quality gates before any release attempt:",

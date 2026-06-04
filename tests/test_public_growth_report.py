@@ -882,6 +882,10 @@ def test_public_launch_preflight_fetch_failure_includes_release_fallbacks(tmp_pa
     assert "Select existing tag `v0.1.1`" in result
     assert "https://github.com/JinNing6/TianGong/actions/workflows/publish-pypi.yml" in result
     assert "workflow_dispatch tag `v0.1.1`" in result
+    assert "GITHUB_TOKEN" in result
+    assert "https://api.github.com/repos/JinNing6/TianGong/releases" in result
+    assert '"tag_name":"v0.1.1"' in result
+    assert '"generate_release_notes":true' in result
     assert "tiangong-mcp public-proof-pack --target-contributors 10" in result
 
 
