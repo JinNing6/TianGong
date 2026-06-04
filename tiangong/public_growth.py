@@ -1267,6 +1267,7 @@ def format_public_launch_preflight(
     local_shares = _count_events(events, EVENT_SHARE_ATTRIBUTION_RECORDED)
     path = Path(source_path) if source_path is not None else Path(config.CAVE_LOGS_DIR) / "activation-events.jsonl"
     target = _safe_positive_int(target_contributors, fallback=10)
+    preflight_recheck = f"public_launch_preflight(target_contributors={target})"
     proof_recheck = f"public_growth_report(record_snapshot=True, target_contributors={target})"
     proof_pack_recheck = f"public_proof_pack(target_contributors={target})"
     no_fake_line = "This preflight does not invent downloads, retention, repost counts, referral conversions, or rewards."
@@ -1305,9 +1306,12 @@ def format_public_launch_preflight(
                 "## Recovery Commands",
                 "",
                 "- Audit local launch assets: `tiangong-mcp public-launch-assets`",
-                "- Generate no-network first proof pack: `tiangong-mcp public-proof-pack --target-contributors 10`",
-                "- Generate MCP first proof pack: `public_proof_pack()`",
-                "- For authenticated verification, set `GITHUB_TOKEN` and retry `tiangong-mcp public-launch-preflight --target-contributors 10`.",
+                f"- Generate no-network first proof pack: `tiangong-mcp public-proof-pack --target-contributors {target}`",
+                f"- Generate MCP first proof pack: `{proof_pack_recheck}`",
+                (
+                    "- For authenticated verification, set `GITHUB_TOKEN` and retry "
+                    f"`tiangong-mcp public-launch-preflight --target-contributors {target}`."
+                ),
                 f"- Open GitHub web release page: {release_draft_url}",
                 f"- Select existing tag `{release_tag}`, generate notes, and publish the Release.",
                 (
@@ -1329,8 +1333,8 @@ def format_public_launch_preflight(
                 ),
                 "```",
                 "",
-                "- Retry preflight: `public_launch_preflight()`",
-                "- Retry proof report: `public_growth_report()`",
+                f"- Retry preflight: `{preflight_recheck}`",
+                f"- Retry proof report: `{proof_recheck}`",
                 "- Run local quality gates before any release attempt:",
                 "  - `python -m ruff check .github tiangong tests`",
                 "  - `python -m pytest -q`",

@@ -889,6 +889,28 @@ def test_public_launch_preflight_fetch_failure_includes_release_fallbacks(tmp_pa
     assert "tiangong-mcp public-proof-pack --target-contributors 10" in result
 
 
+def test_public_launch_preflight_fetch_failure_reuses_campaign_target(tmp_path):
+    """Rate-limit release recovery should not reset the active contributor target."""
+    from tiangong.public_growth import format_public_launch_preflight
+
+    event_path = tmp_path / "activation-events.jsonl"
+    result = format_public_launch_preflight(
+        None,
+        activation_events=[],
+        source_path=event_path,
+        target_contributors=25,
+        fetch_error="GitHub API HTTP 403: rate limit exceeded",
+    )
+
+    assert "tiangong-mcp public-proof-pack --target-contributors 25" in result
+    assert "tiangong-mcp public-launch-preflight --target-contributors 25" in result
+    assert "public_proof_pack(target_contributors=25)" in result
+    assert "public_launch_preflight(target_contributors=25)" in result
+    assert "public_growth_report(record_snapshot=True, target_contributors=25)" in result
+    assert "target_contributors=10" not in result
+    assert "--target-contributors 10" not in result
+
+
 def test_public_growth_snapshot_history_records_jsonl_and_reports_velocity(tmp_path):
     """Public traction needs real velocity history, not just a static snapshot."""
     from tiangong.activation import (
