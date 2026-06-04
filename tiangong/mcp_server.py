@@ -69,6 +69,7 @@ from .lineage import format_lineage_tree, get_artifact_lineage
 from .marketplace import publish_agent as _publish_agent
 from .marketplace import summon_artifact as _summon
 from .onboarding import format_start_cultivation
+from .proof_pack import format_public_proof_pack
 from .public_growth import (
     fetch_public_growth_snapshot,
     format_public_growth_report,
@@ -787,6 +788,38 @@ async def growth_campaign(
             activation_events=events,
             campaign_name=campaign_name,
             target_contributors=target_contributors,
+        )
+    )
+
+
+@mcp.tool()
+async def public_proof_pack(
+    repo_owner: str = "",
+    repo_name: str = "",
+    target_contributors: int = 10,
+    actor: str = "",
+    artifact_name: str = "first-growth-artifact",
+    contribution: str = "forge",
+) -> str:
+    """
+    Public Proof Pack - no-network Growth/Share proof kit and external contributor invite.
+
+    Args:
+        repo_owner: GitHub repository owner; defaults to config.
+        repo_name: GitHub repository name; defaults to config.
+        target_contributors: 72-hour public campaign target used in proof URLs and recheck commands.
+        actor: GitHub actor used in paste-ready ledger commands.
+        artifact_name: artifact name used in the first Share Proof Issue and ledger command.
+        contribution: contribution type for the Share Proof route.
+    """
+    return append_brand_footer(
+        format_public_proof_pack(
+            repo_owner=repo_owner,
+            repo_name=repo_name,
+            target_contributors=target_contributors,
+            actor=actor,
+            artifact_name=artifact_name,
+            contribution=contribution,
         )
     )
 

@@ -73,7 +73,12 @@ def _cold_launch_snapshot():
     )
 
 
-def _write_release_boundary_fixture(root: Path, *, include_terminal_ledger_commands: bool = True) -> tuple[Path, Path]:
+def _write_release_boundary_fixture(
+    root: Path,
+    *,
+    include_terminal_ledger_commands: bool = True,
+    include_mcp_public_proof_pack: bool = True,
+) -> tuple[Path, Path]:
     project_root = root / "project"
     dist_dir = project_root / "dist"
     workflow_dir = project_root / ".github" / "workflows"
@@ -175,6 +180,7 @@ def _write_release_boundary_fixture(root: Path, *, include_terminal_ledger_comma
         "tiangong/public_growth.py",
         "tiangong/release_boundary.py",
         "tiangong/season.py",
+        "tiangong/mcp_server.py",
     ]
     with zipfile.ZipFile(wheel, "w") as archive:
         for module in required_modules:
@@ -185,6 +191,8 @@ def _write_release_boundary_fixture(root: Path, *, include_terminal_ledger_comma
                     module,
                     "tiangong-mcp record-growth-referral\ntiangong-mcp record-share-attribution\n",
                 )
+            elif module == "tiangong/mcp_server.py" and include_mcp_public_proof_pack:
+                archive.writestr(module, "@mcp.tool()\nasync def public_proof_pack():\n    return format_public_proof_pack()\n")
             else:
                 archive.writestr(module, "# packaged\n")
         archive.writestr("tiangong_mcp-0.1.0.dist-info/METADATA", "Name: tiangong-mcp\nVersion: 0.1.0\n")
@@ -208,6 +216,11 @@ def _write_release_boundary_fixture(root: Path, *, include_terminal_ledger_comma
                 elif relative == "tiangong/proof_pack.py" and include_terminal_ledger_commands:
                     source.write_text(
                         "tiangong-mcp record-growth-referral\ntiangong-mcp record-share-attribution\n",
+                        encoding="utf-8",
+                    )
+                elif relative == "tiangong/mcp_server.py" and include_mcp_public_proof_pack:
+                    source.write_text(
+                        "@mcp.tool()\nasync def public_proof_pack():\n    return format_public_proof_pack()\n",
                         encoding="utf-8",
                     )
                 else:
@@ -564,6 +577,7 @@ def test_cli_public_release_boundary_prints_package_boundary(tmp_path):
     assert "Wheel entry point | ready" in output
     assert "Growth modules in wheel | ready" in output
     assert "Proof ledger CLI routes | ready" in output
+    assert "Public proof MCP route | ready" in output
     assert "Source distribution | ready" in output
     assert "Documentation commands | ready" in output
     assert "Workflow release-boundary steps | ready" in output
@@ -586,6 +600,21 @@ def test_cli_public_release_boundary_blocks_missing_terminal_ledger_commands(tmp
     assert "Documentation commands | blocked" in output
     assert "tiangong-mcp record-growth-referral" in output
     assert "tiangong-mcp record-share-attribution" in output
+    assert "Local Release Boundary Blockers" in output
+
+
+def test_cli_public_release_boundary_blocks_missing_mcp_public_proof_pack(tmp_path):
+    """Release boundary should fail if a package drops the MCP proof-pack route."""
+    from tiangong import cli
+
+    project_root, dist_dir = _write_release_boundary_fixture(tmp_path, include_mcp_public_proof_pack=False)
+
+    stdout = StringIO()
+    assert cli.main(["public-release-boundary", "--root", str(project_root), "--dist", str(dist_dir)], stdout=stdout) == 0
+
+    output = stdout.getvalue()
+    assert "Public proof MCP route | blocked" in output
+    assert "public_proof_pack" in output
     assert "Local Release Boundary Blockers" in output
 
 

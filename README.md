@@ -370,6 +370,7 @@ growth_flywheel()                  # Growth flywheel — current real loop snaps
 growth_campaign()                  # Growth campaign — 72h public launch card from the real bottleneck
 public_growth_report()             # Public growth proof — GitHub public traction + local MCP ledger
 public_launch_preflight()          # Public launch preflight — ordered IssueOps/Release/PyPI/first-proof runbook
+public_proof_pack()                # Public proof pack — no-network Growth/Share Issue kit and External Contributor invite
 public_growth_report(record_snapshot=True) # Public growth velocity — record a real GitHub traction snapshot for delta tracking
 public_growth_report(record_snapshot=True, target_contributors=10) # Campaign progress + recap — count real Issue/PR/local contributors and generate the next sprint target
 # Terminal launch gates outside an MCP client:
@@ -408,6 +409,7 @@ leaderboard(type="share")          # Share Proof Rankings from real public contr
 - ✅ `public_growth_report()` checks PyPI JSON API distribution readiness for `tiangong-mcp`, compares the real latest PyPI version with local package metadata, and marks stale PyPI releases as a public install-loop launch blocker
 - ✅ `public_growth_report()` collapses remote IssueOps, PyPI Trusted Publisher, GitHub Release, PyPI latest-version, and first-proof blockers into a `Public Launch Closure Checklist`, so the public flywheel is not claimed closed until every row is rechecked from real public state
 - ✅ `public_launch_preflight()` is the direct MCP release runbook: it fetches the same real public state, prints local quality gates, release command, PyPI Trusted Publishing expectations, closure checklist, Growth/Share Proof form URLs, created-Issue ledger commands, and recheck commands without inventing traction
+- ✅ `public_proof_pack()` is directly callable from MCP: it prints the no-network Growth/Share Issue proof kit, terminal ledger commands, and an External Contributor invite without switching to `tiangong-mcp public-proof-pack`; it does not invent traction
 - ✅ When public proof is still cold, `public_growth_report()` includes a First Public Proof Action with Growth Issue Form, Share Proof Issue Form, created-Issue proof placeholders, exact `record_growth_referral` / `record_share_attribution` commands, and a copy-ready first public proof post
 - ✅ `public_growth_report(record_snapshot=True)` appends the real public traction snapshot to `public-growth-snapshots.jsonl`, so later reports can show true stars/forks/IssueOps/local-ledger deltas instead of static vanity claims
 - ✅ `public_growth_report(target_contributors=...)` counts only real public Growth/Share Issue authors, public Pull Request authors, and local IssueOps/share-attribution actors toward the 72h campaign target, then returns a campaign recap, target-reached/shortfall status, and the next sprint command; stars, forks, watchers, downloads, reposts, and retention are not counted as contributors
@@ -539,6 +541,7 @@ Configure TianGong into your IDE (Cursor / VSCode) or chat client (Claude) and c
 | `growth_campaign` | 🚀 Growth Campaign — 72h public launch card from the real bottleneck |
 | `public_growth_report` | 📈 Public Growth Proof — GitHub public traction, PR contributor proof, campaign target progress, local MCP ledger, and optional velocity snapshot history without fake virality |
 | `public_launch_preflight` | 🚀 Public Launch Preflight — Ordered IssueOps, release, PyPI, and first-proof runbook before claiming flywheel closure |
+| `public_proof_pack` | 📣 Public Proof Pack — No-network Growth/Share Issue kit and External Contributor invite without fake virality |
 | `leaderboard` | 🏆 Celestial Leaderboard — artifact, cultivator, season, tournament, recap, and sect-war rankings |
 | `infuse_spirit` | 💫 Appraise — Six-dimensional artifact assessment |
 | `quest` | 📜 Quests — Browse, post, claim, or submit refinement bounties |

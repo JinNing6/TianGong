@@ -1202,3 +1202,37 @@ async def test_mcp_public_launch_preflight_exposes_release_runbook(monkeypatch, 
     assert "workflow_dispatch tag `v0.1.0`" in result
     assert "public_growth_report(record_snapshot=True, target_contributors=10)" in result
     assert "TianGong" in result
+
+
+@pytest.mark.asyncio
+async def test_mcp_public_proof_pack_exposes_external_contributor_invite():
+    """MCP users should get the no-network proof pack without switching to the terminal CLI."""
+    from tiangong import mcp_server
+
+    result = await mcp_server.public_proof_pack(
+        repo_owner="octo-org",
+        repo_name="octo-repo",
+        target_contributors=10,
+        actor="maintainer",
+        artifact_name="first-growth-artifact",
+        contribution="forge",
+    )
+
+    assert "TianGong First Public Proof Pack" in result
+    assert "https://github.com/octo-org/octo-repo/issues/new?" in result
+    assert "template=tiangong-growth-flywheel.yml" in result
+    assert "template=tiangong-share-proof.yml" in result
+    assert "First External Contributor Path" in result
+    assert "Copy External Contributor Invite" in result
+    assert "pip install -U tiangong-mcp" in result
+    assert 'start_cultivation(username="your_github_username")' in result
+    assert 'forge_agent(name="first-growth-artifact"' in result
+    assert "tiangong-mcp record-growth-referral" in result
+    assert "tiangong-mcp record-share-attribution" in result
+    assert 'record_growth_referral(route="growth"' in result
+    assert 'record_share_attribution(contribution="forge"' in result
+    assert "actor=\"maintainer\"" in result
+    assert "Use created Issue URLs, not `issues/new?...` form URLs" in result
+    assert "Only public Growth/Share Issue authors, public PR authors, and local ledger actors count" in result
+    assert "does not invent downloads, retention, repost counts, referral conversions, or rewards" in result
+    assert "TianGong" in result

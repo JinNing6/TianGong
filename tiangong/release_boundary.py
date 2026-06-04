@@ -18,6 +18,7 @@ REQUIRED_WHEEL_MODULES = (
     "tiangong/public_growth.py",
     "tiangong/release_boundary.py",
     "tiangong/season.py",
+    "tiangong/mcp_server.py",
 )
 
 REQUIRED_DOC_COMMANDS = (
@@ -55,6 +56,11 @@ REQUIRED_PUBLISH_WORKFLOW_FEATURES = (
 REQUIRED_PROOF_LEDGER_ROUTES = (
     ("record-growth-referral", "tiangong-mcp record-growth-referral"),
     ("record-share-attribution", "tiangong-mcp record-share-attribution"),
+)
+
+REQUIRED_MCP_PUBLIC_PROOF_ROUTE = (
+    "public_proof_pack",
+    "format_public_proof_pack",
 )
 
 
@@ -191,6 +197,42 @@ def _proof_ledger_cli_checks(dist: Path) -> list[ReleaseBoundaryCheck]:
     ]
 
 
+def _mcp_public_proof_pack_checks(dist: Path) -> list[ReleaseBoundaryCheck]:
+    """Verify built artifacts expose the MCP proof-pack route for client-side launch recovery."""
+    missing: list[str] = []
+    wheel = _find_one(dist, "tiangong_mcp-*.whl")
+    if wheel is None:
+        missing.append("wheel distribution")
+    else:
+        with zipfile.ZipFile(wheel) as archive:
+            mcp_text = _zip_member_text(archive, "tiangong/mcp_server.py")
+        for marker in REQUIRED_MCP_PUBLIC_PROOF_ROUTE:
+            if marker not in mcp_text:
+                missing.append(f"wheel mcp route marker `{marker}`")
+
+    sdist = _find_one(dist, "tiangong_mcp-*.tar.gz")
+    if sdist is None:
+        missing.append("source distribution")
+    else:
+        with tarfile.open(sdist, "r:gz") as archive:
+            mcp_text = _tar_member_text(archive, "tiangong/mcp_server.py")
+        for marker in REQUIRED_MCP_PUBLIC_PROOF_ROUTE:
+            if marker not in mcp_text:
+                missing.append(f"sdist mcp route marker `{marker}`")
+
+    return [
+        ReleaseBoundaryCheck(
+            "Public proof MCP route",
+            "ready" if not missing else "blocked",
+            (
+                "wheel and sdist expose `public_proof_pack` for MCP clients"
+                if not missing
+                else f"missing {', '.join(missing)}"
+            ),
+        )
+    ]
+
+
 def _sdist_checks(dist: Path) -> list[ReleaseBoundaryCheck]:
     sdist = _find_one(dist, "tiangong_mcp-*.tar.gz")
     if sdist is None:
@@ -279,6 +321,7 @@ def format_public_release_boundary(root: str | Path | None = None, dist: str | P
         *_wheel_checks(dist_dir, version),
         *_sdist_checks(dist_dir),
         *_proof_ledger_cli_checks(dist_dir),
+        *_mcp_public_proof_pack_checks(dist_dir),
         *_documentation_checks(project_root),
         *_workflow_checks(project_root),
     ]

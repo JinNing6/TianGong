@@ -127,3 +127,14 @@ def test_readmes_document_one_command_dev_install_and_quality_gate():
         assert "environment `pypi`" in text
         assert "invalid-publisher" in text
         assert "PYPI_TOKEN" in text
+
+
+def test_readmes_document_mcp_public_proof_pack_tool():
+    """The no-network proof pack should be visible from the MCP tool table, not only the CLI runbook."""
+    for filename in ["README.md", "README.zh-CN.md"]:
+        text = (ROOT / filename).read_text(encoding="utf-8")
+
+        assert "`public_proof_pack`" in text
+        assert "public-proof-pack" in text
+        assert "External Contributor" in text or "外部贡献者" in text
+        assert "does not invent" in text or "不伪造" in text
