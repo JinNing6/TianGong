@@ -11,6 +11,7 @@ from .activation import EVENT_SHARE_ATTRIBUTION_RECORDED, ActivationEvent, build
 from .config import config
 from .cultivator import CultivatorProfile
 from .forge import AgentSpec
+from .install_bridge import DEFAULT_PACKAGE_NAME, git_tag_install_command, local_package_version
 from .sect import SectProfile
 
 GROWTH_ISSUE_TEMPLATE = "tiangong-growth-flywheel.yml"
@@ -29,6 +30,15 @@ class GrowthStage:
 
 def _format_percent(value: float) -> str:
     return f"{value * 100:.1f}%"
+
+
+def _current_candidate_install_command() -> str:
+    return git_tag_install_command(
+        repo_owner="",
+        repo_name="",
+        version_or_tag=local_package_version(DEFAULT_PACKAGE_NAME),
+        package_name=DEFAULT_PACKAGE_NAME,
+    )
 
 
 def _rate(numerator: int, denominator: int) -> float:
@@ -245,6 +255,7 @@ def format_growth_campaign(
     stages = _build_growth_stages(profiles, artifacts, activation_events=activation_events)
     bottleneck = _select_bottleneck(stages)
     active_sects = _count_active_sects(sects)
+    install_command = _current_candidate_install_command()
     first_artifact = artifacts[0].name if artifacts else "first-growth-artifact"
     campaign_hook = f"{campaign}: 72 小时补齐 {bottleneck.label}"
     real_data_context = (
@@ -326,7 +337,9 @@ def format_growth_campaign(
             f"当前真实瓶颈是 {bottleneck.label}，目标招募 {target} 位贡献者完成开炉、回流、分享证明。"
         ),
         "不伪造下载量、留存、转发数、转介绍或灵力奖励。",
-        "加入修炼: pip install tiangong-mcp",
+        f"加入修炼: {install_command}",
+        "安装后复查: tiangong-mcp public-install-command",
+        "PyPI 追平后安装: pip install -U tiangong-mcp",
         "第一步: start_cultivation(username=\"your_github_username\")",
         f"增长 Issue: {growth_issue_url}",
         f"分享证明 Issue: {share_issue_url}",
@@ -344,6 +357,9 @@ def format_growth_campaign(
         f"- 当前真实快照: {len(profiles)} 位修仙者 / {len(artifacts)} 件法宝 / {active_sects} 个活跃宗门",
         f"- 当前瓶颈: {bottleneck.label} ({_format_percent(bottleneck.rate)})",
         "- 数据原则: 不伪造下载量、留存、转发数、转介绍或灵力奖励",
+        f"- 候选安装: `{install_command}`",
+        "- 安装后复查: `tiangong-mcp public-install-command`",
+        "- PyPI 追平后安装: `pip install -U tiangong-mcp`",
         "- 第一手行动: `start_cultivation(username=\"your_github_username\")`",
         f"- Growth Issue: {growth_issue_url}",
         f"- Created Growth Issue proof URL for ledger commands: `{growth_issue_proof_url}`",
@@ -377,6 +393,7 @@ def format_growth_flywheel(
     stages = _build_growth_stages(profiles, artifacts, activation_events=activation_events)
     bottleneck = _select_bottleneck(stages)
     active_sects = _count_active_sects(sects)
+    install_command = _current_candidate_install_command()
     campaign_hook = f"补齐 TianGong 增长飞轮的最薄弱环节: {bottleneck.label}"
     real_data_context = (
         f"当前真实快照: {len(profiles)} 位修仙者 / {len(artifacts)} 件法宝 / "
@@ -449,7 +466,9 @@ def format_growth_flywheel(
                 f"TianGong 当前增长飞轮快照: {len(profiles)} 位修仙者、{len(artifacts)} 件法宝、"
                 f"最薄弱环节是{bottleneck.label}。不伪造历史事件，只用真实 registry 快照补齐下一步。"
             ),
-            "加入修炼: pip install tiangong-mcp",
+            f"加入修炼: {install_command}",
+            "安装后复查: tiangong-mcp public-install-command",
+            "PyPI 追平后安装: pip install -U tiangong-mcp",
             "复查激活: activation_funnel()",
             "复查飞轮: growth_flywheel()",
             "发起战役: growth_campaign()",
@@ -468,13 +487,15 @@ def format_growth_flywheel(
             "- 分享证明原则: 不伪造下载量、留存、转发数、转介绍或灵力奖励",
             f"- 最薄弱环节: {bottleneck.label} ({_format_percent(bottleneck.rate)})",
             f"- 第一手行动: {bottleneck.next_action}",
+            f"- 候选安装: `{install_command}`",
+            "- 安装后复查: `tiangong-mcp public-install-command`",
+            "- PyPI 追平后安装: `pip install -U tiangong-mcp`",
             "- 激活漏斗入口: `activation_funnel()`",
             "- 复查入口: `growth_flywheel()`",
             "- 爆发战役入口: `growth_campaign()`",
             "- 公开证明入口: `public_growth_report()`",
             "- 首个公开证明包: `public_proof_pack()`",
             f"- 外部回流 Issue: {growth_issue_url}",
-            "- 安装: `pip install tiangong-mcp`",
             "```",
         ]
     )
