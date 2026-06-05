@@ -222,9 +222,9 @@ tiangong-mcp public-release-boundary
 
 `tiangong-mcp` 的 PyPI Trusted Publisher 配置必须与 release workflow 精确匹配：owner `JinNing6`，repository `TianGong`，workflow filename `publish-pypi.yml`，workflow path `.github/workflows/publish-pypi.yml`，environment `pypi`。如果 PyPI 返回 `invalid-publisher`，重新运行 `tiangong-mcp public-launch-preflight --target-contributors 10`，使用其中生成的 Trusted Publisher runbook，不要改用长期上传 token。
 
-当 public preflight 显示 PyPI latest stale 或 unverified 时，只能把生成的 Current Candidate Git Tag Install Bridge 当作临时候选贡献者路径，例如 `python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.1"`。这不代表 PyPI 安装闭环已经闭合；必须用 `public_growth_report()` 复查 PyPI JSON latest 后才能宣布公开安装就绪。
+当 public preflight 显示 PyPI latest stale 或 unverified 时，只能把生成的 Current Candidate Git Tag Install Bridge 当作临时候选贡献者路径，例如 `python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.2"`。这不代表 PyPI 安装闭环已经闭合；必须用 `public_growth_report()` 复查 PyPI JSON latest 后才能宣布公开安装就绪。
 
-`tiangong-mcp public-launch-assets` 还会输出完整公开增长 release handoff：创建当前本地版本 GitHub Release（例如 `v0.1.1`）之前需要 staging 的文档、包元数据、Issue Forms、workflows、公开增长模块、用户可见增长表面和测试。
+`tiangong-mcp public-launch-assets` 还会输出完整公开增长 release handoff：创建当前本地版本 GitHub Release（例如 `v0.1.2`）之前需要 staging 的文档、包元数据、Issue Forms、workflows、公开增长模块、用户可见增长表面和测试。
 
 ---
 
@@ -384,7 +384,7 @@ growth_campaign()                  # 爆发战役 — 基于真实瓶颈生成 7
 public_growth_report()             # 公开增长证明 — GitHub 公开牵引力 + 本地 MCP 账本
 public_install_command()           # 公开安装命令 — PyPI 当前安装或 Git tag 候选安装桥
 public_launch_preflight()          # 公开发布预检 — IssueOps/Release/PyPI/首证明顺序执行清单
-public_proof_pack()                # 公开证明包 — 无网络 Growth/Share Issue 套件和外部贡献者邀请
+public_proof_pack()                # 公开证明包 — 无网络 Growth/Share Issue 套件、安装决策入口和外部贡献者邀请
 public_growth_report(record_snapshot=True) # 公开增长速度 — 记录真实 GitHub 牵引力快照，用于增量追踪
 public_growth_report(record_snapshot=True, target_contributors=10) # 战役进度 + 复盘 — 按真实 Issue/PR/本地贡献者计算目标并生成下一轮目标
 # MCP 客户端外的终端发布门禁：
@@ -418,12 +418,12 @@ sect(action="leaderboard")         # 宗门战报 — 可复制分享
 - ✅ 增长战役中的 `issues/new?...` 只作为表单入口；`record_growth_referral()` 和 `record_share_attribution(..., source_url=...)` 会拒绝表单入口和占位 URL，必须使用创建后的公开 Issue/PR/Discussion URL 作为可审查证明
 - ✅ `public_growth_report()` 会抓取真实 GitHub 公开仓库和 IssueOps 指标，并与本地 MCP 激活账本同屏比较，指出最薄弱的外部证明桥；不会伪造下载量、留存、转发数、转介绍转化或奖励
 - ✅ `public_growth_report()` 还会通过 GitHub Contents API 检查远端 Growth Issue Form、Share Proof Issue Form 和 IssueOps workflow 是否已经在默认分支上线；缺失的 `.github` 文件会被标记为公开 launch blocker，而不会把本地未发布入口当成真实闭环
-- ✅ `public_growth_report()` 会通过 GitHub Releases API 检查当前本地版本对应的发布标签，例如 `v0.1.1`；如果缺少触发 PyPI Trusted Publishing 的 GitHub Release，会标记为公开安装闭环 launch blocker；如果无法创建 Release，runbook 会给出受保护 tag 推送和 `workflow_dispatch` 发布兜底，但不会声称 Release proof 已闭合
+- ✅ `public_growth_report()` 会通过 GitHub Releases API 检查当前本地版本对应的发布标签，例如 `v0.1.2`；如果缺少触发 PyPI Trusted Publishing 的 GitHub Release，会标记为公开安装闭环 launch blocker；如果无法创建 Release，runbook 会给出受保护 tag 推送和 `workflow_dispatch` 发布兜底，但不会声称 Release proof 已闭合
 - ✅ `public_growth_report()` 会通过 PyPI JSON API 检查 `tiangong-mcp` 分发就绪状态，把真实 PyPI 最新版本与本地包元数据对齐比较；如果 PyPI 仍是旧版本，会标记为公开安装闭环 launch blocker
 - ✅ `public_install_command()` 是最短可分享安装入口：它用真实 PyPI readiness 判断应该输出 `pip install -U tiangong-mcp` 还是当前 Git tag 候选安装桥，并且不会谎称 PyPI 安装闭环已闭合
 - ✅ `public_growth_report()` 会把远端 IssueOps、PyPI Trusted Publisher、GitHub Release、PyPI 最新版本和首个公开证明断点合并成 `Public Launch Closure Checklist`；只有每一行都能从真实公开状态复查通过，才能声称公开飞轮闭合
 - ✅ `public_launch_preflight()` 是直接可调用的 MCP 发布预检战报：抓取同一份真实公开状态，输出本地质量门、Release 命令、PyPI Trusted Publishing 期望、闭环清单、Growth/Share Proof 表单 URL、创建 Issue 后的账本回填命令和复查命令，不伪造牵引力
-- ✅ `public_proof_pack()` 可直接从 MCP 调用：输出无网络 Growth/Share Issue 证明包、终端账本命令和外部贡献者邀请，不必切换到 `tiangong-mcp public-proof-pack`，也不伪造牵引力
+- ✅ `public_proof_pack()` 可直接从 MCP 调用：输出无网络 Growth/Share Issue 证明包、终端账本命令、`tiangong-mcp public-install-command` 和外部贡献者邀请，不必切换到 `tiangong-mcp public-proof-pack`，也不伪造牵引力
 - ✅ 当公开证明仍是冷启动时，`public_growth_report()` 会直接给出 First Public Proof Action：Growth Issue Form、Share Proof Issue Form、创建后 Issue proof 占位、提交后需要执行的 `record_growth_referral` / `record_share_attribution` 命令，以及可直接复制传播的首条公开证明帖
 - ✅ `public_growth_report(record_snapshot=True)` 会把真实公开牵引力快照追加到 `public-growth-snapshots.jsonl`，让后续报告展示 stars/forks/IssueOps/本地账本的真实增量，而不是静态虚荣指标
 - ✅ `public_growth_report(target_contributors=...)` 只把真实公开 Growth/Share Issue 作者、公开 Pull Request 作者和本地 IssueOps/分享归因 actor 计入 72 小时目标贡献者，并返回战役复盘、达标/短板状态和下一轮命令；stars、forks、watchers、下载量、转发数和留存不会被当成贡献者
@@ -653,7 +653,7 @@ graph TD
 | `public_growth_report` | 📈 公开增长证明 | GitHub 公开牵引力、PR 贡献者证明、战役目标进度、本地 MCP 账本和可选速度快照历史，不伪造爆火数据 |
 | `public_install_command` | ⚒️ 公开安装命令 | PyPI 当前安装或 Git tag 候选安装桥，不谎称安装闭环已闭合 |
 | `public_launch_preflight` | 🚀 公开发布预检 | 声称飞轮闭合前，按顺序复查 IssueOps、Release、PyPI 和首个公开证明 |
-| `public_proof_pack` | 📣 公开证明包 | 无网络 Growth/Share Issue 套件和外部贡献者邀请，不伪造爆火数据 |
+| `public_proof_pack` | 📣 公开证明包 | 无网络 Growth/Share Issue 套件、安装决策入口和外部贡献者邀请，不伪造爆火数据 |
 
 ---
 

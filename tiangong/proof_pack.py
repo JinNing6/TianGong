@@ -100,6 +100,7 @@ def format_public_proof_pack(
             "",
             "- Local launch assets: `tiangong-mcp public-launch-assets`",
             "- Local release boundary: `tiangong-mcp public-release-boundary`",
+            "- Public install decision: `tiangong-mcp public-install-command`",
             f"- Public preflight after remote push: `tiangong-mcp public-launch-preflight --target-contributors {target}`",
             "",
             "## Open Public Proof Issues",
@@ -114,18 +115,20 @@ def format_public_proof_pack(
             "",
             "## First External Contributor Path",
             "",
-            "> Use after public preflight shows remote IssueOps live and PyPI latest current.",
+            "> Run the install command surface before sharing this invite.",
+            "> Use the Git tag candidate bridge when PyPI is stale; use the PyPI command only after registry readiness is current.",
             "> Use form URLs to open Issues, then use created Issue URLs as reviewable proof.",
             "> Only public Growth/Share Issue authors, public PR authors, and local ledger actors count toward the target; stars, forks, downloads, reposts, retention, and watchers do not.",
             "",
-            "1. Install current public package: `pip install -U tiangong-mcp`",
-            '2. Start cultivation in an MCP client: `start_cultivation(username="your_github_username")`',
+            "1. Install decision: `tiangong-mcp public-install-command`",
+            "2. PyPI-current install after registry readiness: `pip install -U tiangong-mcp`",
+            '3. Start cultivation in an MCP client: `start_cultivation(username="your_github_username")`',
             (
-                "3. Forge the first public artifact: "
+                "4. Forge the first public artifact: "
                 f'`forge_agent(name="{artifact}", description="A TianGong artifact opening the first public proof loop")`'
             ),
-            f"4. Open Share Proof Issue Form: {share_issue_url}",
-            f"5. After submission, replace `{share_proof_url}` with the created Issue URL before recording proof.",
+            f"5. Open Share Proof Issue Form: {share_issue_url}",
+            f"6. After submission, replace `{share_proof_url}` with the created Issue URL before recording proof.",
             "",
             "## Git Tag Candidate Install Bridge",
             "",
@@ -167,7 +170,8 @@ def format_public_proof_pack(
                 f"record_share_attribution(contribution=\"{contribution_arg}\", share_url=\"{share_proof_url}\", "
                 f"artifact_name=\"{artifact_arg}\", source_url=\"{growth_proof_url}\", actor=\"{actor_arg}\")"
             ),
-            "Install: pip install tiangong-mcp",
+            "Install decision: tiangong-mcp public-install-command",
+            "PyPI-current install after registry readiness: pip install -U tiangong-mcp",
             f"PyPI stale candidate install bridge: {install_bridge_command}",
             "```",
             "",
@@ -175,7 +179,8 @@ def format_public_proof_pack(
             "",
             "```text",
             f"I want to be counted in the TianGong 72h launch for {owner}/{repo}.",
-            "Install current public package: pip install -U tiangong-mcp",
+            "Install decision: tiangong-mcp public-install-command",
+            "PyPI-current install after registry readiness: pip install -U tiangong-mcp",
             f"If public preflight reports PyPI latest is stale or unverified, install current tag candidate: {install_bridge_command}",
             'Start: start_cultivation(username="your_github_username")',
             (
@@ -191,6 +196,7 @@ def format_public_proof_pack(
             "",
             f"- Public preflight: `tiangong-mcp public-launch-preflight --target-contributors {target}`",
             f"- Public proof report: `tiangong-mcp public-growth-report --record-snapshot --target-contributors {target}`",
+            "- Public install decision: `tiangong-mcp public-install-command`",
             "- Local activation: `activation_funnel()`",
             "",
         ]
