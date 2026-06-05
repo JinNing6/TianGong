@@ -56,6 +56,10 @@ REQUIRED_PUBLISH_WORKFLOW_FEATURES = (
     "fetch-depth: 0",
     "Verify release tag and package version",
     "git fetch --force origin main:refs/remotes/origin/main --tags",
+    'tag_commit="$(git rev-list -n 1 "$RELEASE_TAG")"',
+    'head_commit="$(git rev-parse HEAD)"',
+    'if [[ "$tag_commit" != "$head_commit" ]]; then',
+    "Checked-out commit $head_commit does not match $RELEASE_TAG commit $tag_commit",
     "git merge-base --is-ancestor",
     "pyproject.toml version",
     "id-token: write",
@@ -494,7 +498,8 @@ def _workflow_checks(root: Path) -> list[ReleaseBoundaryCheck]:
             "ready" if not missing else "blocked",
             (
                 "quality and publish workflows run launch assets plus release boundary; "
-                "publish workflow verifies release tags and supports protected tag push plus manual tag dispatch"
+                "publish workflow verifies release tags, requires tag commit must match checkout HEAD, "
+                "and supports protected tag push plus manual tag dispatch"
             )
             if not missing
             else f"missing {', '.join(missing)}",
