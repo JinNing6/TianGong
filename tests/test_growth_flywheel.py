@@ -65,7 +65,7 @@ def test_growth_flywheel_snapshot_uses_real_current_fields():
     assert "template=tiangong-growth-flywheel.yml" in result
     assert "growth_bottleneck=" in result
     assert "campaign_hook=" in result
-    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.11"' in result
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.12"' in result
     assert "tiangong-mcp public-install-command" in result
     assert "pip install -U tiangong-mcp" in result
     assert "加入修炼: pip install tiangong-mcp" not in result
@@ -123,7 +123,7 @@ def test_empty_growth_flywheel_recruits_first_cultivator_without_fake_metrics():
     assert "`public_growth_report()`" in result
     assert "`public_proof_pack()`" in result
     assert "tiangong-growth-flywheel.yml" in result
-    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.11"' in result
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.12"' in result
     assert "加入修炼: pip install tiangong-mcp" not in result
 
 
@@ -211,7 +211,7 @@ def test_growth_campaign_turns_bottleneck_into_72h_public_launch_card(tmp_path):
     assert "`public_growth_report()`" in result
     assert "`public_proof_pack()`" in result
     assert "不伪造下载量、留存、转发数、转介绍或灵力奖励" in result
-    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.11"' in result
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.12"' in result
     assert "tiangong-mcp public-install-command" in result
     assert "加入修炼: pip install tiangong-mcp" not in result
 

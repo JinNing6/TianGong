@@ -81,6 +81,9 @@ REQUIRED_CANDIDATE_SMOKE_MARKERS = (
 )
 
 STALE_PUBLIC_INSTALL_MARKER = "pip install " "tiangong-mcp"
+CANDIDATE_INSTALL_TAG_PATTERN = re.compile(
+    r"tiangong-mcp\s*@\s*git\+https://github\.com/[^\s\"'`]+\.git@(v[0-9][A-Za-z0-9_.+-]*)"
+)
 
 
 @dataclass(frozen=True)
@@ -186,6 +189,76 @@ def _stale_public_install_copy_checks(dist: Path, expected_version: str) -> list
                 "wheel and sdist route public install copy through the candidate bridge or PyPI-current command"
                 if not offenders
                 else f"stale public install copy: {', '.join(offenders)}"
+            ),
+        )
+    ]
+
+
+def _candidate_tag_findings(label: str, text: str, expected_tag: str) -> list[str]:
+    tags = sorted(set(CANDIDATE_INSTALL_TAG_PATTERN.findall(text)))
+    if not tags:
+        return [f"{label} missing `{expected_tag}`"]
+    mismatches = [tag for tag in tags if tag != expected_tag]
+    return [f"{label} uses `{tag}` instead of `{expected_tag}`" for tag in mismatches]
+
+
+def _candidate_install_tag_version_checks(root: Path, dist: Path, expected_version: str) -> list[ReleaseBoundaryCheck]:
+    """Verify public Git tag install bridges point at the current package version."""
+    expected_tag = f"v{expected_version}" if expected_version else ""
+    offenders: list[str] = []
+    if not expected_tag:
+        offenders.append("pyproject.toml version missing")
+
+    for path in (root / "README.md", root / "README.zh-CN.md"):
+        if not path.exists():
+            offenders.append(f"{path.name} missing")
+            continue
+        offenders.extend(_candidate_tag_findings(path.name, _read_text(path), expected_tag))
+
+    issueops = root / ".github" / "workflows" / "issueops-onboarding.yml"
+    if not issueops.exists():
+        offenders.append(".github/workflows/issueops-onboarding.yml missing")
+    else:
+        offenders.extend(_candidate_tag_findings("issueops-onboarding.yml", _read_text(issueops), expected_tag))
+
+    wheel = _find_one(dist, "tiangong_mcp-*.whl", expected_version)
+    if wheel is None:
+        offenders.append("wheel distribution missing")
+    else:
+        with zipfile.ZipFile(wheel) as archive:
+            offenders.extend(_candidate_tag_findings("wheel METADATA", _zip_member_text(archive, ".dist-info/METADATA"), expected_tag))
+
+    sdist = _find_one(dist, "tiangong_mcp-*.tar.gz", expected_version)
+    if sdist is None:
+        offenders.append("source distribution missing")
+    else:
+        with tarfile.open(sdist, "r:gz") as archive:
+            readme_members = [
+                member
+                for member in archive.getmembers()
+                if member.isfile() and member.name.replace("\\", "/").rsplit("/", 1)[-1] in {"README.md", "README.zh-CN.md"}
+            ]
+            if not readme_members:
+                offenders.append("sdist README.md missing")
+            for member in readme_members:
+                normalized_member = member.name.replace("\\", "/")
+                label = f"sdist {normalized_member.rsplit('/', 1)[-1]}"
+                handle = archive.extractfile(member)
+                if handle is None:
+                    offenders.append(f"{label} unreadable")
+                    continue
+                with handle:
+                    text = handle.read().decode("utf-8", errors="replace")
+                offenders.extend(_candidate_tag_findings(label, text, expected_tag))
+
+    return [
+        ReleaseBoundaryCheck(
+            "Candidate install tag version",
+            "ready" if not offenders else "blocked",
+            (
+                f"public candidate install tags match `{expected_tag}` in docs, workflow, wheel, and sdist"
+                if not offenders
+                else f"candidate install tag mismatch: {', '.join(offenders)}"
             ),
         )
     ]
@@ -451,6 +524,7 @@ def format_public_release_boundary(root: str | Path | None = None, dist: str | P
         *_candidate_smoke_checks(dist_dir, version),
         *_mcp_public_route_checks(dist_dir, version),
         *_stale_public_install_copy_checks(dist_dir, version),
+        *_candidate_install_tag_version_checks(project_root, dist_dir, version),
         *_documentation_checks(project_root),
         *_workflow_checks(project_root),
     ]
