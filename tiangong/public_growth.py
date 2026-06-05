@@ -1283,6 +1283,7 @@ def format_public_install_command(
             "## Recheck Commands",
             "",
             "- Short install surface: `tiangong-mcp public-install-command`",
+            "- Candidate install smoke: `tiangong-mcp public-candidate-smoke --target-contributors 10`",
             "- Public preflight: `tiangong-mcp public-launch-preflight --target-contributors 10`",
             "- Public proof report: `tiangong-mcp public-growth-report --record-snapshot --target-contributors 10`",
             "",

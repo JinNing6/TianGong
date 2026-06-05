@@ -60,13 +60,13 @@ def _cold_launch_snapshot():
             ),
         ),
         release_readiness=PublicReleaseReadiness(
-            local_version="0.1.5",
-            expected_tag="v0.1.5",
+            local_version="0.1.6",
+            expected_tag="v0.1.6",
             status="missing",
         ),
         distribution_readiness=PublicDistributionReadiness(
             package_name="tiangong-mcp",
-            local_version="0.1.5",
+            local_version="0.1.6",
             published_version="0.0.1",
             status="stale",
         ),
@@ -78,6 +78,7 @@ def _write_release_boundary_fixture(
     *,
     include_terminal_ledger_commands: bool = True,
     include_mcp_public_proof_pack: bool = True,
+    include_candidate_smoke: bool = True,
 ) -> tuple[Path, Path]:
     project_root = root / "project"
     dist_dir = project_root / "dist"
@@ -101,6 +102,7 @@ def _write_release_boundary_fixture(
     readme_lines = [
         "tiangong-mcp public-launch-assets",
         "tiangong-mcp public-install-command",
+        "tiangong-mcp public-candidate-smoke --target-contributors 10",
         "tiangong-mcp public-launch-preflight --target-contributors 10",
         "tiangong-mcp public-growth-report --record-snapshot --target-contributors 10",
         "tiangong-mcp public-proof-pack --target-contributors 10",
@@ -189,6 +191,7 @@ def _write_release_boundary_fixture(
         "tiangong/cli.py",
         "tiangong/growth.py",
         "tiangong/install_bridge.py",
+        "tiangong/candidate_smoke.py",
         "tiangong/launch_assets.py",
         "tiangong/onboarding.py",
         "tiangong/proof_pack.py",
@@ -200,7 +203,12 @@ def _write_release_boundary_fixture(
     with zipfile.ZipFile(wheel, "w") as archive:
         for module in required_modules:
             if module == "tiangong/cli.py" and include_terminal_ledger_commands:
-                archive.writestr(module, 'subparsers.add_parser("record-growth-referral")\nsubparsers.add_parser("record-share-attribution")\n')
+                archive.writestr(
+                    module,
+                    'subparsers.add_parser("record-growth-referral")\n'
+                    'subparsers.add_parser("record-share-attribution")\n'
+                    + ('subparsers.add_parser("public-candidate-smoke")\n' if include_candidate_smoke else ""),
+                )
             elif module == "tiangong/proof_pack.py" and include_terminal_ledger_commands:
                 archive.writestr(
                     module,
@@ -219,6 +227,11 @@ def _write_release_boundary_fixture(
                             "    return format_public_install_command()",
                         ]
                     ),
+                )
+            elif module == "tiangong/candidate_smoke.py" and include_candidate_smoke:
+                archive.writestr(
+                    module,
+                    "run_public_candidate_install_smoke\nformat_public_candidate_smoke\n",
                 )
             else:
                 archive.writestr(module, "# packaged\n")
@@ -240,6 +253,12 @@ def _write_release_boundary_fixture(
                         'subparsers.add_parser("record-share-attribution")\n',
                         encoding="utf-8",
                     )
+                    if include_candidate_smoke:
+                        source.write_text(
+                            source.read_text(encoding="utf-8")
+                            + 'subparsers.add_parser("public-candidate-smoke")\n',
+                            encoding="utf-8",
+                        )
                 elif relative == "tiangong/proof_pack.py" and include_terminal_ledger_commands:
                     source.write_text(
                         "tiangong-mcp record-growth-referral\ntiangong-mcp record-share-attribution\n",
@@ -257,6 +276,11 @@ def _write_release_boundary_fixture(
                                 "    return format_public_install_command()",
                             ]
                         ),
+                        encoding="utf-8",
+                    )
+                elif relative == "tiangong/candidate_smoke.py" and include_candidate_smoke:
+                    source.write_text(
+                        "run_public_candidate_install_smoke\nformat_public_candidate_smoke\n",
                         encoding="utf-8",
                     )
                 else:
@@ -301,9 +325,9 @@ def test_cli_public_launch_preflight_prints_ordered_release_runbook(monkeypatch,
     assert "First Public Proof Entrypoints" in output
     assert "template=tiangong-growth-flywheel.yml" in output
     assert "template=tiangong-share-proof.yml" in output
-    assert "gh release create v0.1.5 --generate-notes" in output
+    assert "gh release create v0.1.6 --generate-notes" in output
     assert "https://github.com/octo-org/octo-repo/releases/new" in output
-    assert "Select existing tag `v0.1.5`" in output
+    assert "Select existing tag `v0.1.6`" in output
     assert "https://github.com/octo-org/octo-repo/actions/workflows/publish-pypi.yml" in output
     assert "public_growth_report(record_snapshot=True, target_contributors=10)" in output
     assert "After Submission CLI Ledger Commands" in output
@@ -331,8 +355,8 @@ def test_cli_public_launch_preflight_inlines_full_release_handoff(monkeypatch, t
     assert "git add tiangong/activation.py" in output
     assert "git add tests/test_cli.py" in output
     assert 'git commit -m "Prepare TianGong public growth launch"' in output
-    assert "gh release create v0.1.5 --generate-notes" in output
-    assert "git push origin v0.1.5" in output
+    assert "gh release create v0.1.6 --generate-notes" in output
+    assert "git push origin v0.1.6" in output
 
 
 def test_cli_public_launch_assets_prints_local_push_manifest():
@@ -359,6 +383,7 @@ def test_cli_public_launch_assets_prints_local_push_manifest():
     assert ".github/workflows/issueops-onboarding.yml .github/workflows/quality-gates.yml" in output
     assert "template config: ready" in output
     assert "git add tiangong/activation.py" in output
+    assert "tiangong/candidate_smoke.py" in output
     assert "tiangong/artifact_system.py" in output
     assert "tiangong/install_bridge.py" in output
     assert "git add tests/test_cli.py" in output
@@ -369,8 +394,9 @@ def test_cli_public_launch_assets_prints_local_push_manifest():
     assert "| review separately | `.github/workflows/issueops-onboarding.yml` |" not in output
     assert "| review separately | `tiangong/install_bridge.py` |" not in output
     assert 'git commit -m "Prepare TianGong public growth launch"' in output
-    assert "gh release create v0.1.5 --generate-notes" in output
-    assert "git push origin v0.1.5" in output
+    assert "gh release create v0.1.6 --generate-notes" in output
+    assert "git push origin v0.1.6" in output
+    assert "tiangong-mcp public-candidate-smoke --target-contributors 10" in output
     assert "tiangong-mcp public-launch-preflight --target-contributors 10" in output
 
 
@@ -384,6 +410,7 @@ def test_cli_public_launch_assets_preserves_campaign_target():
     output = stdout.getvalue()
     assert "tiangong-mcp public-launch-assets --target-contributors 25" in output
     assert "tiangong-mcp public-install-command" in output
+    assert "tiangong-mcp public-candidate-smoke --target-contributors 25" in output
     assert "tiangong-mcp public-launch-preflight --target-contributors 25" in output
     assert "tiangong-mcp public-growth-report --record-snapshot --target-contributors 25" in output
     assert "--target-contributors 10" not in output
@@ -399,7 +426,7 @@ def test_cli_public_install_command_prints_current_candidate_bridge(monkeypatch)
         "fetch_public_distribution_readiness",
         lambda: PublicDistributionReadiness(
             package_name="tiangong-mcp",
-            local_version="0.1.5",
+            local_version="0.1.6",
             published_version="0.0.1",
             status="stale",
             api_url="https://pypi.org/pypi/tiangong-mcp/json",
@@ -413,10 +440,111 @@ def test_cli_public_install_command_prints_current_candidate_bridge(monkeypatch)
 
     output = stdout.getvalue()
     assert "TianGong Public Install Command" in output
-    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.5"' in output
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.6"' in output
     assert "Canonical install after PyPI latest is current: `pip install -U tiangong-mcp`" in output
+    assert "tiangong-mcp public-candidate-smoke --target-contributors 10" in output
     assert 'start_cultivation(username="your_github_username")' in output
     assert "does not close the PyPI install loop" in output
+
+
+def test_cli_public_candidate_smoke_formats_real_install_gate(monkeypatch, tmp_path):
+    """Release operators should have an explicit smoke gate for the current Git tag bridge."""
+    from tiangong import cli
+    from tiangong.candidate_smoke import CandidateSmokeResult
+
+    calls = []
+
+    def fake_smoke(**kwargs):
+        calls.append(kwargs)
+        return CandidateSmokeResult(
+            package_name="tiangong-mcp",
+            repo_owner="octo-org",
+            repo_name="octo-repo",
+            tag="v0.1.6",
+            requirement="tiangong-mcp @ git+https://github.com/octo-org/octo-repo.git@v0.1.6",
+            install_command='python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/octo-org/octo-repo.git@v0.1.6"',
+            temp_root=tmp_path / "smoke",
+            installed_version="0.1.6",
+            console_script_exists=True,
+            install_surface_contains_tag=True,
+            proof_pack_contains_tag=True,
+            proof_pack_contains_external_invite=True,
+            cleaned=True,
+        )
+
+    monkeypatch.setattr(cli, "run_public_candidate_install_smoke", fake_smoke)
+
+    stdout = StringIO()
+    assert (
+        cli.main(
+            [
+                "public-candidate-smoke",
+                "--repo-owner",
+                "octo-org",
+                "--repo-name",
+                "octo-repo",
+                "--tag",
+                "v0.1.6",
+                "--target-contributors",
+                "25",
+            ],
+            stdout=stdout,
+        )
+        == 0
+    )
+
+    output = stdout.getvalue()
+    assert calls[0]["repo_owner"] == "octo-org"
+    assert calls[0]["repo_name"] == "octo-repo"
+    assert calls[0]["version_or_tag"] == "v0.1.6"
+    assert calls[0]["target_contributors"] == 25
+    assert "# TianGong Public Candidate Install Smoke" in output
+    assert "- Status: ready" in output
+    assert "| Installed package version | ready | `0.1.6` matches `v0.1.6` |" in output
+    assert "| Console script | ready | `tiangong-mcp` command is installed |" in output
+    assert "| Proof pack invite | ready | proof pack includes the current tag and External Contributor invite |" in output
+    assert "does not publish releases, upload distributions, record traction, or claim a closed install loop" in output
+
+
+def test_candidate_smoke_runner_captures_subprocess_output_as_utf8(tmp_path):
+    """Windows smoke runs should not let GBK console defaults corrupt UTF-8 launch output."""
+    import subprocess
+
+    from tiangong.candidate_smoke import run_public_candidate_install_smoke
+
+    calls = []
+
+    def fake_runner(command, **kwargs):
+        calls.append((command, kwargs))
+        assert kwargs["encoding"] == "utf-8"
+        assert kwargs["errors"] == "replace"
+        text_command = " ".join(command)
+        if "-m venv" in text_command:
+            venv = Path(command[-1])
+            scripts = venv / "Scripts"
+            scripts.mkdir(parents=True)
+            (scripts / "python.exe").write_text("", encoding="utf-8")
+            (scripts / "tiangong-mcp.exe").write_text("", encoding="utf-8")
+            return subprocess.CompletedProcess(command, 0, "", "")
+        if "importlib.metadata" in text_command:
+            return subprocess.CompletedProcess(command, 0, "0.1.6\n", "")
+        if "public-install-command" in text_command:
+            return subprocess.CompletedProcess(command, 0, "candidate v0.1.6 天工\n", "")
+        if "public-proof-pack" in text_command:
+            return subprocess.CompletedProcess(command, 0, "v0.1.6\nCopy External Contributor Invite\n", "")
+        return subprocess.CompletedProcess(command, 0, "", "")
+
+    result = run_public_candidate_install_smoke(
+        repo_owner="octo-org",
+        repo_name="octo-repo",
+        version_or_tag="v0.1.6",
+        target_contributors=25,
+        temp_parent=tmp_path,
+        runner=fake_runner,
+    )
+
+    assert result.ready
+    assert calls
 
 
 def test_cli_public_proof_pack_prints_no_network_first_proof_runbook():
@@ -461,13 +589,14 @@ def test_cli_public_proof_pack_prints_no_network_first_proof_runbook():
     assert "tiangong-mcp public-launch-assets" in output
     assert "tiangong-mcp public-release-boundary" in output
     assert "tiangong-mcp public-install-command" in output
+    assert "tiangong-mcp public-candidate-smoke --target-contributors 10" in output
     assert "tiangong-mcp public-launch-preflight --target-contributors 10" in output
     assert "First External Contributor Path" in output
     assert "Share the candidate install first while PyPI is stale or unverified." in output
     assert "Install decision: tiangong-mcp public-install-command" in output
     assert "PyPI-current install after registry readiness: pip install -U tiangong-mcp" in output
     assert "Git Tag Candidate Install Bridge" in output
-    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/octo-org/octo-repo.git@v0.1.5"' in output
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/octo-org/octo-repo.git@v0.1.6"' in output
     assert output.index("Current candidate install:") < output.index("Install decision:")
     invite = output.split("## Copy External Contributor Invite", 1)[1]
     assert invite.index("Current tag candidate install:") < invite.index(
@@ -677,12 +806,14 @@ def test_cli_public_release_boundary_prints_package_boundary(tmp_path):
     assert "Wheel entry point | ready" in output
     assert "Growth modules in wheel | ready" in output
     assert "Proof ledger CLI routes | ready" in output
+    assert "Candidate install smoke route | ready" in output
     assert "Public recovery MCP routes | ready" in output
     assert "Source distribution | ready" in output
     assert "Documentation commands | ready" in output
     assert "Workflow release-boundary steps | ready" in output
     assert "tag push" in output
     assert "tiangong-mcp public-install-command" in output
+    assert "tiangong-mcp public-candidate-smoke --target-contributors 10" in output
     assert "tiangong-mcp public-release-boundary" in output
     assert "Local Release Boundary Status" in output
     assert "blocked" not in output
@@ -698,7 +829,7 @@ def test_cli_public_release_boundary_prefers_current_version_artifacts(tmp_path)
             [
                 "[project]",
                 'name = "tiangong-mcp"',
-                'version = "0.1.5"',
+                'version = "0.1.6"',
                 "",
                 "[project.scripts]",
                 'tiangong-mcp = "tiangong.cli:main"',
@@ -709,25 +840,25 @@ def test_cli_public_release_boundary_prefers_current_version_artifacts(tmp_path)
     )
 
     stale_wheel = dist_dir / "tiangong_mcp-0.1.0-py3-none-any.whl"
-    current_wheel = dist_dir / "tiangong_mcp-0.1.5-py3-none-any.whl"
+    current_wheel = dist_dir / "tiangong_mcp-0.1.6-py3-none-any.whl"
     with zipfile.ZipFile(stale_wheel) as source, zipfile.ZipFile(current_wheel, "w") as target:
         for name in source.namelist():
             if ".dist-info/" not in name:
                 target.writestr(name, source.read(name))
-        target.writestr("tiangong_mcp-0.1.5.dist-info/METADATA", "Name: tiangong-mcp\nVersion: 0.1.5\n")
+        target.writestr("tiangong_mcp-0.1.6.dist-info/METADATA", "Name: tiangong-mcp\nVersion: 0.1.6\n")
         target.writestr(
-            "tiangong_mcp-0.1.5.dist-info/entry_points.txt",
+            "tiangong_mcp-0.1.6.dist-info/entry_points.txt",
             "[console_scripts]\ntiangong-mcp = tiangong.cli:main\n",
         )
 
     stale_sdist = dist_dir / "tiangong_mcp-0.1.0.tar.gz"
-    current_sdist = dist_dir / "tiangong_mcp-0.1.5.tar.gz"
+    current_sdist = dist_dir / "tiangong_mcp-0.1.6.tar.gz"
     with tarfile.open(stale_sdist, "r:gz") as source, tarfile.open(current_sdist, "w:gz") as target:
         for member in source.getmembers():
             extracted = source.extractfile(member)
             if extracted is None:
                 continue
-            member.name = member.name.replace("tiangong_mcp-0.1.0/", "tiangong_mcp-0.1.5/", 1)
+            member.name = member.name.replace("tiangong_mcp-0.1.0/", "tiangong_mcp-0.1.6/", 1)
             target.addfile(member, extracted)
 
     stdout = StringIO()
@@ -735,8 +866,8 @@ def test_cli_public_release_boundary_prefers_current_version_artifacts(tmp_path)
 
     output = stdout.getvalue()
     assert "Wheel distribution | ready" in output
-    assert "tiangong_mcp-0.1.5-py3-none-any.whl" in output
-    assert "tiangong_mcp-0.1.0-py3-none-any.whl` version `0.1.0` vs local `0.1.5" not in output
+    assert "tiangong_mcp-0.1.6-py3-none-any.whl" in output
+    assert "tiangong_mcp-0.1.0-py3-none-any.whl` version `0.1.0` vs local `0.1.6" not in output
     assert "Local Release Boundary Status" in output
 
 
@@ -773,6 +904,22 @@ def test_cli_public_release_boundary_blocks_missing_mcp_public_recovery_routes(t
     assert "Local Release Boundary Blockers" in output
 
 
+def test_cli_public_release_boundary_blocks_missing_candidate_smoke_route(tmp_path):
+    """Release boundary should fail if the package drops the candidate install smoke gate."""
+    from tiangong import cli
+
+    project_root, dist_dir = _write_release_boundary_fixture(tmp_path, include_candidate_smoke=False)
+
+    stdout = StringIO()
+    assert cli.main(["public-release-boundary", "--root", str(project_root), "--dist", str(dist_dir)], stdout=stdout) == 0
+
+    output = stdout.getvalue()
+    assert "Candidate install smoke route | blocked" in output
+    assert "candidate_smoke.py" in output
+    assert "public-candidate-smoke" in output
+    assert "Local Release Boundary Blockers" in output
+
+
 def test_cli_reconfigures_text_streams_for_unicode_launch_output(monkeypatch, tmp_path):
     """Windows consoles may default to GBK; the CLI should still print brand output."""
     from tiangong import cli
@@ -798,6 +945,7 @@ def test_readmes_document_terminal_public_launch_gate():
 
         assert "tiangong-mcp public-launch-assets" in text
         assert "tiangong-mcp public-install-command" in text
+        assert "tiangong-mcp public-candidate-smoke --target-contributors 10" in text
         assert "tiangong-mcp public-launch-preflight --target-contributors 10" in text
         assert "tiangong-mcp public-growth-report --record-snapshot --target-contributors 10" in text
         assert "tiangong-mcp public-proof-pack --target-contributors 10" in text

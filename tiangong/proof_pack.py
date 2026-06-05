@@ -101,6 +101,7 @@ def format_public_proof_pack(
             "- Local launch assets: `tiangong-mcp public-launch-assets`",
             "- Local release boundary: `tiangong-mcp public-release-boundary`",
             "- Public install decision: `tiangong-mcp public-install-command`",
+            f"- Candidate install smoke: `tiangong-mcp public-candidate-smoke --target-contributors {target}`",
             f"- Public preflight after remote push: `tiangong-mcp public-launch-preflight --target-contributors {target}`",
             "",
             "## Open Public Proof Issues",
@@ -198,6 +199,7 @@ def format_public_proof_pack(
             f"- Public preflight: `tiangong-mcp public-launch-preflight --target-contributors {target}`",
             f"- Public proof report: `tiangong-mcp public-growth-report --record-snapshot --target-contributors {target}`",
             "- Public install decision: `tiangong-mcp public-install-command`",
+            f"- Candidate install smoke: `tiangong-mcp public-candidate-smoke --target-contributors {target}`",
             "- Local activation: `activation_funnel()`",
             "",
         ]

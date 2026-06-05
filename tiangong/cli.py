@@ -22,6 +22,7 @@ from .activation import (
     record_activation_event,
 )
 from .banner import append_brand_footer
+from .candidate_smoke import format_public_candidate_smoke, run_public_candidate_install_smoke
 from .config import config
 from .launch_assets import format_public_launch_assets
 from .proof_pack import format_public_proof_pack
@@ -217,6 +218,18 @@ def _format_public_release_boundary_command(args: argparse.Namespace) -> str:
 def _format_public_install_command(args: argparse.Namespace) -> str:
     distribution = fetch_public_distribution_readiness()
     return append_brand_footer(format_public_install_command(distribution))
+
+
+def _format_public_candidate_smoke_command(args: argparse.Namespace) -> str:
+    result = run_public_candidate_install_smoke(
+        repo_owner=args.repo_owner,
+        repo_name=args.repo_name,
+        version_or_tag=args.tag,
+        target_contributors=args.target_contributors,
+        python_executable=args.python,
+        keep_temp=args.keep_temp,
+    )
+    return append_brand_footer(format_public_candidate_smoke(result))
 
 
 def _format_public_proof_pack_command(args: argparse.Namespace) -> str:
@@ -453,6 +466,35 @@ def build_parser() -> argparse.ArgumentParser:
         help="Print the current public install command based on real PyPI readiness.",
     )
     public_install.set_defaults(handler=_format_public_install_command)
+
+    candidate_smoke = subparsers.add_parser(
+        "public-candidate-smoke",
+        help="Install the current public Git tag in a temporary venv and verify the contributor CLI path.",
+    )
+    candidate_smoke.add_argument("--repo-owner", default="", help="GitHub repository owner. Defaults to config.")
+    candidate_smoke.add_argument("--repo-name", default="", help="GitHub repository name. Defaults to config.")
+    candidate_smoke.add_argument(
+        "--tag",
+        default="",
+        help="Existing v* tag to install. Defaults to the installed local package version.",
+    )
+    candidate_smoke.add_argument(
+        "--target-contributors",
+        type=_positive_int,
+        default=10,
+        help="72-hour public campaign target used when running the proof pack inside the smoke venv.",
+    )
+    candidate_smoke.add_argument(
+        "--python",
+        default=sys.executable,
+        help="Python executable used to create the temporary virtual environment.",
+    )
+    candidate_smoke.add_argument(
+        "--keep-temp",
+        action="store_true",
+        help="Keep the temporary smoke environment after the run for inspection.",
+    )
+    candidate_smoke.set_defaults(handler=_format_public_candidate_smoke_command)
 
     proof_pack = subparsers.add_parser(
         "public-proof-pack",

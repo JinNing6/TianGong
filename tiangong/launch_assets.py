@@ -42,6 +42,7 @@ RELEASE_AUTOMATION_ASSETS = (
 PUBLIC_GROWTH_CODE_ASSETS = (
     "tiangong/activation.py",
     "tiangong/artifact_system.py",
+    "tiangong/candidate_smoke.py",
     "tiangong/cli.py",
     "tiangong/growth.py",
     "tiangong/install_bridge.py",
@@ -400,7 +401,7 @@ def _format_table(rows: list[LaunchAssetAudit]) -> list[str]:
 
 def format_full_public_growth_release_handoff_lines(
     *,
-    release_tag: str = "v0.1.5",
+    release_tag: str = "v0.1.6",
     include_audit_instruction: bool = False,
 ) -> list[str]:
     """Return the complete release handoff commands without executing them."""
@@ -497,6 +498,7 @@ def format_public_launch_assets(root: str | Path | None = None, *, target_contri
         "",
         f"- Local asset audit: `tiangong-mcp public-launch-assets --target-contributors {target}`",
         "- Public install command: `tiangong-mcp public-install-command`",
+        f"- Candidate install smoke: `tiangong-mcp public-candidate-smoke --target-contributors {target}`",
         f"- Public preflight: `tiangong-mcp public-launch-preflight --target-contributors {target}`",
         f"- Public proof report: `tiangong-mcp public-growth-report --record-snapshot --target-contributors {target}`",
         "",

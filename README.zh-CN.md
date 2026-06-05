@@ -94,7 +94,7 @@
 **Current Candidate Install / 当前候选安装**
 
 ```bash
-python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.5"
+python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.6"
 ```
 
 *PyPI-current install after registry readiness: `pip install -U tiangong-mcp`。*
@@ -168,7 +168,7 @@ PyPI 追平前先通过当前候选 tag bridge 安装；PyPI latest 就绪后再
 PyPI 当前公开版本仍是旧包，冷启动贡献者应先安装当前公开 tag：
 
 ```bash
-python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.5"
+python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.6"
 ```
 
 #### PyPI-current install after registry readiness / PyPI 就绪后安装
@@ -227,6 +227,7 @@ python -m pip install -e ".[dev]"
 python -m ruff check .
 python -m pytest -q
 tiangong-mcp public-install-command
+tiangong-mcp public-candidate-smoke --target-contributors 10
 tiangong-mcp public-launch-assets
 python -m build
 python -m twine check dist/*
@@ -240,9 +241,9 @@ tiangong-mcp public-release-boundary
 
 `tiangong-mcp` 的 PyPI Trusted Publisher 配置必须与 release workflow 精确匹配：owner `JinNing6`，repository `TianGong`，workflow filename `publish-pypi.yml`，workflow path `.github/workflows/publish-pypi.yml`，environment `pypi`。如果 PyPI 返回 `invalid-publisher`，重新运行 `tiangong-mcp public-launch-preflight --target-contributors 10`，使用其中生成的 Trusted Publisher runbook，不要改用长期上传 token。
 
-当 public preflight 显示 PyPI latest stale 或 unverified 时，只能把生成的 Current Candidate Git Tag Install Bridge 当作临时候选贡献者路径，例如 `python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.5"`。这不代表 PyPI 安装闭环已经闭合；必须用 `public_growth_report()` 复查 PyPI JSON latest 后才能宣布公开安装就绪。
+当 public preflight 显示 PyPI latest stale 或 unverified 时，只能把生成的 Current Candidate Git Tag Install Bridge 当作临时候选贡献者路径，例如 `python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.6"`。这不代表 PyPI 安装闭环已经闭合；必须用 `public_growth_report()` 复查 PyPI JSON latest 后才能宣布公开安装就绪。
 
-`tiangong-mcp public-launch-assets` 还会输出完整公开增长 release handoff：创建当前本地版本 GitHub Release（例如 `v0.1.5`）之前需要 staging 的文档、包元数据、Issue Forms、workflows、公开增长模块、用户可见增长表面和测试。
+`tiangong-mcp public-launch-assets` 还会输出完整公开增长 release handoff：创建当前本地版本 GitHub Release（例如 `v0.1.6`）之前需要 staging 的文档、包元数据、Issue Forms、workflows、公开增长模块、用户可见增长表面和测试。
 
 ---
 
@@ -408,6 +409,7 @@ public_growth_report(record_snapshot=True, target_contributors=10) # 战役进�
 # MCP 客户端外的终端发布门禁：
 # tiangong-mcp public-launch-assets
 # tiangong-mcp public-install-command
+# tiangong-mcp public-candidate-smoke --target-contributors 10
 # tiangong-mcp public-launch-preflight --target-contributors 10
 # tiangong-mcp public-growth-report --record-snapshot --target-contributors 10
 # tiangong-mcp public-proof-pack --target-contributors 10
@@ -436,9 +438,10 @@ sect(action="leaderboard")         # 宗门战报 — 可复制分享
 - ✅ 增长战役中的 `issues/new?...` 只作为表单入口；`record_growth_referral()` 和 `record_share_attribution(..., source_url=...)` 会拒绝表单入口和占位 URL，必须使用创建后的公开 Issue/PR/Discussion URL 作为可审查证明
 - ✅ `public_growth_report()` 会抓取真实 GitHub 公开仓库和 IssueOps 指标，并与本地 MCP 激活账本同屏比较，指出最薄弱的外部证明桥；不会伪造下载量、留存、转发数、转介绍转化或奖励
 - ✅ `public_growth_report()` 还会通过 GitHub Contents API 检查远端 Growth Issue Form、Share Proof Issue Form 和 IssueOps workflow 是否已经在默认分支上线；缺失的 `.github` 文件会被标记为公开 launch blocker，而不会把本地未发布入口当成真实闭环
-- ✅ `public_growth_report()` 会通过 GitHub Releases API 检查当前本地版本对应的发布标签，例如 `v0.1.5`；如果缺少触发 PyPI Trusted Publishing 的 GitHub Release，会标记为公开安装闭环 launch blocker；如果无法创建 Release，runbook 会给出受保护 tag 推送和 `workflow_dispatch` 发布兜底，但不会声称 Release proof 已闭合
+- ✅ `public_growth_report()` 会通过 GitHub Releases API 检查当前本地版本对应的发布标签，例如 `v0.1.6`；如果缺少触发 PyPI Trusted Publishing 的 GitHub Release，会标记为公开安装闭环 launch blocker；如果无法创建 Release，runbook 会给出受保护 tag 推送和 `workflow_dispatch` 发布兜底，但不会声称 Release proof 已闭合
 - ✅ `public_growth_report()` 会通过 PyPI JSON API 检查 `tiangong-mcp` 分发就绪状态，把真实 PyPI 最新版本与本地包元数据对齐比较；如果 PyPI 仍是旧版本，会标记为公开安装闭环 launch blocker
 - ✅ `public_install_command()` 是最短可分享安装入口：它用真实 PyPI readiness 判断应该输出 `pip install -U tiangong-mcp` 还是当前 Git tag 候选安装桥，并且不会谎称 PyPI 安装闭环已闭合
+- ✅ `public-candidate-smoke` 会在临时 venv 中安装当前 Git tag 候选包，验证真实 `tiangong-mcp` 终端命令和 proof pack 外部邀请，并在成功后清理临时环境；它不会发布包，也不会宣称 PyPI 闭环已闭合
 - ✅ `public_growth_report()` 会把远端 IssueOps、PyPI Trusted Publisher、GitHub Release、PyPI 最新版本和首个公开证明断点合并成 `Public Launch Closure Checklist`；只有每一行都能从真实公开状态复查通过，才能声称公开飞轮闭合
 - ✅ `public_growth_report()` 和 `public_launch_preflight()` 会输出 `Public Flywheel Closure Verdict`：只有远端 IssueOps、GitHub Release、PyPI 最新版本、首个公开证明和显式贡献者目标都被真实公开证据证明 ready 时才会显示 `closed`，否则必须显示 `not closed`
 - ✅ `public_launch_preflight()` 是直接可调用的 MCP 发布预检战报：抓取同一份真实公开状态，输出本地质量门、Release 命令、PyPI Trusted Publishing 期望、闭环清单、Growth/Share Proof 表单 URL、创建 Issue 后的账本回填命令和复查命令，不伪造牵引力

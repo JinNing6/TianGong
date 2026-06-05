@@ -107,10 +107,10 @@ def test_fetch_public_growth_snapshot_uses_github_public_endpoints_and_excludes_
             "path": ".github/workflows/issueops-onboarding.yml",
             "html_url": "https://github.com/octo-org/octo-repo/blob/main/.github/workflows/issueops-onboarding.yml",
         },
-        "https://api.github.com/repos/octo-org/octo-repo/releases/tags/v0.1.5": {
-            "tag_name": "v0.1.5",
-            "name": "TianGong 0.1.5",
-            "html_url": "https://github.com/octo-org/octo-repo/releases/tag/v0.1.5",
+        "https://api.github.com/repos/octo-org/octo-repo/releases/tags/v0.1.6": {
+            "tag_name": "v0.1.6",
+            "name": "TianGong 0.1.6",
+            "html_url": "https://github.com/octo-org/octo-repo/releases/tag/v0.1.6",
             "draft": False,
             "prerelease": False,
             "published_at": "2026-06-03T00:00:00Z",
@@ -118,7 +118,7 @@ def test_fetch_public_growth_snapshot_uses_github_public_endpoints_and_excludes_
         "https://pypi.org/pypi/tiangong-mcp/json": {
             "info": {
                 "name": "tiangong-mcp",
-                "version": "0.1.5",
+                "version": "0.1.6",
                 "project_url": "https://pypi.org/project/tiangong-mcp/",
             }
         },
@@ -154,13 +154,13 @@ def test_fetch_public_growth_snapshot_uses_github_public_endpoints_and_excludes_
     assert snapshot.issueops_readiness.growth_form.status == "live"
     assert snapshot.issueops_readiness.share_form.status == "live"
     assert snapshot.issueops_readiness.workflow.status == "live"
-    assert snapshot.release_readiness.local_version == "0.1.5"
-    assert snapshot.release_readiness.expected_tag == "v0.1.5"
+    assert snapshot.release_readiness.local_version == "0.1.6"
+    assert snapshot.release_readiness.expected_tag == "v0.1.6"
     assert snapshot.release_readiness.status == "published"
-    assert snapshot.release_readiness.html_url == "https://github.com/octo-org/octo-repo/releases/tag/v0.1.5"
+    assert snapshot.release_readiness.html_url == "https://github.com/octo-org/octo-repo/releases/tag/v0.1.6"
     assert snapshot.distribution_readiness.package_name == "tiangong-mcp"
-    assert snapshot.distribution_readiness.local_version == "0.1.5"
-    assert snapshot.distribution_readiness.published_version == "0.1.5"
+    assert snapshot.distribution_readiness.local_version == "0.1.6"
+    assert snapshot.distribution_readiness.published_version == "0.1.6"
     assert snapshot.distribution_readiness.status == "current"
     assert calls[0][0] == "https://api.github.com/repos/octo-org/octo-repo"
     assert any("labels=tiangong%3Agrowth" in call[0] for call in calls)
@@ -169,7 +169,7 @@ def test_fetch_public_growth_snapshot_uses_github_public_endpoints_and_excludes_
     assert any("/contents/.github/ISSUE_TEMPLATE/tiangong-growth-flywheel.yml" in call[0] for call in calls)
     assert any("/contents/.github/ISSUE_TEMPLATE/tiangong-share-proof.yml" in call[0] for call in calls)
     assert any("/contents/.github/workflows/issueops-onboarding.yml" in call[0] for call in calls)
-    assert any(call[0] == "https://api.github.com/repos/octo-org/octo-repo/releases/tags/v0.1.5" for call in calls)
+    assert any(call[0] == "https://api.github.com/repos/octo-org/octo-repo/releases/tags/v0.1.6" for call in calls)
     assert any(call[0] == "https://pypi.org/pypi/tiangong-mcp/json" for call in calls)
     github_calls = [call for call in calls if call[0].startswith("https://api.github.com/")]
     assert all(call[1] == "application/vnd.github+json" for call in github_calls)
@@ -326,13 +326,13 @@ def test_public_growth_report_prints_not_closed_flywheel_verdict(tmp_path):
             workflow=PublicIssueOpsRemoteFile("IssueOps Workflow", ".github/workflows/issueops-onboarding.yml", "live"),
         ),
         release_readiness=PublicReleaseReadiness(
-            local_version="0.1.5",
-            expected_tag="v0.1.5",
+            local_version="0.1.6",
+            expected_tag="v0.1.6",
             status="missing",
         ),
         distribution_readiness=PublicDistributionReadiness(
             package_name="tiangong-mcp",
-            local_version="0.1.5",
+            local_version="0.1.6",
             published_version="0.0.1",
             status="stale",
         ),
@@ -348,8 +348,8 @@ def test_public_growth_report_prints_not_closed_flywheel_verdict(tmp_path):
     assert "## Public Flywheel Closure Verdict" in result
     assert "Verdict: not closed" in result
     assert "| Remote IssueOps routes | ready | all required IssueOps routes are live" in result
-    assert "| GitHub Release trigger | blocked | `v0.1.5` is missing" in result
-    assert "| PyPI install loop | blocked | PyPI latest `0.0.1` vs local `0.1.5`" in result
+    assert "| GitHub Release trigger | blocked | `v0.1.6` is missing" in result
+    assert "| PyPI install loop | blocked | PyPI latest `0.0.1` vs local `0.1.6`" in result
     assert "| First public proof | ready | 1 Growth issues, 1 Share issues, 1 local returns, 1 local shares" in result
     assert "| Campaign contributor target | blocked | 1/25 real contributors observed; shortfall 24" in result
     assert "Do not claim a closed public flywheel until every closure gate is ready." in result
@@ -424,14 +424,14 @@ def test_public_growth_report_prints_closed_flywheel_verdict_only_when_all_gates
             workflow=PublicIssueOpsRemoteFile("IssueOps Workflow", ".github/workflows/issueops-onboarding.yml", "live"),
         ),
         release_readiness=PublicReleaseReadiness(
-            local_version="0.1.5",
-            expected_tag="v0.1.5",
+            local_version="0.1.6",
+            expected_tag="v0.1.6",
             status="published",
         ),
         distribution_readiness=PublicDistributionReadiness(
             package_name="tiangong-mcp",
-            local_version="0.1.5",
-            published_version="0.1.5",
+            local_version="0.1.6",
+            published_version="0.1.6",
             status="current",
         ),
     )
@@ -741,7 +741,7 @@ def test_public_install_command_bridges_stale_pypi_distribution():
     result = format_public_install_command(
         PublicDistributionReadiness(
             package_name="tiangong-mcp",
-            local_version="0.1.5",
+            local_version="0.1.6",
             published_version="0.0.1",
             status="stale",
             api_url="https://pypi.org/pypi/tiangong-mcp/json",
@@ -753,9 +753,9 @@ def test_public_install_command_bridges_stale_pypi_distribution():
     )
 
     assert "# TianGong Public Install Command" in result
-    assert "| `tiangong-mcp` | `0.1.5` | `0.0.1` | stale |" in result
+    assert "| `tiangong-mcp` | `0.1.6` | `0.0.1` | stale |" in result
     assert "## Current Candidate Git Tag Install Bridge" in result
-    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/octo-org/octo-repo.git@v0.1.5"' in result
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/octo-org/octo-repo.git@v0.1.6"' in result
     assert "Canonical install after PyPI latest is current: `pip install -U tiangong-mcp`" in result
     assert 'start_cultivation(username="your_github_username")' in result
     assert 'forge_agent(name="first-growth-artifact"' in result
@@ -769,8 +769,8 @@ def test_public_install_command_uses_pypi_when_distribution_is_current():
     result = format_public_install_command(
         PublicDistributionReadiness(
             package_name="tiangong-mcp",
-            local_version="0.1.5",
-            published_version="0.1.5",
+            local_version="0.1.6",
+            published_version="0.1.6",
             status="current",
             api_url="https://pypi.org/pypi/tiangong-mcp/json",
             project_url="https://pypi.org/project/tiangong-mcp/",
@@ -1238,12 +1238,12 @@ def test_public_launch_preflight_fetch_failure_includes_release_fallbacks(tmp_pa
     assert "External Fetch Status" in result
     assert "GitHub API HTTP 403: rate limit exceeded" in result
     assert "https://github.com/JinNing6/TianGong/releases/new" in result
-    assert "Select existing tag `v0.1.5`" in result
+    assert "Select existing tag `v0.1.6`" in result
     assert "https://github.com/JinNing6/TianGong/actions/workflows/publish-pypi.yml" in result
-    assert "workflow_dispatch tag `v0.1.5`" in result
+    assert "workflow_dispatch tag `v0.1.6`" in result
     assert "GITHUB_TOKEN" in result
     assert "https://api.github.com/repos/JinNing6/TianGong/releases" in result
-    assert '"tag_name":"v0.1.5"' in result
+    assert '"tag_name":"v0.1.6"' in result
     assert '"generate_release_notes":true' in result
     assert "## PyPI Trusted Publisher Setup Runbook" in result
     assert "invalid-publisher" in result
@@ -1252,7 +1252,7 @@ def test_public_launch_preflight_fetch_failure_includes_release_fallbacks(tmp_pa
     assert "| Repository name | `TianGong` | `repository`: `JinNing6/TianGong` |" in result
     assert (
         "| Workflow filename | `publish-pypi.yml` | `workflow_ref`: "
-        "`JinNing6/TianGong/.github/workflows/publish-pypi.yml@refs/tags/v0.1.5` |"
+        "`JinNing6/TianGong/.github/workflows/publish-pypi.yml@refs/tags/v0.1.6` |"
     ) in result
     assert (
         "| Environment | `pypi` | `environment`: `pypi` and "
@@ -1261,7 +1261,7 @@ def test_public_launch_preflight_fetch_failure_includes_release_fallbacks(tmp_pa
     assert "Recheck install loop: `public_growth_report(record_snapshot=True, target_contributors=10)`" in result
     assert "tiangong-mcp public-proof-pack --target-contributors 10" in result
     assert "## Current Candidate Git Tag Install Bridge" in result
-    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.5"' in result
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.6"' in result
     assert "Canonical install after PyPI latest is current: `pip install -U tiangong-mcp`" in result
     assert "does not close the PyPI install loop" in result
 
@@ -1494,7 +1494,7 @@ async def test_mcp_public_install_command_exposes_current_install_bridge(monkeyp
         "fetch_public_distribution_readiness",
         lambda: PublicDistributionReadiness(
             package_name="tiangong-mcp",
-            local_version="0.1.5",
+            local_version="0.1.6",
             published_version="0.0.1",
             status="stale",
             api_url="https://pypi.org/pypi/tiangong-mcp/json",
@@ -1506,7 +1506,7 @@ async def test_mcp_public_install_command_exposes_current_install_bridge(monkeyp
     result = await mcp_server.public_install_command()
 
     assert "TianGong Public Install Command" in result
-    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.5"' in result
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.6"' in result
     assert "Canonical install after PyPI latest is current: `pip install -U tiangong-mcp`" in result
     assert 'start_cultivation(username="your_github_username")' in result
     assert "does not close the PyPI install loop" in result
@@ -1747,7 +1747,7 @@ async def test_mcp_public_proof_pack_exposes_external_contributor_invite():
     assert "Install decision: tiangong-mcp public-install-command" in result
     assert "PyPI-current install after registry readiness: pip install -U tiangong-mcp" in result
     assert "Git Tag Candidate Install Bridge" in result
-    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/octo-org/octo-repo.git@v0.1.5"' in result
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/octo-org/octo-repo.git@v0.1.6"' in result
     assert "Use this only when public preflight reports PyPI latest is stale or unverified." in result
     assert 'start_cultivation(username="your_github_username")' in result
     assert 'forge_agent(name="first-growth-artifact"' in result

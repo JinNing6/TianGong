@@ -12,6 +12,7 @@ REQUIRED_WHEEL_MODULES = (
     "tiangong/activation.py",
     "tiangong/cli.py",
     "tiangong/growth.py",
+    "tiangong/candidate_smoke.py",
     "tiangong/install_bridge.py",
     "tiangong/launch_assets.py",
     "tiangong/onboarding.py",
@@ -25,6 +26,7 @@ REQUIRED_WHEEL_MODULES = (
 REQUIRED_DOC_COMMANDS = (
     "tiangong-mcp public-launch-assets",
     "tiangong-mcp public-install-command",
+    "tiangong-mcp public-candidate-smoke --target-contributors 10",
     "tiangong-mcp public-launch-preflight --target-contributors 10",
     "tiangong-mcp public-growth-report --record-snapshot --target-contributors 10",
     "tiangong-mcp public-proof-pack --target-contributors 10",
@@ -70,6 +72,12 @@ REQUIRED_MCP_PUBLIC_ROUTES = (
     "format_public_proof_pack",
     "public_install_command",
     "format_public_install_command",
+)
+
+REQUIRED_CANDIDATE_SMOKE_MARKERS = (
+    "public-candidate-smoke",
+    "run_public_candidate_install_smoke",
+    "format_public_candidate_smoke",
 )
 
 
@@ -210,6 +218,46 @@ def _proof_ledger_cli_checks(dist: Path, expected_version: str) -> list[ReleaseB
     ]
 
 
+def _candidate_smoke_checks(dist: Path, expected_version: str) -> list[ReleaseBoundaryCheck]:
+    """Verify built artifacts expose the candidate Git tag install smoke gate."""
+    missing: list[str] = []
+    wheel = _find_one(dist, "tiangong_mcp-*.whl", expected_version)
+    if wheel is None:
+        missing.append("wheel distribution")
+    else:
+        with zipfile.ZipFile(wheel) as archive:
+            cli_text = _zip_member_text(archive, "tiangong/cli.py")
+            smoke_text = _zip_member_text(archive, "tiangong/candidate_smoke.py")
+        for marker in REQUIRED_CANDIDATE_SMOKE_MARKERS:
+            source = cli_text if marker == "public-candidate-smoke" else smoke_text
+            if marker not in source:
+                missing.append(f"wheel candidate_smoke.py marker `{marker}`")
+
+    sdist = _find_one(dist, "tiangong_mcp-*.tar.gz", expected_version)
+    if sdist is None:
+        missing.append("source distribution")
+    else:
+        with tarfile.open(sdist, "r:gz") as archive:
+            cli_text = _tar_member_text(archive, "tiangong/cli.py")
+            smoke_text = _tar_member_text(archive, "tiangong/candidate_smoke.py")
+        for marker in REQUIRED_CANDIDATE_SMOKE_MARKERS:
+            source = cli_text if marker == "public-candidate-smoke" else smoke_text
+            if marker not in source:
+                missing.append(f"sdist candidate_smoke.py marker `{marker}`")
+
+    return [
+        ReleaseBoundaryCheck(
+            "Candidate install smoke route",
+            "ready" if not missing else "blocked",
+            (
+                "wheel and sdist expose `public-candidate-smoke` for the Git tag install bridge"
+                if not missing
+                else f"missing {', '.join(missing)}"
+            ),
+        )
+    ]
+
+
 def _mcp_public_route_checks(dist: Path, expected_version: str) -> list[ReleaseBoundaryCheck]:
     """Verify built artifacts expose MCP launch recovery routes for client-side users."""
     missing: list[str] = []
@@ -334,6 +382,7 @@ def format_public_release_boundary(root: str | Path | None = None, dist: str | P
         *_wheel_checks(dist_dir, version),
         *_sdist_checks(dist_dir, version),
         *_proof_ledger_cli_checks(dist_dir, version),
+        *_candidate_smoke_checks(dist_dir, version),
         *_mcp_public_route_checks(dist_dir, version),
         *_documentation_checks(project_root),
         *_workflow_checks(project_root),
@@ -357,6 +406,7 @@ def format_public_release_boundary(root: str | Path | None = None, dist: str | P
         "```bash",
         "tiangong-mcp public-launch-assets",
         "tiangong-mcp public-install-command",
+        "tiangong-mcp public-candidate-smoke --target-contributors 10",
         "python -m build",
         "python -m twine check dist/*",
         "tiangong-mcp public-release-boundary",

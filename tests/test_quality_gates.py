@@ -44,7 +44,7 @@ def test_runtime_version_matches_project_metadata():
 
     project_version = _pyproject()["project"]["version"]
 
-    assert project_version == "0.1.5"
+    assert project_version == "0.1.6"
     assert tiangong.__version__ == project_version
     assert metadata.version("tiangong-mcp") == project_version
 
@@ -121,6 +121,7 @@ def test_readmes_document_one_command_dev_install_and_quality_gate():
         assert "python -m pytest -q" in text
         assert "tiangong-mcp public-launch-assets" in text
         assert "tiangong-mcp public-install-command" in text
+        assert "tiangong-mcp public-candidate-smoke --target-contributors 10" in text
         assert "python -m build" in text
         assert "python -m twine check dist/*" in text
         assert "tiangong-mcp public-release-boundary" in text
@@ -135,13 +136,13 @@ def test_readmes_document_one_command_dev_install_and_quality_gate():
         assert "environment `pypi`" in text
         assert "invalid-publisher" in text
         assert "Current Candidate Git Tag Install Bridge" in text
-        assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.5"' in text
+        assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.6"' in text
         assert "PYPI_TOKEN" in text
 
 
 def test_readmes_put_current_candidate_install_before_stale_pypi_command():
     """Cold public visitors should not be routed to the stale PyPI build before the current tag bridge."""
-    candidate = 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.5"'
+    candidate = 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.6"'
     canonical = "pip install -U tiangong-mcp"
 
     for filename in ["README.md", "README.zh-CN.md"]:
