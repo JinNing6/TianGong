@@ -80,6 +80,8 @@ REQUIRED_CANDIDATE_SMOKE_MARKERS = (
     "format_public_candidate_smoke",
 )
 
+STALE_PUBLIC_INSTALL_MARKER = "pip install " "tiangong-mcp"
+
 
 @dataclass(frozen=True)
 class ReleaseBoundaryCheck:
@@ -123,6 +125,70 @@ def _tar_member_text(archive: tarfile.TarFile, suffix: str) -> str:
         return ""
     with handle:
         return handle.read().decode("utf-8", errors="replace")
+
+
+def _public_copy_member_name(name: str) -> str:
+    normalized = name.replace("\\", "/")
+    marker = "/tiangong/"
+    if marker in f"/{normalized}":
+        return normalized[normalized.index("tiangong/"):]
+    return normalized.rsplit("/", 1)[-1]
+
+
+def _should_scan_public_copy_member(name: str) -> bool:
+    normalized = name.replace("\\", "/")
+    if not normalized.endswith((".py", ".md", ".yml", ".yaml", ".txt")):
+        return False
+    public_name = _public_copy_member_name(normalized)
+    return (
+        public_name.startswith("tiangong/")
+        or public_name in {"README.md", "README.zh-CN.md"}
+        or "/.github/workflows/" in f"/{normalized}"
+    )
+
+
+def _stale_public_install_copy_checks(dist: Path, expected_version: str) -> list[ReleaseBoundaryCheck]:
+    """Verify built public copy does not route cold users to the stale PyPI command."""
+    offenders: list[str] = []
+    wheel = _find_one(dist, "tiangong_mcp-*.whl", expected_version)
+    if wheel is None:
+        offenders.append("wheel distribution")
+    else:
+        with zipfile.ZipFile(wheel) as archive:
+            for name in archive.namelist():
+                if not _should_scan_public_copy_member(name):
+                    continue
+                text = archive.read(name).decode("utf-8", errors="replace")
+                if STALE_PUBLIC_INSTALL_MARKER in text:
+                    offenders.append(f"wheel {_public_copy_member_name(name)} contains `{STALE_PUBLIC_INSTALL_MARKER}`")
+
+    sdist = _find_one(dist, "tiangong_mcp-*.tar.gz", expected_version)
+    if sdist is None:
+        offenders.append("source distribution")
+    else:
+        with tarfile.open(sdist, "r:gz") as archive:
+            for member in archive.getmembers():
+                if not member.isfile() or not _should_scan_public_copy_member(member.name):
+                    continue
+                handle = archive.extractfile(member)
+                if handle is None:
+                    continue
+                with handle:
+                    text = handle.read().decode("utf-8", errors="replace")
+                if STALE_PUBLIC_INSTALL_MARKER in text:
+                    offenders.append(f"sdist {_public_copy_member_name(member.name)} contains `{STALE_PUBLIC_INSTALL_MARKER}`")
+
+    return [
+        ReleaseBoundaryCheck(
+            "Public install copy in package",
+            "ready" if not offenders else "blocked",
+            (
+                "wheel and sdist route public install copy through the candidate bridge or PyPI-current command"
+                if not offenders
+                else f"stale public install copy: {', '.join(offenders)}"
+            ),
+        )
+    ]
 
 
 def _proof_ledger_missing(*, cli_text: str, proof_pack_text: str, archive_label: str) -> list[str]:
@@ -384,6 +450,7 @@ def format_public_release_boundary(root: str | Path | None = None, dist: str | P
         *_proof_ledger_cli_checks(dist_dir, version),
         *_candidate_smoke_checks(dist_dir, version),
         *_mcp_public_route_checks(dist_dir, version),
+        *_stale_public_install_copy_checks(dist_dir, version),
         *_documentation_checks(project_root),
         *_workflow_checks(project_root),
     ]
