@@ -11,6 +11,7 @@ from typing import Any
 from urllib.parse import urlencode, urlsplit
 
 from .config import config
+from .install_bridge import DEFAULT_PACKAGE_NAME, git_tag_install_command, local_package_version
 
 EVENT_START_CULTIVATION_VIEWED = "start_cultivation_viewed"
 EVENT_ISSUEOPS_REFERRAL_RECORDED = "issueops_referral_recorded"
@@ -31,6 +32,15 @@ SCHEMA_VERSION = 1
 MAX_EVENT_BYTES = 2_000_000
 MAX_EVENTS = 5_000
 SHARE_PROOF_ISSUE_TEMPLATE = "tiangong-share-proof.yml"
+
+
+def _current_candidate_install_command() -> str:
+    return git_tag_install_command(
+        repo_owner="",
+        repo_name="",
+        version_or_tag=local_package_version(DEFAULT_PACKAGE_NAME),
+        package_name=DEFAULT_PACKAGE_NAME,
+    )
 
 
 @dataclass(frozen=True)
@@ -404,7 +414,9 @@ def format_share_attribution_report(
                 f"Current bottleneck: {bottleneck}."
             ),
             "No fake downloads, retention, repost counts, or referral conversions are claimed.",
-            "Install: pip install tiangong-mcp",
+            f"Install: {_current_candidate_install_command()}",
+            "Install decision: tiangong-mcp public-install-command",
+            "PyPI-current install after registry readiness: pip install -U tiangong-mcp",
             "Recheck: share_attribution_report()",
             f"Open proof issue: {share_issue_url}",
             "```",
@@ -537,7 +549,9 @@ def format_share_proof_leaderboard(
                 f"{champion_line}"
             ),
             "No fake downloads, retention, repost counts, referrals, or Spirit Power are claimed.",
-            "Join: pip install tiangong-mcp",
+            f"Join: {_current_candidate_install_command()}",
+            "Install decision: tiangong-mcp public-install-command",
+            "PyPI-current install after registry readiness: pip install -U tiangong-mcp",
             "Record proof: record_share_attribution(...)",
             "Refresh board: leaderboard(type=\"share\")",
             f"Open proof issue: {share_issue_url}",
@@ -800,7 +814,9 @@ def format_activation_funnel(
                 f"TianGong 真实激活漏斗: {len(filtered_events)} 条事件、{actor_count} 位参与者、"
                 f"{artifact_count} 件法宝。当前瓶颈是 {bottleneck.label}，下一步 {bottleneck.next_action}。"
             ),
-            "加入修炼: pip install tiangong-mcp",
+            f"加入修炼: {_current_candidate_install_command()}",
+            "安装后复查: tiangong-mcp public-install-command",
+            "PyPI 追平后安装: pip install -U tiangong-mcp",
             "复查激活: activation_funnel()",
             "复查飞轮: growth_flywheel()",
             "发起战役: growth_campaign()",

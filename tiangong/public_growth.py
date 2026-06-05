@@ -22,7 +22,7 @@ from .activation import (
 )
 from .config import config
 from .growth import build_growth_issue_url
-from .install_bridge import format_current_candidate_install_bridge_lines
+from .install_bridge import format_current_candidate_install_bridge_lines, git_tag_install_command
 from .launch_assets import format_full_public_growth_release_handoff_lines
 from .proof_pack import format_public_proof_pack
 
@@ -1957,6 +1957,34 @@ def _issue_proof_placeholder(repo_full_name: str, token: str) -> str:
     return f"https://github.com/{owner}/{repo}/issues/<opened-{token}-issue-number>"
 
 
+def _copyable_public_install_lines(snapshot: PublicGrowthSnapshot, *, owner: str, repo: str) -> list[str]:
+    distribution = snapshot.distribution_readiness
+    package = distribution.package_name or PACKAGE_NAME
+    if distribution.status == "current":
+        return [
+            f"Install: pip install -U {package}",
+            "Install decision: tiangong-mcp public-install-command",
+        ]
+
+    candidate_version = (
+        distribution.local_version
+        or snapshot.release_readiness.local_version
+        or get_local_package_version(package)
+    )
+    candidate_command = git_tag_install_command(
+        repo_owner=owner,
+        repo_name=repo,
+        version_or_tag=candidate_version,
+        package_name=package,
+    )
+    return [
+        f"Install: {candidate_command}",
+        "Install decision: tiangong-mcp public-install-command",
+        f"PyPI-current install after registry readiness: pip install -U {package}",
+        "Do not claim the PyPI install loop closed until public_growth_report() shows PyPI latest is current.",
+    ]
+
+
 def _format_first_public_proof_action_lines(
     snapshot: PublicGrowthSnapshot,
     *,
@@ -2027,6 +2055,7 @@ def _format_first_public_proof_action_lines(
             f"| 0 | Publish remote IssueOps routes first: commit and push {missing_paths} to the repository default branch. |"
         )
         copy_readiness_lines.append(f"Publish IssueOps routes first: commit and push {missing_paths}.")
+    install_lines = _copyable_public_install_lines(snapshot, owner=owner, repo=repo)
 
     return [
         "## First Public Proof Action",
@@ -2075,7 +2104,7 @@ def _format_first_public_proof_action_lines(
         f"Record Growth return: {mcp_growth_command}",
         f"Record Share proof: {mcp_share_command}",
         f"Proof pack: {proof_pack_command}",
-        "Install: pip install tiangong-mcp",
+        *install_lines,
         "```",
         "",
     ]

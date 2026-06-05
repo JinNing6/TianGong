@@ -110,7 +110,10 @@ def test_activation_funnel_formats_real_conversion_without_fake_metrics(tmp_path
     assert "`public_growth_report()`" in result
     assert "`public_launch_preflight()`" in result
     assert "`public_proof_pack()`" in result
-    assert "pip install tiangong-mcp" in result
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.7"' in result
+    assert "tiangong-mcp public-install-command" in result
+    assert "pip install -U tiangong-mcp" in result
+    assert "pip install tiangong-mcp" not in result
 
 
 def test_share_attribution_command_is_paste_ready_and_reviewable():
@@ -203,6 +206,9 @@ def test_share_attribution_report_scores_public_share_urls(tmp_path):
     assert "https://github.com/JinNing6/TianGong/issues/new?" in result
     assert "template=tiangong-share-proof.yml" in result
     assert "contribution_type=forge" in result
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.7"' in result
+    assert "Install decision: tiangong-mcp public-install-command" in result
+    assert "Install: pip install tiangong-mcp" not in result
     assert "does not invent downloads, retention, repost counts, or referral conversions" in result
 
 
@@ -317,6 +323,9 @@ def test_share_proof_leaderboard_ranks_real_public_share_proof(tmp_path):
     assert "`share_attribution_report()`" in result
     assert "`leaderboard(type=\"share\")`" in result
     assert "template=tiangong-share-proof.yml" in result
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.7"' in result
+    assert "Install decision: tiangong-mcp public-install-command" in result
+    assert "Join: pip install tiangong-mcp" not in result
 
 
 def test_empty_share_proof_leaderboard_recruits_first_public_competitor(tmp_path):

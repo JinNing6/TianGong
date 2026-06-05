@@ -8,5 +8,5 @@ My fate is mine, not heaven's.
 Phase 2: 分发平台 · 22 级仙逆体系 · 六维灵根评估 · 洞府管理
 """
 
-__version__ = "0.1.6"
+__version__ = "0.1.7"
 __author__ = "JinNing6"

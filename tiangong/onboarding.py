@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from .growth import build_growth_issue_url
+from .install_bridge import DEFAULT_PACKAGE_NAME, git_tag_install_command, local_package_version
 
 
 def _clean_slug(value: str, fallback: str) -> str:
@@ -47,6 +48,12 @@ def format_start_cultivation(username: str = "", artifact_name: str = "") -> str
         campaign_hook=f"邀请 {display_username} 完成 TianGong 第一件法宝开炉",
         real_data_context="首会话起火入道入口: 尚未写入修仙档案，等待用户执行真实 forge_agent 命令",
     )
+    install_command = git_tag_install_command(
+        repo_owner="",
+        repo_name="",
+        version_or_tag=local_package_version(DEFAULT_PACKAGE_NAME),
+        package_name=DEFAULT_PACKAGE_NAME,
+    )
 
     lines = [
         "# ⚒️ 起火入道",
@@ -57,8 +64,12 @@ def format_start_cultivation(username: str = "", artifact_name: str = "") -> str
         "## 1. 安装",
         "",
         "```bash",
-        "pip install tiangong-mcp",
+        install_command,
         "```",
+        "",
+        "- 安装后复查分发入口: `tiangong-mcp public-install-command`",
+        "- PyPI latest 追平后再切换: `pip install -U tiangong-mcp`",
+        "- 不要在 `public_growth_report()` 证明 PyPI latest current 前宣称 PyPI 安装闭环已闭合。",
         "",
         "## 2. MCP 配置",
         "",
@@ -88,7 +99,9 @@ def format_start_cultivation(username: str = "", artifact_name: str = "") -> str
             f"我准备在 TianGong 起火入道：{display_username} 将开炉第一件本命法宝 `{first_artifact}`。"
             "不伪造灵力，不伪造档案，执行 forge_agent 后才算真正踏入修炼。"
         ),
-        "加入修炼: pip install tiangong-mcp",
+        f"加入修炼: {install_command}",
+        "安装后复查: tiangong-mcp public-install-command",
+        "PyPI 追平后安装: pip install -U tiangong-mcp",
         f"首件法宝: forge_agent(name=\"{first_artifact}\", description=\"...\")",
         "复查飞轮: growth_flywheel()",
         "发起战役: growth_campaign()",

@@ -101,6 +101,22 @@ def test_issueops_workflow_routes_forms_to_real_public_tools():
         assert command in workflow
 
 
+def test_issueops_workflow_comments_candidate_install_before_pypi_install():
+    """The first public bot comment must not route cold visitors to the stale PyPI package."""
+    workflow = WORKFLOW.read_text(encoding="utf-8")
+    candidate = (
+        'Current candidate install: `python -m pip install --upgrade '
+        '"tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.7"`'
+    )
+    canonical = "PyPI-current install after registry readiness: `pip install -U tiangong-mcp`"
+
+    assert candidate in workflow
+    assert "Install decision after installation: `tiangong-mcp public-install-command`" in workflow
+    assert canonical in workflow
+    assert "Install: `pip install tiangong-mcp`" not in workflow
+    assert workflow.index(candidate) < workflow.index(canonical)
+
+
 def test_issueops_workflow_records_external_return_before_next_commands():
     """IssueOps comments should make the external-to-MCP return measurable."""
     workflow = WORKFLOW.read_text(encoding="utf-8")
@@ -150,7 +166,7 @@ def test_issueops_docs_expose_public_forms_and_workflow():
         assert "Contents API" in text
         assert "launch blocker" in text or "公开 launch blocker" in text
         assert "GitHub Releases API" in text
-        assert "v0.1.6" in text
+        assert "v0.1.7" in text
         assert "PyPI JSON API" in text
         assert "Public Launch Closure Checklist" in text
         assert "stale" in text or "旧版本" in text
