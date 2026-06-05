@@ -44,7 +44,7 @@ def test_runtime_version_matches_project_metadata():
 
     project_version = _pyproject()["project"]["version"]
 
-    assert project_version == "0.1.4"
+    assert project_version == "0.1.5"
     assert tiangong.__version__ == project_version
     assert metadata.version("tiangong-mcp") == project_version
 
@@ -135,8 +135,22 @@ def test_readmes_document_one_command_dev_install_and_quality_gate():
         assert "environment `pypi`" in text
         assert "invalid-publisher" in text
         assert "Current Candidate Git Tag Install Bridge" in text
-        assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.4"' in text
+        assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.5"' in text
         assert "PYPI_TOKEN" in text
+
+
+def test_readmes_put_current_candidate_install_before_stale_pypi_command():
+    """Cold public visitors should not be routed to the stale PyPI build before the current tag bridge."""
+    candidate = 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.5"'
+    canonical = "pip install -U tiangong-mcp"
+
+    for filename in ["README.md", "README.zh-CN.md"]:
+        text = (ROOT / filename).read_text(encoding="utf-8")
+
+        assert candidate in text
+        assert "Current Candidate Install" in text
+        assert "PyPI-current install after registry readiness" in text
+        assert text.index(candidate) < text.index(canonical)
 
 
 def test_readmes_document_mcp_public_proof_pack_tool():

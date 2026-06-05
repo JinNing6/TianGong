@@ -115,20 +115,21 @@ def format_public_proof_pack(
             "",
             "## First External Contributor Path",
             "",
-            "> Run the install command surface before sharing this invite.",
+            "> Share the candidate install first while PyPI is stale or unverified.",
             "> Use the Git tag candidate bridge when PyPI is stale; use the PyPI command only after registry readiness is current.",
             "> Use form URLs to open Issues, then use created Issue URLs as reviewable proof.",
             "> Only public Growth/Share Issue authors, public PR authors, and local ledger actors count toward the target; stars, forks, downloads, reposts, retention, and watchers do not.",
             "",
-            "1. Install decision: `tiangong-mcp public-install-command`",
-            "2. PyPI-current install after registry readiness: `pip install -U tiangong-mcp`",
-            '3. Start cultivation in an MCP client: `start_cultivation(username="your_github_username")`',
+            f"1. Current candidate install: `{install_bridge_command}`",
+            "2. Install decision after installation: `tiangong-mcp public-install-command`",
+            "3. PyPI-current install after registry readiness: `pip install -U tiangong-mcp`",
+            '4. Start cultivation in an MCP client: `start_cultivation(username="your_github_username")`',
             (
-                "4. Forge the first public artifact: "
+                "5. Forge the first public artifact: "
                 f'`forge_agent(name="{artifact}", description="A TianGong artifact opening the first public proof loop")`'
             ),
-            f"5. Open Share Proof Issue Form: {share_issue_url}",
-            f"6. After submission, replace `{share_proof_url}` with the created Issue URL before recording proof.",
+            f"6. Open Share Proof Issue Form: {share_issue_url}",
+            f"7. After submission, replace `{share_proof_url}` with the created Issue URL before recording proof.",
             "",
             "## Git Tag Candidate Install Bridge",
             "",
@@ -179,9 +180,9 @@ def format_public_proof_pack(
             "",
             "```text",
             f"I want to be counted in the TianGong 72h launch for {owner}/{repo}.",
-            "Install decision: tiangong-mcp public-install-command",
+            f"Current tag candidate install: {install_bridge_command}",
+            "Install decision after installation: tiangong-mcp public-install-command",
             "PyPI-current install after registry readiness: pip install -U tiangong-mcp",
-            f"If public preflight reports PyPI latest is stale or unverified, install current tag candidate: {install_bridge_command}",
             'Start: start_cultivation(username="your_github_username")',
             (
                 f'Forge: forge_agent(name="{artifact}", '
