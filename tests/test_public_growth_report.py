@@ -1049,6 +1049,20 @@ def test_public_launch_preflight_fetch_failure_includes_release_fallbacks(tmp_pa
     assert "https://api.github.com/repos/JinNing6/TianGong/releases" in result
     assert '"tag_name":"v0.1.2"' in result
     assert '"generate_release_notes":true' in result
+    assert "## PyPI Trusted Publisher Setup Runbook" in result
+    assert "invalid-publisher" in result
+    assert "https://pypi.org/manage/project/tiangong-mcp/settings/publishing/" in result
+    assert "| Repository owner | `JinNing6` | `repository_owner`: `JinNing6` |" in result
+    assert "| Repository name | `TianGong` | `repository`: `JinNing6/TianGong` |" in result
+    assert (
+        "| Workflow filename | `publish-pypi.yml` | `workflow_ref`: "
+        "`JinNing6/TianGong/.github/workflows/publish-pypi.yml@refs/tags/v0.1.2` |"
+    ) in result
+    assert (
+        "| Environment | `pypi` | `environment`: `pypi` and "
+        "`sub`: `repo:JinNing6/TianGong:environment:pypi` |"
+    ) in result
+    assert "Recheck install loop: `public_growth_report(record_snapshot=True, target_contributors=10)`" in result
     assert "tiangong-mcp public-proof-pack --target-contributors 10" in result
     assert "## Current Candidate Git Tag Install Bridge" in result
     assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.2"' in result

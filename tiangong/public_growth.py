@@ -1291,19 +1291,19 @@ def format_public_install_command(
     return "\n".join(lines)
 
 
-def _format_pypi_trusted_publisher_runbook_lines(
-    snapshot: PublicGrowthSnapshot,
+def _format_pypi_trusted_publisher_setup_runbook_lines(
     *,
+    owner: str,
+    repo: str,
+    package_name: str,
+    local_version: str,
+    published_version: str = "",
+    release_tag: str,
     target_contributors: int = 10,
 ) -> list[str]:
-    distribution = snapshot.distribution_readiness
-    if distribution.status not in {"stale", "unverified"}:
-        return []
-
-    owner, repo = _repo_owner_name(snapshot.repo.full_name)
-    release_tag = snapshot.release_readiness.expected_tag or f"v{distribution.local_version or 'current-local-version'}"
     target = _safe_positive_int(target_contributors, fallback=10)
-    lines = [
+    expected_version = local_version or "current-local-version"
+    return [
         "## PyPI Trusted Publisher Setup Runbook",
         "",
         "> Use this when PyPI Trusted Publishing fails with `invalid-publisher` after lint, tests, build, `twine check`, and `public-release-boundary` passed.",
@@ -1326,17 +1326,38 @@ def _format_pypi_trusted_publisher_runbook_lines(
             f"| Workflow path | `{PYPI_TRUSTED_PUBLISHER_WORKFLOW_PATH}` | GitHub Actions workflow file on default branch |"
         ),
         f"| Environment | `{PYPI_TRUSTED_PUBLISHER_ENVIRONMENT}` | `environment`: `{PYPI_TRUSTED_PUBLISHER_ENVIRONMENT}` and `sub`: `repo:{owner}/{repo}:environment:{PYPI_TRUSTED_PUBLISHER_ENVIRONMENT}` |",
-        f"| Package | `{distribution.package_name}` | PyPI latest `{distribution.published_version or 'unknown'}` vs local `{distribution.local_version or 'unknown'}` |",
+        f"| Package | `{package_name}` | PyPI latest `{published_version or 'unknown'}` vs local `{expected_version}` |",
         "",
         "## After PyPI Setup",
         "",
         f"- Re-run failed release job, push tag `{release_tag}` to trigger the workflow, or manually dispatch the workflow "
         f"with tag `{release_tag}` from the Actions page above.",
         f"- Recheck install loop: `public_growth_report(record_snapshot=True, target_contributors={target})`",
-        f"- Expected proof: PyPI JSON latest version becomes `{distribution.local_version or 'current-local-version'}`.",
+        f"- Expected proof: PyPI JSON latest version becomes `{expected_version}`.",
         "",
     ]
-    return lines
+
+
+def _format_pypi_trusted_publisher_runbook_lines(
+    snapshot: PublicGrowthSnapshot,
+    *,
+    target_contributors: int = 10,
+) -> list[str]:
+    distribution = snapshot.distribution_readiness
+    if distribution.status not in {"stale", "unverified"}:
+        return []
+
+    owner, repo = _repo_owner_name(snapshot.repo.full_name)
+    release_tag = snapshot.release_readiness.expected_tag or f"v{distribution.local_version or 'current-local-version'}"
+    return _format_pypi_trusted_publisher_setup_runbook_lines(
+        owner=owner,
+        repo=repo,
+        package_name=distribution.package_name,
+        local_version=distribution.local_version,
+        published_version=distribution.published_version,
+        release_tag=release_tag,
+        target_contributors=target_contributors,
+    )
 
 
 def _format_public_launch_closure_checklist_lines(
@@ -1521,6 +1542,15 @@ def format_public_launch_preflight(
                     f"workflow_dispatch tag `{release_tag}`."
                 ),
                 "",
+                *_format_pypi_trusted_publisher_setup_runbook_lines(
+                    owner=owner,
+                    repo=repo,
+                    package_name=PACKAGE_NAME,
+                    local_version=local_version,
+                    published_version="unknown",
+                    release_tag=release_tag,
+                    target_contributors=target,
+                ),
                 *format_current_candidate_install_bridge_lines(
                     repo_owner=owner,
                     repo_name=repo,
