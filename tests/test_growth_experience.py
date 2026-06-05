@@ -1246,7 +1246,10 @@ async def test_forge_agent_success_contains_shareable_creation_loop(monkeypatch)
     assert "`tg-dragon`" in result
     assert "@forgeking" in result
     assert "+100 灵力" in result
-    assert "pip install tiangong-mcp" in result
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.9"' in result
+    assert "tiangong-mcp public-install-command" in result
+    assert "pip install -U tiangong-mcp" in result
+    assert "加入修炼: pip install tiangong-mcp" not in result
     assert "`refine_agent(agent_id=\"tg-dragon\", changes=\"...\")`" in result
     assert "`publish_agent(artifact_name=\"dragon-forge\")`" in result
     assert "`treasure_pavilion(action=\"search\", query=\"dragon-forge\")`" in result
@@ -1290,7 +1293,10 @@ async def test_refine_agent_success_contains_shareable_repeat_loop(monkeypatch):
     assert "Added retry" in result
     assert "+30 灵力" in result
     assert "@refiner" in result
-    assert "pip install tiangong-mcp" in result
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.9"' in result
+    assert "tiangong-mcp public-install-command" in result
+    assert "pip install -U tiangong-mcp" in result
+    assert "加入修炼: pip install tiangong-mcp" not in result
     assert "`publish_agent`" in result
     assert "`infuse_spirit(artifact_name=\"dragon-forge\")`" in result
     assert "`my_realm(username=\"refiner\")`" in result

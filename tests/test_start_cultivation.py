@@ -13,7 +13,7 @@ def test_start_cultivation_card_turns_install_into_first_action():
 
     assert "起火入道" in result
     assert "当前没有伪造修仙档案" in result
-    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.8"' in result
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.9"' in result
     assert "tiangong-mcp public-install-command" in result
     assert "pip install -U tiangong-mcp" in result
     assert "pip install tiangong-mcp" not in result

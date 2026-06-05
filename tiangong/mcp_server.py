@@ -65,6 +65,7 @@ from .forge import (
     refine_agent as _refine_agent,
 )
 from .growth import format_growth_campaign, format_growth_flywheel
+from .install_bridge import DEFAULT_PACKAGE_NAME, git_tag_install_command, local_package_version
 from .lineage import format_lineage_tree, get_artifact_lineage
 from .marketplace import publish_agent as _publish_agent
 from .marketplace import summon_artifact as _summon
@@ -166,6 +167,16 @@ def _public_proof_url_problem(value: str, *, field_name: str) -> str:
     return public_proof_url_problem(value, field_name=field_name)
 
 
+def _current_candidate_install_command() -> str:
+    """Return the current Git tag candidate install while PyPI may be stale."""
+    return git_tag_install_command(
+        repo_owner="",
+        repo_name="",
+        version_or_tag=local_package_version(DEFAULT_PACKAGE_NAME),
+        package_name=DEFAULT_PACKAGE_NAME,
+    )
+
+
 # ============================================================
 # 🔧 Tool 1: forge_agent — ⚒️ 开炉炼器
 # ============================================================
@@ -196,6 +207,7 @@ async def start_cultivation(
 
 def _build_forge_share_block(agent_id: str, artifact_name: str, creator: str) -> str:
     """Build a paste-ready share block for successful artifact creation."""
+    install_command = _current_candidate_install_command()
     share_text = (
         f"我在 TianGong 开炉炼器：@{creator} 铸成法宝 `{artifact_name}`"
         f"（ID: `{agent_id}`），+100 灵力。"
@@ -206,7 +218,9 @@ def _build_forge_share_block(agent_id: str, artifact_name: str, creator: str) ->
         "## 📣 复制分享\n\n"
         "```text\n"
         f"{share_text}\n"
-        "加入修炼: pip install tiangong-mcp\n"
+        f"加入修炼: {install_command}\n"
+        "安装后复查: tiangong-mcp public-install-command\n"
+        "PyPI 追平后安装: pip install -U tiangong-mcp\n"
         "```\n\n"
         "## 下一步\n\n"
         f"- 继续淬炼: `refine_agent(agent_id=\"{agent_id}\", changes=\"...\")`\n"
@@ -319,6 +333,7 @@ async def forge_agent(
 
 def _build_refine_share_block(agent_id: str, changes: str, refiner: str) -> str:
     """Build a paste-ready share block for successful artifact refinements."""
+    install_command = _current_candidate_install_command()
     share_text = (
         f"我在 TianGong 淬炼法宝 `{agent_id}`：@{refiner} 完成一次优化，"
         f"+30 灵力。变化：{changes}"
@@ -329,7 +344,9 @@ def _build_refine_share_block(agent_id: str, changes: str, refiner: str) -> str:
         "## 📣 复制分享\n\n"
         "```text\n"
         f"{share_text}\n"
-        "加入修炼: pip install tiangong-mcp\n"
+        f"加入修炼: {install_command}\n"
+        "安装后复查: tiangong-mcp public-install-command\n"
+        "PyPI 追平后安装: pip install -U tiangong-mcp\n"
         "```\n\n"
         "## 下一步\n\n"
         f"- 发布出世: `publish_agent` with `artifact_name=\"{agent_id}\"`\n"
