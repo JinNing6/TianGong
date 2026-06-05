@@ -1246,7 +1246,7 @@ async def test_forge_agent_success_contains_shareable_creation_loop(monkeypatch)
     assert "`tg-dragon`" in result
     assert "@forgeking" in result
     assert "+100 灵力" in result
-    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.13"' in result
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.14"' in result
     assert "tiangong-mcp public-install-command" in result
     assert "pip install -U tiangong-mcp" in result
     assert "加入修炼: pip install tiangong-mcp" not in result
@@ -1293,7 +1293,7 @@ async def test_refine_agent_success_contains_shareable_repeat_loop(monkeypatch):
     assert "Added retry" in result
     assert "+30 灵力" in result
     assert "@refiner" in result
-    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.13"' in result
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.14"' in result
     assert "tiangong-mcp public-install-command" in result
     assert "pip install -U tiangong-mcp" in result
     assert "加入修炼: pip install tiangong-mcp" not in result
