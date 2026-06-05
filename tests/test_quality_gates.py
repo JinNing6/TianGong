@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PYPROJECT = ROOT / "pyproject.toml"
 QUALITY_WORKFLOW = ROOT / ".github" / "workflows" / "quality-gates.yml"
 PUBLISH_WORKFLOW = ROOT / ".github" / "workflows" / "publish-pypi.yml"
+CI_PYTEST_HELPER = ROOT / ".github" / "scripts" / "run_pytest_with_annotations.py"
 
 
 def _pyproject() -> dict:
@@ -45,7 +46,7 @@ def test_runtime_version_matches_project_metadata():
 
     project_version = _pyproject()["project"]["version"]
 
-    assert project_version == "0.1.14"
+    assert project_version == "0.1.15"
     assert tiangong.__version__ == project_version
     assert metadata.version("tiangong-mcp") == project_version
 
@@ -62,7 +63,7 @@ def test_quality_workflow_installs_dev_extra_and_runs_release_gates():
     assert "cache: pip" in workflow
     assert "python -m pip install -e \".[dev]\"" in workflow
     assert "python -m ruff check ." in workflow
-    assert "python -m pytest -q" in workflow
+    assert "python .github/scripts/run_pytest_with_annotations.py" in workflow
     assert "tiangong-mcp public-launch-assets" in workflow
     assert "python -m build" in workflow
     assert "python -m twine check dist/*" in workflow
@@ -101,7 +102,7 @@ def test_pypi_publish_workflow_uses_trusted_publishing_after_release_gates():
     assert "git merge-base --is-ancestor" in workflow
     assert "pyproject.toml version" in workflow
     assert "python -m ruff check ." in workflow
-    assert "python -m pytest -q" in workflow
+    assert "python .github/scripts/run_pytest_with_annotations.py" in workflow
     assert "tiangong-mcp public-launch-assets" in workflow
     assert "python -m build" in workflow
     assert "python -m twine check dist/*" in workflow
@@ -137,13 +138,23 @@ def test_readmes_document_one_command_dev_install_and_quality_gate():
         assert "environment `pypi`" in text
         assert "invalid-publisher" in text
         assert "Current Candidate Git Tag Install Bridge" in text
-        assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.14"' in text
+        assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.15"' in text
         assert "PYPI_TOKEN" in text
+
+
+def test_ci_pytest_helper_emits_public_failure_annotations():
+    """Remote pytest failures must remain diagnosable through public GitHub check annotations."""
+    helper = CI_PYTEST_HELPER.read_text(encoding="utf-8")
+
+    assert "subprocess.run" in helper
+    assert "python -m pytest -q -p no:cacheprovider --basetemp=.pytest-tmp-ci --tb=short --maxfail=1" in helper
+    assert "::error title=pytest failed::" in helper
+    assert "GITHUB_STEP_SUMMARY" in helper
 
 
 def test_readmes_put_current_candidate_install_before_stale_pypi_command():
     """Cold public visitors should not be routed to the stale PyPI build before the current tag bridge."""
-    candidate = 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.14"'
+    candidate = 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.15"'
     canonical = "pip install -U tiangong-mcp"
 
     for filename in ["README.md", "README.zh-CN.md"]:

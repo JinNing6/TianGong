@@ -93,7 +93,7 @@
 **Current Candidate Install**
 
 ```bash
-python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.14"
+python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.15"
 ```
 
 *PyPI-current install after registry readiness: `pip install -U tiangong-mcp`.*
@@ -167,7 +167,7 @@ Install via the current candidate tag bridge while PyPI catches up, configure yo
 PyPI currently serves an older public build, so cold-start contributors should install the current public tag first:
 
 ```bash
-python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.14"
+python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.15"
 ```
 
 ### PyPI-current install after registry readiness
@@ -232,9 +232,9 @@ tiangong-mcp public-release-boundary
 
 PyPI Trusted Publisher setup for `tiangong-mcp` must match the release workflow exactly: owner `JinNing6`, repository `TianGong`, workflow filename `publish-pypi.yml`, workflow path `.github/workflows/publish-pypi.yml`, and environment `pypi`. If PyPI returns `invalid-publisher`, rerun `tiangong-mcp public-launch-preflight --target-contributors 10` and use the generated Trusted Publisher runbook instead of adding a long-lived upload token.
 
-When public preflight reports PyPI latest is stale or unverified, use the generated Current Candidate Git Tag Install Bridge only as a temporary contributor path, for example `python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.14"`. This does not close the PyPI install loop; recheck PyPI JSON latest with `public_growth_report()` before claiming public install readiness.
+When public preflight reports PyPI latest is stale or unverified, use the generated Current Candidate Git Tag Install Bridge only as a temporary contributor path, for example `python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.15"`. This does not close the PyPI install loop; recheck PyPI JSON latest with `public_growth_report()` before claiming public install readiness.
 
-`tiangong-mcp public-launch-assets` also prints a full public growth release handoff: docs, package metadata, Issue Forms, workflows, public growth modules, user-facing growth surfaces, and tests to stage before creating the current local version GitHub Release, such as `v0.1.14`.
+`tiangong-mcp public-launch-assets` also prints a full public growth release handoff: docs, package metadata, Issue Forms, workflows, public growth modules, user-facing growth surfaces, and tests to stage before creating the current local version GitHub Release, such as `v0.1.15`.
 
 ---
 
@@ -428,7 +428,7 @@ leaderboard(type="share")          # Share Proof Rankings from real public contr
 - ✅ Growth campaign ledger commands treat `issues/new?...` as the form entrypoint only; `record_growth_referral()` and `record_share_attribution(..., source_url=...)` reject form entrypoints and placeholder URLs, requiring the created public Issue/PR/Discussion URL as reviewable proof
 - ✅ `public_growth_report()` fetches real GitHub public repository and IssueOps metrics, compares them with the local MCP activation ledger, names the weakest external proof bridge, and refuses to invent downloads, retention, repost counts, referral conversions, or rewards
 - ✅ `public_growth_report()` also checks GitHub Contents API readiness for the remote Growth Issue Form, Share Proof Issue Form, and IssueOps workflow, then marks missing default-branch `.github` files as a public launch blocker instead of treating local-only routes as live
-- ✅ `public_growth_report()` checks GitHub Releases API readiness for the current local version tag, such as `v0.1.14`, so a missing release-trigger for PyPI Trusted Publishing is marked as a public install-loop launch blocker; if release creation is unavailable, the runbook exposes the protected tag push and `workflow_dispatch` publish fallbacks without claiming Release proof is closed
+- ✅ `public_growth_report()` checks GitHub Releases API readiness for the current local version tag, such as `v0.1.15`, so a missing release-trigger for PyPI Trusted Publishing is marked as a public install-loop launch blocker; if release creation is unavailable, the runbook exposes the protected tag push and `workflow_dispatch` publish fallbacks without claiming Release proof is closed
 - ✅ `public_growth_report()` checks PyPI JSON API distribution readiness for `tiangong-mcp`, compares the real latest PyPI version with local package metadata, and marks stale PyPI releases as a public install-loop launch blocker
 - ✅ `public_install_command()` is the shortest shareable install surface: it uses real PyPI readiness to choose either `pip install -U tiangong-mcp` or the current Git tag candidate bridge without claiming the PyPI install loop is closed
 - ✅ `public-candidate-smoke` installs the current Git tag candidate in a temporary venv, verifies the real `tiangong-mcp` console script plus proof pack invite, and cleans up on success without publishing or claiming PyPI closure

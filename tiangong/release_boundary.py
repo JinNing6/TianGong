@@ -38,6 +38,7 @@ REQUIRED_DOC_COMMANDS = (
 REQUIRED_WORKFLOW_COMMANDS = (
     "tiangong-mcp public-launch-assets",
     "tiangong-mcp public-release-boundary",
+    "python .github/scripts/run_pytest_with_annotations.py",
 )
 
 REQUIRED_PUBLISH_WORKFLOW_FEATURES = (

@@ -15,6 +15,7 @@ ISSUE_TEMPLATE_CONFIG = ".github/ISSUE_TEMPLATE/config.yml"
 ISSUEOPS_WORKFLOW = ".github/workflows/issueops-onboarding.yml"
 QUALITY_WORKFLOW = ".github/workflows/quality-gates.yml"
 PUBLISH_WORKFLOW = ".github/workflows/publish-pypi.yml"
+CI_PYTEST_HELPER = ".github/scripts/run_pytest_with_annotations.py"
 
 REMOTE_ACQUISITION_ASSETS = (
     GROWTH_FORM,
@@ -36,6 +37,7 @@ ISSUE_FORM_ASSETS = (
 RELEASE_AUTOMATION_ASSETS = (
     QUALITY_WORKFLOW,
     PUBLISH_WORKFLOW,
+    CI_PYTEST_HELPER,
     "pyproject.toml",
 )
 
@@ -104,6 +106,7 @@ FULL_PUBLIC_GROWTH_RELEASE_ASSETS = (
     ISSUEOPS_WORKFLOW,
     QUALITY_WORKFLOW,
     PUBLISH_WORKFLOW,
+    CI_PYTEST_HELPER,
     *PUBLIC_GROWTH_CODE_ASSETS,
     *PUBLIC_GROWTH_SURFACE_ASSETS,
     *PUBLIC_GROWTH_TEST_ASSETS,
@@ -224,7 +227,7 @@ def _quality_workflow_audit(root: Path) -> LaunchAssetAudit:
         "no pull_request_target": "pull_request_target" not in text,
         "dev install": 'python -m pip install -e ".[dev]"' in text,
         "lint": "python -m ruff check ." in text,
-        "tests": "python -m pytest -q" in text,
+        "annotated tests": "python .github/scripts/run_pytest_with_annotations.py" in text,
         "build": "python -m build" in text,
         "twine": "python -m twine check dist/*" in text,
     }
@@ -248,6 +251,7 @@ def _publish_workflow_audit(root: Path) -> LaunchAssetAudit:
         "trusted publisher id-token": "id-token: write" in text,
         "pypi environment": "environment: pypi" in text,
         "publish action": "pypa/gh-action-pypi-publish@release/v1" in text,
+        "annotated tests": "python .github/scripts/run_pytest_with_annotations.py" in text,
         "no token": "PYPI_TOKEN" not in text,
         "no password": "password:" not in text,
         "no username": "username:" not in text,
@@ -256,6 +260,24 @@ def _publish_workflow_audit(root: Path) -> LaunchAssetAudit:
     if blocked:
         return LaunchAssetAudit(path, "blocked", f"{yaml_status}; Publish workflow: blocked ({', '.join(blocked)})")
     return LaunchAssetAudit(path, "ready", f"{yaml_status}; Publish workflow: ready")
+
+
+def _ci_pytest_helper_audit(root: Path) -> LaunchAssetAudit:
+    path = CI_PYTEST_HELPER
+    full_path = root / path
+    if not full_path.exists():
+        return LaunchAssetAudit(path, "missing", "file is absent")
+    text = full_path.read_text(encoding="utf-8")
+    checks = {
+        "pytest command": "python -m pytest -q -p no:cacheprovider --basetemp=.pytest-tmp-ci --tb=short --maxfail=1" in text,
+        "github annotation": "::error title=pytest failed::" in text,
+        "step summary": "GITHUB_STEP_SUMMARY" in text,
+        "subprocess capture": "subprocess.run" in text and "stderr=subprocess.STDOUT" in text,
+    }
+    blocked = [name for name, ok in checks.items() if not ok]
+    if blocked:
+        return LaunchAssetAudit(path, "blocked", f"CI pytest helper: blocked ({', '.join(blocked)})")
+    return LaunchAssetAudit(path, "ready", "CI pytest helper: ready")
 
 
 def _pyproject_audit(root: Path) -> LaunchAssetAudit:
@@ -287,6 +309,8 @@ def _audit_by_path(root: Path, path: str) -> LaunchAssetAudit:
         return _quality_workflow_audit(root)
     if path == PUBLISH_WORKFLOW:
         return _publish_workflow_audit(root)
+    if path == CI_PYTEST_HELPER:
+        return _ci_pytest_helper_audit(root)
     if path == "pyproject.toml":
         return _pyproject_audit(root)
     return LaunchAssetAudit(path, "unverified", "no audit rule")
@@ -401,7 +425,7 @@ def _format_table(rows: list[LaunchAssetAudit]) -> list[str]:
 
 def format_full_public_growth_release_handoff_lines(
     *,
-    release_tag: str = "v0.1.14",
+    release_tag: str = "v0.1.15",
     include_audit_instruction: bool = False,
 ) -> list[str]:
     """Return the complete release handoff commands without executing them."""
@@ -423,7 +447,7 @@ def format_full_public_growth_release_handoff_lines(
             "```bash",
             _git_add_command((".gitignore",)),
             _git_add_command(tuple(path for path in PUBLIC_GROWTH_RELEASE_DOCS if path != ".gitignore")),
-            _git_add_command((*ISSUE_FORM_ASSETS, ISSUEOPS_WORKFLOW, QUALITY_WORKFLOW, PUBLISH_WORKFLOW)),
+            _git_add_command((*ISSUE_FORM_ASSETS, ISSUEOPS_WORKFLOW, QUALITY_WORKFLOW, PUBLISH_WORKFLOW, CI_PYTEST_HELPER)),
             _git_add_command(PUBLIC_GROWTH_CODE_ASSETS),
             _git_add_command(PUBLIC_GROWTH_SURFACE_ASSETS),
             _git_add_command(PUBLIC_GROWTH_TEST_ASSETS),

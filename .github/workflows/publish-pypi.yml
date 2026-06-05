@@ -111,7 +111,7 @@ jobs:
         run: python -m ruff check .
 
       - name: Test
-        run: python -m pytest -q
+        run: python .github/scripts/run_pytest_with_annotations.py
 
       - name: Check public launch assets
         run: tiangong-mcp public-launch-assets

@@ -106,7 +106,7 @@ def test_issueops_workflow_comments_candidate_install_before_pypi_install():
     workflow = WORKFLOW.read_text(encoding="utf-8")
     candidate = (
         'Current candidate install: `python -m pip install --upgrade '
-        '"tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.14"`'
+        '"tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.15"`'
     )
     canonical = "PyPI-current install after registry readiness: `pip install -U tiangong-mcp`"
 
@@ -166,7 +166,7 @@ def test_issueops_docs_expose_public_forms_and_workflow():
         assert "Contents API" in text
         assert "launch blocker" in text or "公开 launch blocker" in text
         assert "GitHub Releases API" in text
-        assert "v0.1.14" in text
+        assert "v0.1.15" in text
         assert "PyPI JSON API" in text
         assert "Public Launch Closure Checklist" in text
         assert "stale" in text or "旧版本" in text
