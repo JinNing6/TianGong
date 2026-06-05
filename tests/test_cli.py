@@ -60,13 +60,13 @@ def _cold_launch_snapshot():
             ),
         ),
         release_readiness=PublicReleaseReadiness(
-            local_version="0.1.2",
-            expected_tag="v0.1.2",
+            local_version="0.1.3",
+            expected_tag="v0.1.3",
             status="missing",
         ),
         distribution_readiness=PublicDistributionReadiness(
             package_name="tiangong-mcp",
-            local_version="0.1.2",
+            local_version="0.1.3",
             published_version="0.0.1",
             status="stale",
         ),
@@ -301,9 +301,9 @@ def test_cli_public_launch_preflight_prints_ordered_release_runbook(monkeypatch,
     assert "First Public Proof Entrypoints" in output
     assert "template=tiangong-growth-flywheel.yml" in output
     assert "template=tiangong-share-proof.yml" in output
-    assert "gh release create v0.1.2 --generate-notes" in output
+    assert "gh release create v0.1.3 --generate-notes" in output
     assert "https://github.com/octo-org/octo-repo/releases/new" in output
-    assert "Select existing tag `v0.1.2`" in output
+    assert "Select existing tag `v0.1.3`" in output
     assert "https://github.com/octo-org/octo-repo/actions/workflows/publish-pypi.yml" in output
     assert "public_growth_report(record_snapshot=True, target_contributors=10)" in output
     assert "After Submission CLI Ledger Commands" in output
@@ -331,8 +331,8 @@ def test_cli_public_launch_preflight_inlines_full_release_handoff(monkeypatch, t
     assert "git add tiangong/activation.py" in output
     assert "git add tests/test_cli.py" in output
     assert 'git commit -m "Prepare TianGong public growth launch"' in output
-    assert "gh release create v0.1.2 --generate-notes" in output
-    assert "git push origin v0.1.2" in output
+    assert "gh release create v0.1.3 --generate-notes" in output
+    assert "git push origin v0.1.3" in output
 
 
 def test_cli_public_launch_assets_prints_local_push_manifest():
@@ -369,8 +369,8 @@ def test_cli_public_launch_assets_prints_local_push_manifest():
     assert "| review separately | `.github/workflows/issueops-onboarding.yml` |" not in output
     assert "| review separately | `tiangong/install_bridge.py` |" not in output
     assert 'git commit -m "Prepare TianGong public growth launch"' in output
-    assert "gh release create v0.1.2 --generate-notes" in output
-    assert "git push origin v0.1.2" in output
+    assert "gh release create v0.1.3 --generate-notes" in output
+    assert "git push origin v0.1.3" in output
     assert "tiangong-mcp public-launch-preflight --target-contributors 10" in output
 
 
@@ -399,7 +399,7 @@ def test_cli_public_install_command_prints_current_candidate_bridge(monkeypatch)
         "fetch_public_distribution_readiness",
         lambda: PublicDistributionReadiness(
             package_name="tiangong-mcp",
-            local_version="0.1.2",
+            local_version="0.1.3",
             published_version="0.0.1",
             status="stale",
             api_url="https://pypi.org/pypi/tiangong-mcp/json",
@@ -413,7 +413,7 @@ def test_cli_public_install_command_prints_current_candidate_bridge(monkeypatch)
 
     output = stdout.getvalue()
     assert "TianGong Public Install Command" in output
-    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.2"' in output
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.3"' in output
     assert "Canonical install after PyPI latest is current: `pip install -U tiangong-mcp`" in output
     assert 'start_cultivation(username="your_github_username")' in output
     assert "does not close the PyPI install loop" in output
@@ -467,7 +467,7 @@ def test_cli_public_proof_pack_prints_no_network_first_proof_runbook():
     assert "Install decision: tiangong-mcp public-install-command" in output
     assert "PyPI-current install after registry readiness: pip install -U tiangong-mcp" in output
     assert "Git Tag Candidate Install Bridge" in output
-    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/octo-org/octo-repo.git@v0.1.2"' in output
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/octo-org/octo-repo.git@v0.1.3"' in output
     assert "Use this only when public preflight reports PyPI latest is stale or unverified." in output
     assert 'start_cultivation(username="your_github_username")' in output
     assert 'forge_agent(name="first-growth-artifact"' in output
@@ -693,7 +693,7 @@ def test_cli_public_release_boundary_prefers_current_version_artifacts(tmp_path)
             [
                 "[project]",
                 'name = "tiangong-mcp"',
-                'version = "0.1.2"',
+                'version = "0.1.3"',
                 "",
                 "[project.scripts]",
                 'tiangong-mcp = "tiangong.cli:main"',
@@ -704,25 +704,25 @@ def test_cli_public_release_boundary_prefers_current_version_artifacts(tmp_path)
     )
 
     stale_wheel = dist_dir / "tiangong_mcp-0.1.0-py3-none-any.whl"
-    current_wheel = dist_dir / "tiangong_mcp-0.1.2-py3-none-any.whl"
+    current_wheel = dist_dir / "tiangong_mcp-0.1.3-py3-none-any.whl"
     with zipfile.ZipFile(stale_wheel) as source, zipfile.ZipFile(current_wheel, "w") as target:
         for name in source.namelist():
             if ".dist-info/" not in name:
                 target.writestr(name, source.read(name))
-        target.writestr("tiangong_mcp-0.1.2.dist-info/METADATA", "Name: tiangong-mcp\nVersion: 0.1.2\n")
+        target.writestr("tiangong_mcp-0.1.3.dist-info/METADATA", "Name: tiangong-mcp\nVersion: 0.1.3\n")
         target.writestr(
-            "tiangong_mcp-0.1.2.dist-info/entry_points.txt",
+            "tiangong_mcp-0.1.3.dist-info/entry_points.txt",
             "[console_scripts]\ntiangong-mcp = tiangong.cli:main\n",
         )
 
     stale_sdist = dist_dir / "tiangong_mcp-0.1.0.tar.gz"
-    current_sdist = dist_dir / "tiangong_mcp-0.1.2.tar.gz"
+    current_sdist = dist_dir / "tiangong_mcp-0.1.3.tar.gz"
     with tarfile.open(stale_sdist, "r:gz") as source, tarfile.open(current_sdist, "w:gz") as target:
         for member in source.getmembers():
             extracted = source.extractfile(member)
             if extracted is None:
                 continue
-            member.name = member.name.replace("tiangong_mcp-0.1.0/", "tiangong_mcp-0.1.2/", 1)
+            member.name = member.name.replace("tiangong_mcp-0.1.0/", "tiangong_mcp-0.1.3/", 1)
             target.addfile(member, extracted)
 
     stdout = StringIO()
@@ -730,8 +730,8 @@ def test_cli_public_release_boundary_prefers_current_version_artifacts(tmp_path)
 
     output = stdout.getvalue()
     assert "Wheel distribution | ready" in output
-    assert "tiangong_mcp-0.1.2-py3-none-any.whl" in output
-    assert "tiangong_mcp-0.1.0-py3-none-any.whl` version `0.1.0` vs local `0.1.2" not in output
+    assert "tiangong_mcp-0.1.3-py3-none-any.whl" in output
+    assert "tiangong_mcp-0.1.0-py3-none-any.whl` version `0.1.0` vs local `0.1.3" not in output
     assert "Local Release Boundary Status" in output
 
 
