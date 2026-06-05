@@ -1146,7 +1146,7 @@ def _format_distribution_readiness_lines(
     lines = [
         "## PyPI Distribution Readiness",
         "",
-        "> The public install loop depends on the version users receive from `pip install tiangong-mcp`.",
+        "> The public install loop depends on the version users receive from `pip install -U tiangong-mcp` after registry readiness.",
         "> This check compares local package metadata with the real PyPI JSON API latest version.",
         "",
         "| Package | Local version | PyPI latest | Status | Source |",

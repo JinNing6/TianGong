@@ -60,7 +60,7 @@ def test_season_leaderboard_outputs_shareable_table():
     assert result.index("@forgeking") < result.index("@alice")
     assert "复制分享" in result
     assert "leaderboard(type=\"season\")" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
 
 
 def test_season_leaderboard_includes_champion_chase_and_public_copy():
@@ -93,7 +93,7 @@ def test_season_leaderboard_includes_champion_chase_and_public_copy():
     assert "复制 Discussion/PR 战报" in result
     assert "复制社交战报" in result
     assert "TianGong 2026年06月 天工赛季战报" in result
-    assert "加入修炼：pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "`my_realm(username=\"forgeking\")`" in result
     assert "`infuse_spirit(artifact_name=\"artifact-name\")`" in result
     assert "`quest(action=\"post\")`" in result
@@ -110,7 +110,7 @@ def test_empty_season_leaderboard_recruits_first_cultivator():
     assert "当前档案快照" in result
     assert "不伪造历史赛季数据" in result
     assert "复制分享" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "`forge_agent(name=\"first-season-artifact\"," in result
     assert "`quest(action=\"post\", artifact_name=\"first-season-artifact\"," in result
     assert "`leaderboard(type=\"season\")`" in result
@@ -153,7 +153,7 @@ def test_tournament_board_pairs_current_contributors_with_bye_and_public_copy():
     assert "`leaderboard(type=\"tournament\")`" in result
     assert "复制 Discussion/PR 擂台帖" in result
     assert "复制社交擂台帖" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
 
 
 def test_empty_tournament_board_recruits_first_duelists():
@@ -168,7 +168,7 @@ def test_empty_tournament_board_recruits_first_duelists():
     assert "`forge_agent(name=\"first-duel-artifact\"," in result
     assert "`quest(action=\"post\", artifact_name=\"first-duel-artifact\"," in result
     assert "`leaderboard(type=\"tournament\")`" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
 
 
 def test_tournament_recap_turns_current_snapshot_into_repeat_loop():
@@ -209,7 +209,7 @@ def test_tournament_recap_turns_current_snapshot_into_repeat_loop():
     assert "`leaderboard(type=\"season\")`" in result
     assert "复制 Discussion/PR 复盘帖" in result
     assert "复制社交复盘帖" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
 
 
 def test_empty_tournament_recap_recruits_first_recap_candidate():
@@ -225,7 +225,7 @@ def test_empty_tournament_recap_recruits_first_recap_candidate():
     assert "`quest(action=\"post\", artifact_name=\"first-recap-artifact\"," in result
     assert "`leaderboard(type=\"tournament_recap\")`" in result
     assert "`leaderboard(type=\"tournament\")`" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
 
 
 def test_sect_war_banner_outputs_shareable_report():
@@ -253,7 +253,7 @@ def test_sect_war_banner_outputs_shareable_report():
     assert result.index("天工盟") < result.index("散修盟")
     assert "复制战报" in result
     assert "leaderboard(type=\"sect\")" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
 
 
 def test_sect_war_banner_includes_champion_chase_and_public_copy():
@@ -285,7 +285,7 @@ def test_sect_war_banner_includes_champion_chase_and_public_copy():
     assert "复制 Discussion/PR 战报" in result
     assert "复制社交战报" in result
     assert "TianGong 宗门战 2026年06月 天工赛季战报" in result
-    assert "加入宗门战：pip install tiangong-mcp" in result
+    assert "加入宗门战: python -m pip install --upgrade" in result
     assert "`sect(action=\"join\", sect_name=\"天工盟\")`" in result
     assert "`sect(action=\"leaderboard\")`" in result
     assert "`leaderboard(type=\"sect\")`" in result
@@ -302,7 +302,7 @@ def test_empty_sect_war_banner_recruits_first_sect():
     assert "当前宗门档案快照" in result
     assert "不伪造历史战报" in result
     assert "复制战报" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "`sect(action=\"create\", sect_name=\"天工盟\"," in result
     assert "`leaderboard(type=\"sect\")`" in result
     assert "`sect(action=\"leaderboard\")`" in result

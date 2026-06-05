@@ -65,7 +65,12 @@ from .forge import (
     refine_agent as _refine_agent,
 )
 from .growth import format_growth_campaign, format_growth_flywheel
-from .install_bridge import DEFAULT_PACKAGE_NAME, git_tag_install_command, local_package_version
+from .install_bridge import (
+    DEFAULT_PACKAGE_NAME,
+    format_candidate_join_lines,
+    git_tag_install_command,
+    local_package_version,
+)
 from .lineage import format_lineage_tree, get_artifact_lineage
 from .marketplace import publish_agent as _publish_agent
 from .marketplace import summon_artifact as _summon
@@ -400,7 +405,7 @@ def _format_cultivator_leaderboard(profiles, top_n: int) -> str:
         lines.append("TianGong 修仙天榜等待第一位修仙者留名。")
 
     lines.extend([
-        "加入修炼: pip install tiangong-mcp",
+        *format_candidate_join_lines(),
         "```",
         "",
         "## 下一步",
@@ -554,7 +559,7 @@ def _format_tribulation_evidence_help(message: str) -> str:
             "",
             "```text",
             "我在 TianGong 修正了一次渡劫证据提交：高阶境界必须绑定公开 URL，不靠口头进度越级。",
-            "加入修炼: pip install tiangong-mcp",
+            *format_candidate_join_lines(),
             "```",
         ]
     )
@@ -608,7 +613,7 @@ def _format_tribulation_evidence_card(
                 f"我在 TianGong 记录渡劫证据：@{profile.username} 的 `{evidence_key}` "
                 f"+{amount}，公开来源 {source_url}。境界变化：{realm_shift}。"
             ),
-            "加入修炼: pip install tiangong-mcp",
+            *format_candidate_join_lines(),
             f"查看渡劫: check_tribulation(username=\"{profile.username}\")",
             "```",
         ]
@@ -694,7 +699,7 @@ def _format_leaderboard_type_help(message: str) -> str:
         "",
         "```text",
         "我在 TianGong 修正了一次天榜入口：公开 type 是 artifact / cultivator / season / tournament / tournament_recap / sect / growth / share。",
-        "加入修炼: pip install tiangong-mcp",
+        *format_candidate_join_lines(),
         "```",
     ])
 
@@ -955,7 +960,7 @@ def _format_growth_referral_source_help(route: str, source_url: str) -> str:
             "",
             "```text",
             "我在 TianGong 记录外部回流前校准了来源：必须绑定公开 GitHub Issue/PR/Discussion URL，不能用不可审查的口头来源。",
-            "加入修炼: pip install tiangong-mcp",
+            *format_candidate_join_lines(),
             "```",
         ]
         + [
@@ -1026,7 +1031,7 @@ async def record_growth_referral(
                     "",
                     "```text",
                     "我从 TianGong GitHub IssueOps 回到 MCP，但本地激活账本暂时不可写；先修复日志权限，再记录真实回流。",
-                    "加入修炼: pip install tiangong-mcp",
+                    *format_candidate_join_lines(),
                     "```",
                 ]
             )
@@ -1062,7 +1067,7 @@ async def record_growth_referral(
             f"我从 TianGong GitHub IssueOps 回到 MCP：@{actor} 记录 `{normalized_route}` 回流，"
             "下一步用真实开炉、悬赏或鉴定补齐增长闭环。"
         ),
-        "加入修炼: pip install tiangong-mcp",
+        *format_candidate_join_lines(),
         "复查激活: activation_funnel()",
         "复查飞轮: growth_flywheel()",
         "发起战役: growth_campaign()",
@@ -1104,7 +1109,7 @@ def _format_share_attribution_source_help(contribution: str, share_url: str, sou
             "",
             "```text",
             "我在 TianGong 记录贡献分享前校准了公开来源：必须绑定可审查的 http(s) URL，不能用不可验证的私聊位置。",
-            "加入修炼: pip install tiangong-mcp",
+            *format_candidate_join_lines(),
             "```",
         ]
         + [
@@ -1190,7 +1195,7 @@ async def record_share_attribution(
                     "",
                     "```text",
                     "我已经完成 TianGong 贡献并准备公开分享，但本地激活账本暂时不可写；先修复日志权限，再记录真实分享归因。",
-                    "加入修炼: pip install tiangong-mcp",
+                    *format_candidate_join_lines(),
                     "```",
                 ]
             )
@@ -1226,7 +1231,7 @@ async def record_share_attribution(
             f"我在 TianGong 完成 `{normalized_contribution}` 贡献并公开分享：{public_share_url}。"
             "这次传播已写入真实激活账本。"
         ),
-        "加入修炼: pip install tiangong-mcp",
+        *format_candidate_join_lines(),
         "复查激活: activation_funnel()",
         "复查飞轮: growth_flywheel()",
         "Next contributor invite: public_proof_pack()",
@@ -1298,7 +1303,7 @@ def _format_treasure_pavilion_action_help(message: str) -> str:
         "",
         "```text",
         "我在 TianGong 寻宝阁修正了一次请宝路径：公开入口是 treasure_pavilion(action=\"search|summon|lineage\")。",
-        "加入修炼: pip install tiangong-mcp",
+        *format_candidate_join_lines(),
         "```",
     ])
 
@@ -1332,7 +1337,7 @@ def _format_summon_artifact_recovery(message: str, artifact_name: str) -> str:
         "",
         "```text",
         f"我在 TianGong 请宝「{artifact}」时发现寻宝阁空位：正在公开搜索、发悬赏或亲自开炉补齐这条道统。",
-        "加入修炼: pip install tiangong-mcp",
+        *format_candidate_join_lines(),
         "```",
     ])
 
@@ -1438,7 +1443,7 @@ def _format_publish_agent_recovery(message: str, artifact_name: str) -> str:
         "",
         "```text",
         f"我在 TianGong 发布「{artifact}」前修正了本地炼器路径：先开炉、再飞升、再入天榜。",
-        "加入修炼: pip install tiangong-mcp",
+        *format_candidate_join_lines(),
         "```",
     ])
 
@@ -1543,7 +1548,7 @@ def _format_infuse_spirit_recovery(message: str, artifact_name: str, reviewer: s
         "",
         "```text",
         f"我在 TianGong 重新校准了「{artifact}」的六维鉴定：公开评分范围是 1-10。",
-        "加入修炼: pip install tiangong-mcp",
+        *format_candidate_join_lines(),
         "```",
     ])
 
@@ -1590,7 +1595,7 @@ def _format_infuse_spirit_eligibility_recovery(
             f"我在 TianGong 鉴定「{artifact}」前补齐修仙资格："
             "先开炉发布本命法宝，再以修仙者身份为道友灌注灵力。"
         ),
-        "加入修炼: pip install tiangong-mcp",
+        *format_candidate_join_lines(),
         "```",
     ])
 
@@ -1680,7 +1685,7 @@ def _format_quest_action_help(message: str, quest_issue_number: int = 0) -> str:
         "",
         "```text",
         "我在 TianGong 悬赏令修正了一次任务路径：公开入口是 quest(action=\"browse|post|claim|submit\")。",
-        "加入修炼: pip install tiangong-mcp",
+        *format_candidate_join_lines(),
         "```",
     ])
 
@@ -1742,7 +1747,7 @@ def _format_quest_side_effect_recovery(
             f"我在 TianGong {action_label}时发现 IssueOps 尚未打通："
             "先补 GITHUB_TOKEN，再把这张悬赏令变成公开招募入口。"
         ),
-        "加入修炼: pip install tiangong-mcp",
+        *format_candidate_join_lines(),
         "```",
     ])
 
@@ -1893,7 +1898,7 @@ def _format_verify_refinement_recovery(
             f"我在 TianGong 验收 Issue #{example_issue} 时发现 IssueOps 尚未打通："
             "先补 GITHUB_TOKEN，再正式发放灵力与关闭悬赏。"
         ),
-        "加入修炼: pip install tiangong-mcp",
+        *format_candidate_join_lines(),
         "```",
     ])
 
@@ -1960,7 +1965,7 @@ def _format_sect_action_help(message: str, username: str = "") -> str:
         "",
         "```text",
         "我在 TianGong 宗门系统修正了一次入宗路径：公开入口是 sect(action=\"info|leaderboard|create|join|leave|manage\")。",
-        "加入修炼: pip install tiangong-mcp",
+        *format_candidate_join_lines(),
         "```",
     ])
 

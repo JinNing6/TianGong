@@ -16,6 +16,7 @@ import httpx
 from .activation import format_share_attribution_command
 from .artifact_system import DIMENSIONS
 from .config import config
+from .install_bridge import format_candidate_join_text
 
 logger = logging.getLogger("tiangong.review")
 
@@ -54,7 +55,7 @@ def _build_infuse_share_block(
         "## 📣 复制分享\n\n"
         "```text\n"
         f"{share_text}\n"
-        "加入修炼：pip install tiangong-mcp\n"
+        f"{format_candidate_join_text()}\n"
         "```\n\n"
         "## 下一步\n\n"
         "- 继续鉴定: `infuse_spirit` with `artifact_name=\"community-artifact\"`\n"
@@ -262,7 +263,7 @@ def _build_quest_share_block(
         "## 📣 复制分享\n\n"
         "```text\n"
         f"{share_text}\n"
-        "加入修炼: pip install tiangong-mcp\n"
+        f"{format_candidate_join_text()}\n"
         "```\n\n"
         "## 下一步\n\n"
         f"- 认领此令: `quest(action=\"claim\", quest_issue_number={issue_number})`\n"
@@ -284,7 +285,7 @@ def _build_claim_share_block(quest_issue_number: int, refiner: str) -> str:
         "## 📣 复制分享\n\n"
         "```text\n"
         f"{share_text}\n"
-        "加入修炼: pip install tiangong-mcp\n"
+        f"{format_candidate_join_text()}\n"
         "```\n\n"
         "## 下一步\n\n"
         f"- 提交成果: `quest(action=\"submit\", quest_issue_number={quest_issue_number}, solution=\"...\")`\n"
@@ -310,7 +311,7 @@ def _build_submit_share_block(
         "## 📣 复制分享\n\n"
         "```text\n"
         f"{share_text}\n"
-        "加入修炼: pip install tiangong-mcp\n"
+        f"{format_candidate_join_text()}\n"
         "```\n\n"
         "## 下一步\n\n"
         f"- 发布者验收: `verify_refinement` with `quest_issue_number={quest_issue_number}`\n"
@@ -336,7 +337,7 @@ def _build_verify_approval_share_block(
         "## 📣 复制分享\n\n"
         "```text\n"
         f"{share_text}\n"
-        "加入修炼: pip install tiangong-mcp\n"
+        f"{format_candidate_join_text()}\n"
         "```\n\n"
         "## 下一步\n\n"
         f"- 查看修行名片: `my_realm(username=\"{refiner}\")`\n"
@@ -359,7 +360,7 @@ def _build_bounty_board_share_block(items: list[dict], total_count: int) -> str:
         "## 📣 复制分享\n\n"
         "```text\n"
         f"{share_text}\n"
-        "加入修炼: pip install tiangong-mcp\n"
+        f"{format_candidate_join_text()}\n"
         "```\n\n"
         "## 下一步\n\n"
         "- 认领悬赏: `quest(action=\"claim\", quest_issue_number=...)`\n"

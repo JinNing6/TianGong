@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 try:
@@ -44,7 +45,7 @@ def test_runtime_version_matches_project_metadata():
 
     project_version = _pyproject()["project"]["version"]
 
-    assert project_version == "0.1.9"
+    assert project_version == "0.1.10"
     assert tiangong.__version__ == project_version
     assert metadata.version("tiangong-mcp") == project_version
 
@@ -136,13 +137,13 @@ def test_readmes_document_one_command_dev_install_and_quality_gate():
         assert "environment `pypi`" in text
         assert "invalid-publisher" in text
         assert "Current Candidate Git Tag Install Bridge" in text
-        assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.9"' in text
+        assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.10"' in text
         assert "PYPI_TOKEN" in text
 
 
 def test_readmes_put_current_candidate_install_before_stale_pypi_command():
     """Cold public visitors should not be routed to the stale PyPI build before the current tag bridge."""
-    candidate = 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.9"'
+    candidate = 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.10"'
     canonical = "pip install -U tiangong-mcp"
 
     for filename in ["README.md", "README.zh-CN.md"]:
@@ -152,6 +153,20 @@ def test_readmes_put_current_candidate_install_before_stale_pypi_command():
         assert "Current Candidate Install" in text
         assert "PyPI-current install after registry readiness" in text
         assert text.index(candidate) < text.index(canonical)
+
+
+def test_public_join_copy_never_uses_stale_bare_pypi_install():
+    """Public share surfaces should not route cold contributors to the stale PyPI build."""
+    stale_install = re.compile(r"(?<!-U )(?<!--upgrade )pip install tiangong-mcp")
+    offenders: list[str] = []
+
+    for path in sorted((ROOT / "tiangong").glob("*.py")):
+        text = path.read_text(encoding="utf-8")
+        for match in stale_install.finditer(text):
+            line_no = text.count("\n", 0, match.start()) + 1
+            offenders.append(f"{path.relative_to(ROOT)}:{line_no}")
+
+    assert offenders == []
 
 
 def test_readmes_document_mcp_public_proof_pack_tool():

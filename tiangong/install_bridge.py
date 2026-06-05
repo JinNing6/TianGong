@@ -63,6 +63,56 @@ def git_tag_install_command(
     return f'python -m pip install --upgrade "{requirement}"'
 
 
+def current_candidate_install_command(package_name: str = DEFAULT_PACKAGE_NAME) -> str:
+    """Build the current local-version Git tag install command for public share cards."""
+    package = clean_install_arg(package_name, DEFAULT_PACKAGE_NAME)
+    return git_tag_install_command(
+        repo_owner="",
+        repo_name="",
+        version_or_tag=local_package_version(package),
+        package_name=package,
+    )
+
+
+def format_candidate_join_lines(
+    package_name: str = DEFAULT_PACKAGE_NAME,
+    *,
+    join_label: str = "加入修炼",
+) -> list[str]:
+    """Return plain-text install lines for compact public share blocks."""
+    package = clean_install_arg(package_name, DEFAULT_PACKAGE_NAME)
+    label = clean_install_arg(join_label, "加入修炼")
+    return [
+        f"{label}: {current_candidate_install_command(package)}",
+        f"安装后复查: {package} public-install-command",
+        f"PyPI 追平后安装: pip install -U {package}",
+    ]
+
+
+def format_candidate_join_text(
+    package_name: str = DEFAULT_PACKAGE_NAME,
+    *,
+    join_label: str = "加入修炼",
+) -> str:
+    """Return newline-joined install lines for paste-ready code blocks."""
+    return "\n".join(format_candidate_join_lines(package_name, join_label=join_label))
+
+
+def format_candidate_install_markdown_lines(package_name: str = DEFAULT_PACKAGE_NAME) -> list[str]:
+    """Return Markdown bullet install lines for Discussion/PR recovery surfaces."""
+    package = clean_install_arg(package_name, DEFAULT_PACKAGE_NAME)
+    return [
+        f"- 当前候选安装: `{current_candidate_install_command(package)}`",
+        f"- 安装后复查: `{package} public-install-command`",
+        f"- PyPI 追平后安装: `pip install -U {package}`",
+    ]
+
+
+def format_candidate_install_markdown_text(package_name: str = DEFAULT_PACKAGE_NAME) -> str:
+    """Return newline-joined Markdown install bullets for generated public posts."""
+    return "\n".join(format_candidate_install_markdown_lines(package_name))
+
+
 def format_current_candidate_install_bridge_lines(
     *,
     repo_owner: str,

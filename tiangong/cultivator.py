@@ -12,6 +12,12 @@ from dataclasses import asdict, dataclass, field
 from typing import Any
 
 from .config import config
+from .install_bridge import (
+    format_candidate_install_markdown_lines,
+    format_candidate_install_markdown_text,
+    format_candidate_join_lines,
+    format_candidate_join_text,
+)
 from .realm import (
     MAX_STAGE,
     REALMS,
@@ -564,7 +570,7 @@ def format_tribulation_check(profile: CultivatorProfile) -> str:
             f"我在 TianGong 发起渡劫检查：@{profile.username} 当前 {realm.symbol} {realm.name_cn}，"
             f"灵力 {profile.spirit_power}，赛季战力 {snapshot_power}。下一劫：{next_name}；任务：{next_task}。"
         ),
-        "加入修炼：pip install tiangong-mcp",
+        *format_candidate_join_lines(),
         f"查看渡劫：check_tribulation(username=\"{profile.username}\")",
         "```",
         "",
@@ -583,7 +589,7 @@ def format_tribulation_check(profile: CultivatorProfile) -> str:
         f"- 修行名片: `my_realm(username=\"{profile.username}\")`",
         "- 悬赏循环: `quest(action=\"browse\")`",
         "- 天榜追踪: `leaderboard(type=\"season\")` / `leaderboard(type=\"tournament\")`",
-        "- 安装: `pip install tiangong-mcp`",
+        *format_candidate_install_markdown_lines(),
         "```",
     ])
 
@@ -606,7 +612,7 @@ def _build_cultivator_share_block(profile: CultivatorProfile, snapshot_power: in
         "## 📣 复制修行名片\n\n"
         "```text\n"
         f"{share_text}\n"
-        "加入修炼：pip install tiangong-mcp\n"
+        f"{format_candidate_join_text()}\n"
         f"查看档案：my_realm(username=\"{profile.username}\")\n"
         "争夺天榜：leaderboard(type=\"season\")\n"
         "```\n\n"
@@ -672,7 +678,7 @@ def _build_mentor_readiness_recovery_block(
         f"我在 TianGong 准备带 @{apprentice.username} 入门，但 @{mentor.username} "
         f"还需要补齐导师履历：最低 {min_realm.name_cn}、至少 1 件法宝、至少 1 次真实评价。"
         "先完成开炉、发布、鉴定，再生成师徒邀请。\n"
-        "加入修炼：pip install tiangong-mcp\n"
+        f"{format_candidate_join_text()}\n"
         "```\n\n"
         "### 复制 Discussion/PR 恢复帖\n\n"
         "```markdown\n"
@@ -688,7 +694,7 @@ def _build_mentor_readiness_recovery_block(
         f"- 真实鉴定: `infuse_spirit(artifact_name=\"artifact-name\", reviewer=\"{mentor.username}\")`\n"
         "- 社区悬赏: `quest(action=\"browse\")`\n"
         "- 天榜追踪: `leaderboard(type=\"season\")`\n"
-        "- 安装: `pip install tiangong-mcp`\n"
+        f"{format_candidate_install_markdown_text()}\n"
         "```"
     )
 
@@ -730,7 +736,7 @@ def _build_mentor_apprentice_share_block(
         f"导师 {mentor_realm.name_cn}、赛季战力 {mentor_power}；"
         f"徒弟 {apprentice_realm.name_cn}、赛季战力 {apprentice_power}。"
         f"目标：{apprentice_realm.name_cn} → {next_realm.name_cn}。\n"
-        "加入修炼：pip install tiangong-mcp\n"
+        f"{format_candidate_join_text()}\n"
         "```\n\n"
         "### 复制 Discussion/PR 师徒帖\n\n"
         "```markdown\n"
@@ -746,7 +752,7 @@ def _build_mentor_apprentice_share_block(
         f"- 导师鉴定: `infuse_spirit(artifact_name=\"{apprentice_artifact}\", reviewer=\"{mentor.username}\")`\n"
         f"- 徒弟名片: `my_realm(username=\"{apprentice.username}\")`\n"
         "- 天榜追踪: `leaderboard(type=\"season\")` / `leaderboard(type=\"sect\")`\n"
-        "- 安装: `pip install tiangong-mcp`\n"
+        f"{format_candidate_install_markdown_text()}\n"
         "```"
     )
 

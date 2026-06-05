@@ -19,6 +19,7 @@ import re
 import httpx
 
 from .config import config
+from .install_bridge import format_candidate_join_text
 
 logger = logging.getLogger("tiangong.search")
 
@@ -310,7 +311,7 @@ def _build_search_share_block(artifacts: list[dict], query: str = "") -> str:
         "## 📣 复制分享\n\n"
         "```text\n"
         f"{share_text}\n"
-        "加入修炼: pip install tiangong-mcp\n"
+        f"{format_candidate_join_text()}\n"
         "```\n\n"
         "## 下一步\n\n"
         f"- 请宝下凡: {_summon_command(first_name)}\n"
@@ -331,7 +332,7 @@ def _build_empty_search_recruitment_block(query: str) -> str:
         "```text\n"
         f"我在 TianGong 寻宝阁没有找到{query_text}。"
         "这就是一个新法宝缺口：谁来开炉补位，谁就先占这个道统。\n"
-        "加入修炼: pip install tiangong-mcp\n"
+        f"{format_candidate_join_text()}\n"
         "```\n\n"
         "## 下一步\n\n"
         f"- 发布悬赏: `quest(action=\"post\", artifact_name=\"{artifact_name}\", description=\"{description}\")`\n"

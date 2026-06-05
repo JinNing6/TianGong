@@ -19,6 +19,11 @@ from dataclasses import asdict, dataclass, field
 
 from .config import config
 from .cultivator import CultivatorProfile
+from .install_bridge import (
+    format_candidate_install_markdown_lines,
+    format_candidate_join_lines,
+    format_candidate_join_text,
+)
 
 logger = logging.getLogger("tiangong.sect")
 
@@ -191,7 +196,7 @@ def _build_create_sect_share_block(sect: SectProfile) -> str:
         "## 📣 复制分享\n\n"
         "```text\n"
         f"{share_text}\n"
-        "加入修炼: pip install tiangong-mcp\n"
+        f"{format_candidate_join_text()}\n"
         "```\n\n"
         "## 下一步\n\n"
         f"- 招募同门: `sect(action=\"join\", sect_name=\"{sect.name}\")`\n"
@@ -214,7 +219,7 @@ def _build_join_sect_share_block(sect: SectProfile, username: str) -> str:
         "## 📣 复制分享\n\n"
         "```text\n"
         f"{share_text}\n"
-        "加入修炼: pip install tiangong-mcp\n"
+        f"{format_candidate_join_text()}\n"
         "```\n\n"
         "## 下一步\n\n"
         f"- 查看宗门: `sect(action=\"info\", sect_name=\"{sect.name}\")`\n"
@@ -700,7 +705,7 @@ def format_sect_card(sect: SectProfile, candidate: CultivatorProfile | None = No
             f"我在 TianGong 邀请 @{candidate.username} 拜入宗门「{sect.name}」："
             f"候选人灵力 {candidate.spirit_power}，法宝 {candidate.agent_count}，"
             f"境界 {candidate_realm.name_cn}；宗门当前 {sect.member_count} 人，宗门灵力 {sect.total_spirit_power}。",
-            "加入修炼：pip install tiangong-mcp",
+            *format_candidate_join_lines(),
             f"拜入宗门：sect(action=\"join\", sect_name=\"{sect.name}\")",
             "```",
             "",
@@ -717,7 +722,7 @@ def format_sect_card(sect: SectProfile, candidate: CultivatorProfile | None = No
             f"- 拜入命令: `sect(action=\"join\", sect_name=\"{sect.name}\")`",
             f"- 候选人名片: `my_realm(username=\"{candidate.username}\")`",
             "- 宗门战报: `sect(action=\"leaderboard\")` / `leaderboard(type=\"sect\")`",
-            "- 安装: `pip install tiangong-mcp`",
+            *format_candidate_install_markdown_lines(),
             "```",
         ])
     else:
@@ -734,7 +739,7 @@ def format_sect_card(sect: SectProfile, candidate: CultivatorProfile | None = No
             "```text",
             f"我在 TianGong 看到宗门「{sect.name}」正在招募同门：宗门当前 {sect.member_count} 人，"
             f"宗门灵力 {sect.total_spirit_power}，等阶 {grade.name_cn}。@candidate 可先完成入宗试炼，再拜入宗门。",
-            "加入修炼：pip install tiangong-mcp",
+            *format_candidate_join_lines(),
             f"拜入宗门：sect(action=\"join\", sect_name=\"{sect.name}\")",
             "```",
             "",
@@ -749,7 +754,7 @@ def format_sect_card(sect: SectProfile, candidate: CultivatorProfile | None = No
             f"- 入宗试炼: `quest(action=\"post\", artifact_name=\"{trial_artifact}\", description=\"{trial_description}\")`",
             f"- 拜入命令: `sect(action=\"join\", sect_name=\"{sect.name}\")`",
             "- 宗门战报: `sect(action=\"leaderboard\")` / `leaderboard(type=\"sect\")`",
-            "- 安装: `pip install tiangong-mcp`",
+            *format_candidate_install_markdown_lines(),
             "```",
         ])
 

@@ -15,6 +15,7 @@ import logging
 import httpx
 
 from .config import config
+from .install_bridge import format_candidate_join_text
 
 logger = logging.getLogger("tiangong.lineage")
 
@@ -153,7 +154,7 @@ def _build_lineage_share_block(tree: dict) -> str:
         "```text\n"
         f"我在 TianGong 追溯道统：{artifact_name} 已留下 {lineage_count} 条道统传承，"
         f"传承加成 +{bonus} 灵力。\n"
-        "加入修炼: pip install tiangong-mcp\n"
+        f"{format_candidate_join_text()}\n"
         "```\n\n"
         "## 下一步\n\n"
         f"- 请宝下凡: `treasure_pavilion(action=\"summon\", artifact_name=\"{artifact_name}\")`\n"

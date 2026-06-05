@@ -15,6 +15,7 @@ import httpx
 
 from .activation import format_share_attribution_command
 from .config import config
+from .install_bridge import format_candidate_join_text
 from .vault import check_artifact_exists, ensure_cave, save_artifact_meta
 
 logger = logging.getLogger("tiangong.marketplace")
@@ -105,7 +106,7 @@ def _build_publish_share_block(
         "## 📣 复制分享\n\n"
         "```text\n"
         f"{share_text}\n"
-        "加入修炼：pip install tiangong-mcp\n"
+        f"{format_candidate_join_text()}\n"
         "```\n\n"
         "## 下一步\n\n"
         f"- 去寻宝阁看法宝: `treasure_pavilion` with `query=\"{artifact_name}\"`\n"
@@ -131,7 +132,7 @@ def _build_summon_share_block(
         "## 📣 复制分享\n\n"
         "```text\n"
         f"{share_text}\n"
-        "加入修炼：pip install tiangong-mcp\n"
+        f"{format_candidate_join_text()}\n"
         "```\n\n"
         "## 下一步\n\n"
         f"- 灌注灵力: `infuse_spirit(artifact_name=\"{artifact_name}\")`\n"
@@ -262,7 +263,7 @@ def _build_issue_body(meta: dict, artifact_name: str, creator: str, artifact_dir
 | **创建者** | @{creator} |
 | **框架** | {meta.get('framework', 'N/A')} |
 | **语言** | {meta.get('language', 'python')} |
-| **版本** | {meta.get('version', '0.1.9')} |
+| **版本** | {meta.get('version', '0.1.10')} |
 | **描述** | {meta.get('description', 'N/A')} |
 
 ## 📖 使用说明

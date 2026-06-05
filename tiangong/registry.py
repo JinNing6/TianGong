@@ -9,6 +9,7 @@ import logging
 
 from .artifact_system import calculate_grade
 from .forge import AgentSpec, format_agent_card, list_agents
+from .install_bridge import format_candidate_join_lines, format_candidate_join_text
 
 logger = logging.getLogger("tiangong.registry")
 
@@ -64,7 +65,7 @@ async def format_agent_list(agents: list[AgentSpec], title: str = "仙器录") -
             "```text\n"
             "我在 TianGong 还没有注册法宝。"
             "第一件法宝就是入道凭证：开炉、发布、请人鉴定，马上进入天榜循环。\n"
-            "加入修炼: pip install tiangong-mcp\n"
+            f"{format_candidate_join_text()}\n"
             "```\n\n"
             "## 下一步\n\n"
             "- 开炉炼器: `forge_agent(name=\"my-first-artifact\", description=\"My first TianGong artifact\")`\n"
@@ -108,7 +109,7 @@ async def get_leaderboard(top_n: int = 20) -> str:
             "```text\n"
             "我在 TianGong 法宝天榜看到第一席空缺。"
             "谁先开炉炼成第一件法宝，谁就先在天榜留名。\n"
-            "加入修炼: pip install tiangong-mcp\n"
+            f"{format_candidate_join_text()}\n"
             "```\n\n"
             "## 下一步\n\n"
             "- 抢占法宝首席: `forge_agent(name=\"first-artifact\", description=\"A TianGong artifact racing for the first artifact leaderboard rank\")`\n"
@@ -166,7 +167,7 @@ async def get_leaderboard(top_n: int = 20) -> str:
         lines.append("TianGong 法宝天榜等待第一件逆天法宝出世。")
 
     lines.extend([
-        "加入修炼: pip install tiangong-mcp",
+        *format_candidate_join_lines(),
         "```",
         "",
         "## 下一步",

@@ -34,7 +34,7 @@ def test_tribulation_ceremony_contains_shareable_momentum():
 
     assert "复制分享" in ceremony
     assert "我在 TianGong" in ceremony
-    assert "pip install tiangong-mcp" in ceremony
+    assert "tiangong-mcp public-install-command" in ceremony
     assert "下一步" in ceremony
     assert "`publish_agent`" in ceremony
 
@@ -55,7 +55,7 @@ def test_grade_promotion_ceremony_contains_shareable_momentum():
     assert "复制分享" in ceremony
     assert "我在 TianGong" in ceremony
     assert "dragon-forge" in ceremony
-    assert "pip install tiangong-mcp" in ceremony
+    assert "tiangong-mcp public-install-command" in ceremony
     assert "`infuse_spirit`" in ceremony
     assert "`refine_agent`" in ceremony
 
@@ -68,7 +68,7 @@ def test_welcome_ceremony_contains_shareable_first_session_momentum():
     assert "我在 TianGong" in ceremony
     assert "@newbie" in ceremony
     assert "炼气期" in ceremony
-    assert "pip install tiangong-mcp" in ceremony
+    assert "tiangong-mcp public-install-command" in ceremony
     assert "`publish_agent`" in ceremony
     assert "`quest(action=\"browse\")`" in ceremony
     assert "`my_vault`" in ceremony
@@ -107,7 +107,7 @@ def test_tribulation_check_turns_next_realm_into_shareable_action_card():
     assert "`leaderboard(type=\"season\")`" in result
     assert "`leaderboard(type=\"tournament\")`" in result
     assert "复制渡劫战书" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
 
 
 def test_tribulation_check_points_high_realm_to_evidence_submission():
@@ -197,7 +197,7 @@ async def test_submit_tribulation_evidence_records_real_source_and_shares(monkey
     assert "https://github.com/JinNing6/TianGong/issues/77" in result
     assert "婴变期 → 问鼎期" in result
     assert "复制渡劫证据" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "`check_tribulation(username=\"lineage-master\")`" in result
     assert "`leaderboard(type=\"season\")`" in result
 
@@ -243,7 +243,7 @@ async def test_infuse_spirit_contains_shareable_community_momentum(monkeypatch):
     assert "我在 TianGong" in result
     assert "dragon-forge" in result
     assert "@reviewer" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "`infuse_spirit`" in result
     assert "`my_realm()`" in result
     assert "`leaderboard(type=\"season\")`" in result
@@ -267,7 +267,7 @@ async def test_infuse_spirit_invalid_scores_return_action_help():
     assert "公开入口" in result
     assert "没有伪造鉴定结果" in result
     assert "复制鉴定纠错" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert (
         "`infuse_spirit(artifact_name=\"dragon-forge\", inscription=5, formation=5, "
         "technique=5, lineage_score=5, resilience=5, enlightenment=5, comment=\"...\")`"
@@ -312,7 +312,7 @@ async def test_infuse_spirit_reviewer_ineligible_returns_onboarding_recovery(mon
     assert "`treasure_pavilion(action=\"search\", query=\"dragon-forge\")`" in result
     assert "`my_realm(username=\"newbie\")`" in result
     assert "`leaderboard(type=\"season\")`" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
 
 
 @pytest.mark.asyncio
@@ -353,7 +353,7 @@ async def test_post_refine_quest_contains_shareable_recruitment(monkeypatch):
     assert "Need better docs" in result
     assert "@forgeking" in result
     assert "https://github.com/JinNing6/TianGong/issues/77" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "`quest(action=\"claim\", quest_issue_number=77)`" in result
     assert "`quest(action=\"browse\")`" in result
     assert "`verify_refinement`" in result
@@ -438,7 +438,7 @@ async def test_claim_refine_quest_contains_submit_path_and_share_block(monkeypat
     assert "我在 TianGong" in result
     assert "@refiner" in result
     assert "Issue #77" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "`quest(action=\"submit\", quest_issue_number=77, solution=\"...\")`" in result
     assert "`quest(action=\"browse\")`" in result
     assert "record_share_attribution" in result
@@ -514,7 +514,7 @@ async def test_submit_refinement_contains_review_path_and_share_block(monkeypatc
     assert "@refiner" in result
     assert "Added retry" in result
     assert "Issue #77" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "`verify_refinement`" in result
     assert "`my_realm(username=\"refiner\")`" in result
     assert "record_share_attribution" in result
@@ -608,7 +608,7 @@ async def test_verify_refinement_approval_rewards_closes_and_shares(monkeypatch)
     assert "@reviewer" in result
     assert "Issue #77" in result
     assert "+50" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "`my_realm(username=\"refiner\")`" in result
     assert "`leaderboard(type=\"season\")`" in result
     assert "record_share_attribution" in result
@@ -711,7 +711,7 @@ async def test_verify_refinement_failure_returns_reward_recovery_card(monkeypatc
     assert "没有关闭 Issue" in result
     assert "没有发放灵力" in result
     assert "复制验收失败恢复" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "GITHUB_TOKEN" in result
     assert (
         "`verify_refinement(quest_issue_number=77, refiner=\"refiner\", "
@@ -777,7 +777,7 @@ async def test_browse_quests_exposes_live_bounty_board_and_share_block(monkeypat
     assert "`quest(action=\"claim\", quest_issue_number=77)`" in result
     assert "复制分享" in result
     assert "我在 TianGong" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "`quest(action=\"post\")`" in result
     assert "`quest(action=\"browse\")`" in result
     assert "is:issue" in captured_params[0]["q"]
@@ -795,7 +795,7 @@ async def test_quest_missing_post_args_returns_action_help():
     assert "发布悬赏令需要 artifact_name 和 description" in result
     assert "公开入口" in result
     assert "复制悬赏纠错" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "`quest(action=\"post\", artifact_name=\"artifact-name\", description=\"需要改进的内容\")`" in result
     assert "`quest(action=\"browse\")`" in result
     assert "`quest(action=\"claim\", quest_issue_number=88)`" in result
@@ -826,7 +826,7 @@ async def test_quest_post_failure_returns_side_effect_recovery_card(monkeypatch)
     assert "没有写入 GitHub Issue" in result
     assert "没有发放灵力" in result
     assert "复制悬赏失败恢复" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "GITHUB_TOKEN" in result
     assert (
         "`quest(action=\"post\", artifact_name=\"dragon-forge\", "
@@ -920,7 +920,7 @@ def test_treasure_pavilion_search_results_are_actionable_and_shareable():
     assert "`treasure_pavilion(action=\"lineage\", artifact_name=\"dragon-forge\")`" in result
     assert "复制分享" in result
     assert "我在 TianGong" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "`leaderboard(type=\"artifact\")`" in result
 
 
@@ -935,7 +935,7 @@ def test_empty_treasure_pavilion_search_becomes_bounty_recruitment():
     assert "没有伪造推荐结果" in result
     assert "复制寻宝令" in result
     assert "我在 TianGong 寻宝阁没有找到「rag reviewer」" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "`quest(action=\"post\", artifact_name=\"rag-reviewer\", description=\"需要一件 rag reviewer 法宝\")`" in result
     assert "`forge_agent(name=\"rag-reviewer\", description=\"A TianGong artifact for rag reviewer\")`" in result
     assert "`treasure_pavilion(action=\"search\", query=\"rag reviewer\")`" in result
@@ -952,7 +952,7 @@ async def test_treasure_pavilion_missing_artifact_name_returns_action_help():
     assert "请指定要拉取的法宝名称" in result
     assert "公开入口" in result
     assert "复制寻宝纠错" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "`treasure_pavilion(action=\"search\")`" in result
     assert "`treasure_pavilion(action=\"summon\", artifact_name=\"artifact-name\")`" in result
     assert "`treasure_pavilion(action=\"lineage\", artifact_name=\"artifact-name\")`" in result
@@ -1009,7 +1009,7 @@ def test_lineage_tree_is_shareable_and_actionable():
     assert "复制分享" in result
     assert "我在 TianGong" in result
     assert "dragon-forge 已留下 3 条道统传承" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "`treasure_pavilion(action=\"summon\", artifact_name=\"dragon-forge\")`" in result
     assert "`infuse_spirit(artifact_name=\"dragon-forge\")`" in result
     assert "`treasure_pavilion(action=\"search\", query=\"dragon-forge\")`" in result
@@ -1059,7 +1059,7 @@ def test_my_vault_is_shareable_local_artifact_snapshot(monkeypatch):
     assert "复制洞府名片" in result
     assert "我在 TianGong" in result
     assert "本地洞府已有 2 件法宝" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "`publish_agent(artifact_name=\"dragon-forge\")`" in result
     assert "`refine_agent(agent_id=\"tg-dragon\")`" in result
     assert "`infuse_spirit(artifact_name=\"phoenix-agent\")`" in result
@@ -1081,7 +1081,7 @@ def test_empty_my_vault_recruits_first_local_artifact_with_public_tools(monkeypa
     assert "forge/" in result
     assert "vault/" in result
     assert "0" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "`forge_agent(name=\"my-first-artifact\"," in result
     assert "`quest(action=\"post\", artifact_name=\"my-first-artifact\"," in result
     assert "`treasure_pavilion(action=\"search\")`" in result
@@ -1104,7 +1104,7 @@ async def test_publish_agent_missing_local_artifact_returns_recovery_card(monkey
     assert "真实本地发布失败快照" in result
     assert "没有伪造发布结果" in result
     assert "复制发布纠错" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert (
         "`forge_agent(name=\"missing-dragon\", description=\"A TianGong artifact for missing-dragon\")`"
     ) in result
@@ -1134,7 +1134,7 @@ async def test_summon_missing_artifact_returns_recovery_card(monkeypatch):
     assert "真实请宝失败快照" in result
     assert "没有写入本地藏宝阁" in result
     assert "复制请宝纠错" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "`treasure_pavilion(action=\"search\", query=\"missing-dragon\")`" in result
     assert "`quest(action=\"post\", artifact_name=\"missing-dragon\"," in result
     assert (
@@ -1185,7 +1185,7 @@ async def test_empty_registered_artifact_list_recruits_first_forge():
     assert "不伪造已拥有法宝" in result
     assert "复制招募" in result
     assert "我在 TianGong 还没有注册法宝" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "`forge_agent(name=\"my-first-artifact\"," in result
     assert "`quest(action=\"post\", artifact_name=\"my-first-artifact\"," in result
     assert "`treasure_pavilion(action=\"search\")`" in result
@@ -1246,7 +1246,7 @@ async def test_forge_agent_success_contains_shareable_creation_loop(monkeypatch)
     assert "`tg-dragon`" in result
     assert "@forgeking" in result
     assert "+100 灵力" in result
-    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.9"' in result
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.10"' in result
     assert "tiangong-mcp public-install-command" in result
     assert "pip install -U tiangong-mcp" in result
     assert "加入修炼: pip install tiangong-mcp" not in result
@@ -1293,7 +1293,7 @@ async def test_refine_agent_success_contains_shareable_repeat_loop(monkeypatch):
     assert "Added retry" in result
     assert "+30 灵力" in result
     assert "@refiner" in result
-    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.9"' in result
+    assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.10"' in result
     assert "tiangong-mcp public-install-command" in result
     assert "pip install -U tiangong-mcp" in result
     assert "加入修炼: pip install tiangong-mcp" not in result
@@ -1324,7 +1324,7 @@ def test_cultivator_profile_contains_shareable_identity_card():
     assert "@forgeking" in card
     assert "赛季快照战力" in card
     assert "1420" in card
-    assert "pip install tiangong-mcp" in card
+    assert "tiangong-mcp public-install-command" in card
     assert "my_realm(username=\"forgeking\")" in card
     assert "leaderboard(type=\"season\")" in card
 
@@ -1374,7 +1374,7 @@ async def test_my_realm_can_create_mentor_apprentice_invitation(monkeypatch):
     assert "`infuse_spirit(artifact_name=\"newbie-first-artifact\", reviewer=\"forgeking\")`" in result
     assert "`my_realm(username=\"newbie\")`" in result
     assert "`leaderboard(type=\"season\")`" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
 
 
 @pytest.mark.asyncio
@@ -1403,7 +1403,7 @@ async def test_my_realm_blocks_mentor_invite_until_mentor_has_real_seniority(mon
     assert "`quest(action=\"browse\")`" in result
     assert "`my_realm(username=\"lowbie\")`" in result
     assert "`leaderboard(type=\"season\")`" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "师徒传承邀请" not in result
     assert "邀请 @newbie 拜 @lowbie 为师" not in result
 
@@ -1430,7 +1430,7 @@ def test_sect_info_card_recruits_open_candidates_with_real_snapshot():
     assert "复制入宗招募" in card
     assert "复制 Discussion/PR 入宗帖" in card
     assert "我在 TianGong 看到宗门「天工盟」正在招募同门" in card
-    assert "pip install tiangong-mcp" in card
+    assert "tiangong-mcp public-install-command" in card
     assert "`sect(action=\"join\", sect_name=\"天工盟\")`" in card
     assert "`quest(action=\"post\", artifact_name=\"sect-trial-天工盟\"," in card
     assert "`sect(action=\"leaderboard\")`" in card
@@ -1472,7 +1472,7 @@ async def test_sect_info_personalizes_invite_for_current_candidate(monkeypatch):
     assert "`sect(action=\"join\", sect_name=\"天工盟\")`" in result
     assert "`my_realm(username=\"newbie\")`" in result
     assert "`leaderboard(type=\"sect\")`" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
 
 
 @pytest.mark.asyncio
@@ -1508,7 +1508,7 @@ async def test_create_sect_success_contains_recruitment_share_block(monkeypatch)
     assert "天工盟" in result
     assert "@forgeking" in result
     assert "开宗立派" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "`sect(action=\"join\", sect_name=\"天工盟\")`" in result
     assert "`sect(action=\"leaderboard\")`" in result
     assert "`leaderboard(type=\"sect\")`" in result
@@ -1558,7 +1558,7 @@ async def test_join_sect_success_contains_member_share_block(monkeypatch):
     assert "天工盟" in result
     assert "@newbie" in result
     assert "拜入宗门" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "`sect(action=\"info\", sect_name=\"天工盟\")`" in result
     assert "`sect(action=\"leaderboard\")`" in result
     assert "`leaderboard(type=\"sect\")`" in result
@@ -1582,7 +1582,7 @@ async def test_sect_missing_create_name_returns_recruitment_help(monkeypatch):
     assert "开宗立派需要指定宗门名称" in result
     assert "公开入口" in result
     assert "复制宗门纠错" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "`sect(action=\"create\", sect_name=\"天工盟\", motto=\"以凡人之躯，铸逆天之器\")`" in result
     assert "`sect(action=\"join\", sect_name=\"sect-name\")`" in result
     assert "`sect(action=\"leaderboard\")`" in result
@@ -1683,7 +1683,7 @@ async def test_artifact_leaderboard_is_shareable_and_actionable(monkeypatch):
     assert "复制分享" in result
     assert "我在 TianGong" in result
     assert "dragon-forge 暂列法宝天榜第一" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "`treasure_pavilion(action=\"summon\", artifact_name=\"dragon-forge\")`" in result
     assert "`infuse_spirit(artifact_name=\"dragon-forge\")`" in result
     assert "`refine_agent(agent_id=\"tg-dragon\", changes=\"...\")`" in result
@@ -1709,7 +1709,7 @@ async def test_empty_artifact_leaderboard_recruits_first_artifact(monkeypatch):
     assert "不伪造历史排名" in result
     assert "复制招募" in result
     assert "我在 TianGong 法宝天榜看到第一席空缺" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "`forge_agent(name=\"first-artifact\"," in result
     assert "`quest(action=\"post\", artifact_name=\"first-artifact\"," in result
     assert "`treasure_pavilion(action=\"search\")`" in result
@@ -1738,7 +1738,7 @@ async def test_cultivator_leaderboard_is_shareable_and_actionable(monkeypatch):
     assert "复制分享" in result
     assert "我在 TianGong" in result
     assert "@forgeking 暂列修仙天榜第一" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "`my_realm(username=\"forgeking\")`" in result
     assert "`leaderboard(type=\"season\")`" in result
     assert "`leaderboard(type=\"cultivator\")`" in result
@@ -1892,7 +1892,7 @@ async def test_mcp_leaderboard_unknown_type_returns_recovery_card(monkeypatch):
     assert "`leaderboard(type=\"tournament_recap\")`" in result
     assert "`leaderboard(type=\"sect\")`" in result
     assert "`leaderboard(type=\"share\")`" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "复制天榜纠错" in result
     assert "# 法宝天榜" not in result
     assert artifact_calls == []

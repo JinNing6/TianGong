@@ -66,7 +66,7 @@ async def test_publish_agent_success(mock_config, mock_post, tmp_path):
     assert "我在 TianGong" in result
     assert "mock_artifact" in result
     assert "https://github.com/test/repo/issues/42" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "`treasure_pavilion`" in result
     assert "`infuse_spirit`" in result
     assert "`leaderboard(type=\"artifact\")`" in result
@@ -112,7 +112,7 @@ async def test_summon_artifact_success_contains_shareable_next_actions(monkeypat
     assert "dragon-forge" in result
     assert "forgeking" in result
     assert "🟣 仙器" in result
-    assert "pip install tiangong-mcp" in result
+    assert "tiangong-mcp public-install-command" in result
     assert "`infuse_spirit(artifact_name=\"dragon-forge\")`" in result
     assert "`my_vault()`" in result
     assert "`leaderboard(type=\"artifact\")`" in result

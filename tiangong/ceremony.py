@@ -15,6 +15,7 @@ from .animations import (
     render_realm_chain,
     render_starfield,
 )
+from .install_bridge import format_candidate_join_text
 from .realm import REALMS, Realm
 
 # ============================================================
@@ -145,7 +146,7 @@ def _build_tribulation_share_block(username: str, new_realm: Realm, agent_count:
         "## 📣 复制分享\n\n"
         "```text\n"
         f"{share_text}\n"
-        "加入修炼：pip install tiangong-mcp\n"
+        f"{format_candidate_join_text()}\n"
         "```\n\n"
         "## 下一步\n\n"
         f"- 继续修炼: {next_action}\n"
@@ -174,7 +175,7 @@ def _build_grade_promotion_share_block(
         "## 📣 复制分享\n\n"
         "```text\n"
         f"{share_text}\n"
-        "加入修炼：pip install tiangong-mcp\n"
+        f"{format_candidate_join_text()}\n"
         "```\n\n"
         "## 下一步\n\n"
         "- 继续灌注灵力: `infuse_spirit` with `artifact_name=\"community-artifact\"`\n"
@@ -195,7 +196,7 @@ def _build_welcome_share_block(username: str) -> str:
         "## 📣 复制分享\n\n"
         "```text\n"
         f"{share_text}\n"
-        "加入修炼：pip install tiangong-mcp\n"
+        f"{format_candidate_join_text()}\n"
         "```\n\n"
         "## 下一步\n\n"
         "- 发布出世: `publish_agent` with `artifact_name=\"your-artifact\"`\n"

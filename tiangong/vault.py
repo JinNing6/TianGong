@@ -27,6 +27,7 @@ from contextlib import suppress
 from pathlib import Path
 
 from .config import config
+from .install_bridge import format_candidate_join_lines
 
 logger = logging.getLogger("tiangong.vault")
 
@@ -372,7 +373,7 @@ def _build_vault_share_block(forge_items: list[dict], vault_items: list[dict]) -
         "",
         "```text",
         share_text,
-        "加入修炼: pip install tiangong-mcp",
+        *format_candidate_join_lines(),
         "```",
         "",
         "## 下一步",

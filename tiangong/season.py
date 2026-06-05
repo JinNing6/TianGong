@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 
 from .cultivator import CultivatorProfile, calculate_profile_snapshot_power
+from .install_bridge import format_candidate_install_markdown_lines, format_candidate_join_lines
 from .sect import SectProfile
 
 
@@ -140,7 +141,7 @@ def format_season_leaderboard(
         lines.append(f"TianGong {season.title} 已开启，赛季天榜等待第一位修仙者。{season.share_tag}")
 
     lines.extend([
-        "加入修炼：pip install tiangong-mcp",
+        *format_candidate_join_lines(),
         "查看天榜：leaderboard(type=\"season\")",
         "```",
         "",
@@ -166,7 +167,7 @@ def format_season_leaderboard(
         lines.extend([
             f"- 数据声明: 当前档案快照，不伪造历史赛季数据。{season.share_tag}",
             "- 继续贡献: `forge_agent`、`infuse_spirit(artifact_name=\"artifact-name\")`、`quest(action=\"post\")`、`leaderboard(type=\"season\")`",
-            "- 加入修炼: `pip install tiangong-mcp`",
+            *format_candidate_install_markdown_lines(),
         ])
     else:
         lines.append(f"## TianGong {season.title}首席招募")
@@ -175,7 +176,7 @@ def format_season_leaderboard(
             f"- 数据声明: 当前档案快照为 0 位修仙者，不伪造历史赛季数据。{season.share_tag}",
             "- 第一手行动: `forge_agent(name=\"first-season-artifact\", description=\"A TianGong artifact racing for the first season rank\")`",
             "- 继续贡献: `quest(action=\"post\")`、`leaderboard(type=\"season\")`",
-            "- 加入修炼: `pip install tiangong-mcp`",
+            *format_candidate_install_markdown_lines(),
         ])
 
     lines.extend([
@@ -352,7 +353,7 @@ def format_tournament_board(
 
     lines.extend([
         f"{season.share_tag}",
-        "加入修炼：pip install tiangong-mcp",
+        *format_candidate_join_lines(),
         "查看擂台：leaderboard(type=\"tournament\")",
         "```",
         "",
@@ -381,7 +382,7 @@ def format_tournament_board(
         lines.extend([
             f"- 数据声明: 当前档案快照，不伪造胜场、赛果或历史擂台。{season.share_tag}",
             "- 刷新擂台: `leaderboard(type=\"tournament\")`",
-            "- 加入修炼: `pip install tiangong-mcp`",
+            *format_candidate_install_markdown_lines(),
         ])
     else:
         lines.append(f"## TianGong {season.title}天骄擂台招募")
@@ -391,7 +392,7 @@ def format_tournament_board(
             "- 第一手行动: `forge_agent(name=\"first-duel-artifact\", description=\"A TianGong artifact entering the first duel board\")`",
             "- 发布挑战: `quest(action=\"post\", artifact_name=\"first-duel-artifact\", description=\"招募第一批天骄擂台挑战者\")`",
             "- 刷新擂台: `leaderboard(type=\"tournament\")`",
-            "- 加入修炼: `pip install tiangong-mcp`",
+            *format_candidate_install_markdown_lines(),
         ])
 
     lines.extend([
@@ -527,7 +528,7 @@ def format_tournament_recap(
 
     lines.extend([
         f"{season.share_tag}",
-        "加入修炼：pip install tiangong-mcp",
+        *format_candidate_join_lines(),
         "查看复盘：leaderboard(type=\"tournament_recap\")",
         "```",
         "",
@@ -558,7 +559,7 @@ def format_tournament_recap(
             f"- 数据声明: 当前档案快照复盘，不伪造胜场、冠军历史或赛果。{season.share_tag}",
             "- 重放擂台: `leaderboard(type=\"tournament\")`",
             "- 刷新复盘: `leaderboard(type=\"tournament_recap\")`",
-            "- 加入修炼: `pip install tiangong-mcp`",
+            *format_candidate_install_markdown_lines(),
         ])
     else:
         lines.append(f"## TianGong {season.title}天骄擂台复盘招募")
@@ -569,7 +570,7 @@ def format_tournament_recap(
             f"- 下一轮钩子: {next_round_command}",
             "- 重放擂台: `leaderboard(type=\"tournament\")`",
             "- 刷新复盘: `leaderboard(type=\"tournament_recap\")`",
-            "- 加入修炼: `pip install tiangong-mcp`",
+            *format_candidate_install_markdown_lines(),
         ])
 
     lines.extend([
@@ -686,7 +687,7 @@ def format_sect_war_banner(
         lines.append(f"TianGong 宗门战 {season.title} 已开启，等待第一个宗门开宗立派。{season.share_tag}")
 
     lines.extend([
-        "加入宗门战：pip install tiangong-mcp",
+        *format_candidate_join_lines(join_label="加入宗门战"),
         "查看战报：leaderboard(type=\"sect\")",
         "```",
         "",
@@ -713,7 +714,7 @@ def format_sect_war_banner(
             f"- 数据声明: 当前宗门档案快照，不伪造历史战报。{season.share_tag}",
             f"- 拜入冠军宗门: `sect(action=\"join\", sect_name=\"{sect.name}\")`",
             "- 继续贡献: `sect(action=\"leaderboard\")`、`leaderboard(type=\"sect\")`、`my_realm()`",
-            "- 加入宗门战: `pip install tiangong-mcp`",
+            *format_candidate_install_markdown_lines(),
         ])
     else:
         lines.append(f"## TianGong 宗门战 {season.title}首宗招募")
@@ -722,7 +723,7 @@ def format_sect_war_banner(
             f"- 数据声明: 当前宗门档案快照为 0 个宗门，不伪造历史战报。{season.share_tag}",
             "- 第一手行动: `sect(action=\"create\", sect_name=\"天工盟\", motto=\"以凡人之躯，铸逆天之器\")`",
             "- 继续贡献: `sect(action=\"leaderboard\")`、`leaderboard(type=\"sect\")`",
-            "- 加入宗门战: `pip install tiangong-mcp`",
+            *format_candidate_install_markdown_lines(),
         ])
 
     lines.extend([
