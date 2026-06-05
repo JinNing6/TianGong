@@ -1467,6 +1467,146 @@ def _format_public_launch_closure_checklist_lines(
     return lines
 
 
+def _format_public_flywheel_closure_verdict_lines(
+    snapshot: PublicGrowthSnapshot,
+    *,
+    events: Sequence[ActivationEvent],
+    local_referrals: int,
+    local_shares: int,
+    target_contributors: int,
+) -> list[str]:
+    target = _safe_positive_int(target_contributors)
+    recheck_command = (
+        f"`public_growth_report(record_snapshot=True, target_contributors={target})`"
+        if target
+        else "`public_growth_report(record_snapshot=True, target_contributors=<target>)`"
+    )
+    release_tag = snapshot.release_readiness.expected_tag or f"v{snapshot.distribution_readiness.local_version}"
+
+    issueops_ready = all(file.status == "live" for file in snapshot.issueops_readiness.files)
+    issueops_blocked = any(file.status == "missing" for file in snapshot.issueops_readiness.files)
+    issueops_evidence = (
+        "all required IssueOps routes are live"
+        if issueops_ready
+        else ", ".join(f"{file.route}: {file.status}" for file in snapshot.issueops_readiness.files)
+    )
+
+    release_ready = snapshot.release_readiness.status == "published"
+    release_blocked = snapshot.release_readiness.status in {"missing", "draft", "prerelease", "mismatch"}
+    distribution_ready = snapshot.distribution_readiness.status == "current"
+    distribution_blocked = snapshot.distribution_readiness.status == "stale"
+    first_proof_ready = (
+        snapshot.growth_issues.total > 0
+        and snapshot.share_issues.total > 0
+        and local_referrals > 0
+        and local_shares > 0
+    )
+    actors = _target_actor_set(snapshot, events)
+    observed = len(actors)
+    target_shortfall = max(0, target - observed) if target else observed
+    target_ready = target > 0 and observed >= target
+
+    rows: list[tuple[str, str, str, str]] = [
+        (
+            "Remote IssueOps routes",
+            _gate_status_label(ready=issueops_ready, blocked=issueops_blocked),
+            issueops_evidence,
+            "`tiangong-mcp public-launch-assets`, then push the Issue Forms and comment workflow to the default branch.",
+        ),
+        (
+            "GitHub Release trigger",
+            _gate_status_label(ready=release_ready, blocked=release_blocked),
+            f"`{release_tag or 'unknown'}` is {snapshot.release_readiness.status or 'not_checked'}",
+            f"Publish GitHub Release `{release_tag}` or trigger `.github/workflows/{PYPI_TRUSTED_PUBLISHER_WORKFLOW_FILENAME}` for that tag.",
+        ),
+        (
+            "PyPI install loop",
+            _gate_status_label(ready=distribution_ready, blocked=distribution_blocked),
+            (
+                f"PyPI latest `{snapshot.distribution_readiness.published_version or 'unknown'}` vs local "
+                f"`{snapshot.distribution_readiness.local_version or 'unknown'}`"
+            ),
+            "`tiangong-mcp public-install-command`, then fix Trusted Publishing and recheck PyPI latest.",
+        ),
+        (
+            "First public proof",
+            "ready" if first_proof_ready else "blocked",
+            (
+                f"{snapshot.growth_issues.total} Growth issues, {snapshot.share_issues.total} Share issues, "
+                f"{local_referrals} local returns, {local_shares} local shares"
+            ),
+            "`public_proof_pack()` -> open created Issues -> record Growth and Share proof URLs.",
+        ),
+        (
+            "Campaign contributor target",
+            "ready" if target_ready else "blocked" if target else "unverified",
+            (
+                f"{observed}/{target} real contributors observed; shortfall {target_shortfall}"
+                if target
+                else "no explicit contributor target supplied"
+            ),
+            f"`growth_campaign(target_contributors={target})`, then {recheck_command}" if target else recheck_command,
+        ),
+    ]
+    ready_count = sum(1 for _, status, _, _ in rows if status == "ready")
+    verdict = "closed" if ready_count == len(rows) else "not closed"
+    first_open_gate = next(((gate, action) for gate, status, _, action in rows if status != "ready"), None)
+    next_action = (
+        "keep recording real public snapshots and raise the next contributor target."
+        if first_open_gate is None
+        else f"{first_open_gate[0]} -> {first_open_gate[1]}"
+    )
+
+    lines = [
+        "## Public Flywheel Closure Verdict",
+        "",
+        f"- Verdict: {verdict}",
+        f"- Ready gates: {ready_count}/{len(rows)}",
+        "- Closure rule: every closure gate below must be `ready`; `blocked` or `unverified` is not closed.",
+        f"- Next decisive action: {next_action}",
+    ]
+    if verdict != "closed":
+        lines.append("- Do not claim a closed public flywheel until every closure gate is ready.")
+    lines.extend(
+        [
+            "",
+            "| Closure gate | Status | Real evidence | Next action |",
+            "|---|---|---|---|",
+        ]
+    )
+    for gate, status, evidence, action in rows:
+        lines.append(f"| {gate} | {status} | {evidence} | {action} |")
+    lines.append("")
+    return lines
+
+
+def _format_unverified_public_flywheel_closure_verdict_lines(
+    *,
+    fetch_error: str,
+    target_contributors: int,
+) -> list[str]:
+    target = _safe_positive_int(target_contributors, fallback=10)
+    recheck_command = f"`public_growth_report(record_snapshot=True, target_contributors={target})`"
+    preflight_command = f"`public_launch_preflight(target_contributors={target})`"
+    return [
+        "## Public Flywheel Closure Verdict",
+        "",
+        "- Verdict: not closed",
+        "- Ready gates: 0/5",
+        "- Closure rule: every closure gate must be verified from current public GitHub/PyPI state; fetch failure is not closed.",
+        f"- Next decisive action: External public snapshot -> retry {preflight_command}, then {recheck_command}.",
+        "- Do not claim a closed public flywheel until the public snapshot is verified.",
+        "",
+        "| Closure gate | Status | Real evidence | Next action |",
+        "|---|---|---|---|",
+        (
+            "| External public snapshot | unverified | public GitHub/PyPI state was not fetched | "
+            f"{fetch_error or 'missing public snapshot'}; retry {preflight_command} |"
+        ),
+        "",
+    ]
+
+
 def _gate_status_label(*, ready: bool, blocked: bool = False) -> str:
     if ready:
         return "ready"
@@ -1519,6 +1659,10 @@ def format_public_launch_preflight(
         )
         lines.extend(
             [
+                *_format_unverified_public_flywheel_closure_verdict_lines(
+                    fetch_error=fetch_error,
+                    target_contributors=target,
+                ),
                 "## External Fetch Status",
                 "",
                 "- Public GitHub/PyPI state could not be fetched.",
@@ -1654,6 +1798,13 @@ def format_public_launch_preflight(
                 f"{local_referrals} local returns, {local_shares} local shares |"
             ),
             "",
+            *_format_public_flywheel_closure_verdict_lines(
+                snapshot,
+                events=events,
+                local_referrals=local_referrals,
+                local_shares=local_shares,
+                target_contributors=target,
+            ),
             "## Local Quality Gates Before Release",
             "",
             "Run these before creating the GitHub Release trigger:",
@@ -2141,6 +2292,10 @@ def format_public_growth_report(
         campaign_recheck = f"growth_campaign(target_contributors={recovery_target})"
         lines.extend(
             [
+                *_format_unverified_public_flywheel_closure_verdict_lines(
+                    fetch_error=fetch_error,
+                    target_contributors=recovery_target,
+                ),
                 "## External Fetch Status",
                 "",
                 "- External GitHub metrics were not fetched.",
@@ -2182,6 +2337,13 @@ def format_public_growth_report(
 
     lines.extend(
         [
+            *_format_public_flywheel_closure_verdict_lines(
+                snapshot,
+                events=events,
+                local_referrals=local_referrals,
+                local_shares=local_shares,
+                target_contributors=target_contributors,
+            ),
             "## Public Repository Signals",
             "",
             f"- Repository: [{snapshot.repo.full_name}]({snapshot.repo.html_url})",

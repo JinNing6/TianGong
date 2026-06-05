@@ -150,7 +150,7 @@ def test_issueops_docs_expose_public_forms_and_workflow():
         assert "Contents API" in text
         assert "launch blocker" in text or "公开 launch blocker" in text
         assert "GitHub Releases API" in text
-        assert "v0.1.3" in text
+        assert "v0.1.4" in text
         assert "PyPI JSON API" in text
         assert "Public Launch Closure Checklist" in text
         assert "stale" in text or "旧版本" in text
