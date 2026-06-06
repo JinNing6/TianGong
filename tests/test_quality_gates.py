@@ -46,9 +46,17 @@ def test_runtime_version_matches_project_metadata():
 
     project_version = _pyproject()["project"]["version"]
 
-    assert project_version == "0.1.16"
+    assert project_version == "0.1.17"
     assert tiangong.__version__ == project_version
     assert metadata.version("tiangong-mcp") == project_version
+
+
+def test_pypi_summary_metadata_is_legacy_console_safe():
+    """The PyPI headline should not break pip show on Windows legacy consoles."""
+    description = _pyproject()["project"]["description"]
+
+    assert "\n" not in description
+    assert description.isascii()
 
 
 def test_quality_workflow_installs_dev_extra_and_runs_release_gates():
@@ -138,7 +146,7 @@ def test_readmes_document_one_command_dev_install_and_quality_gate():
         assert "environment `pypi`" in text
         assert "invalid-publisher" in text
         assert "Current Candidate Git Tag Install Bridge" in text
-        assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.16"' in text
+        assert 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.17"' in text
         assert "PYPI_TOKEN" in text
 
 
@@ -154,7 +162,7 @@ def test_ci_pytest_helper_emits_public_failure_annotations():
 
 def test_readmes_put_current_candidate_install_before_stale_pypi_command():
     """Cold public visitors should not be routed to the stale PyPI build before the current tag bridge."""
-    candidate = 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.16"'
+    candidate = 'python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.17"'
     canonical = "pip install -U tiangong-mcp"
 
     for filename in ["README.md", "README.zh-CN.md"]:

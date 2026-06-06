@@ -263,7 +263,7 @@ def _build_issue_body(meta: dict, artifact_name: str, creator: str, artifact_dir
 | **创建者** | @{creator} |
 | **框架** | {meta.get('framework', 'N/A')} |
 | **语言** | {meta.get('language', 'python')} |
-| **版本** | {meta.get('version', '0.1.16')} |
+| **版本** | {meta.get('version', '0.1.17')} |
 | **描述** | {meta.get('description', 'N/A')} |
 
 ## 📖 使用说明
