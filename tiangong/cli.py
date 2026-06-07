@@ -37,6 +37,7 @@ from .public_growth import (
     record_public_growth_snapshot,
 )
 from .release_boundary import format_public_release_boundary
+from .skill_scrolls import format_skill_pavilion
 
 
 def _positive_int(value: str) -> int:
@@ -240,6 +241,17 @@ def _format_public_proof_pack_command(args: argparse.Namespace) -> str:
         actor=args.actor,
         artifact_name=args.artifact_name,
         contribution=args.contribution,
+    )
+
+
+def _format_skill_pavilion_command(args: argparse.Namespace) -> str:
+    return append_brand_footer(
+        format_skill_pavilion(
+            action=args.action,
+            skill_name=args.skill,
+            output_dir=args.output_dir,
+            force=args.force,
+        )
     )
 
 
@@ -516,6 +528,29 @@ def build_parser() -> argparse.ArgumentParser:
     )
     proof_pack.add_argument("--contribution", default="forge", help="Contribution type for the Share Proof route.")
     proof_pack.set_defaults(handler=_format_public_proof_pack_command)
+
+    skill_pavilion = subparsers.add_parser(
+        "skill-pavilion",
+        help="List, show, or export portable Agent Skill bundles for TianGong users.",
+    )
+    skill_pavilion.add_argument(
+        "--action",
+        choices=["list", "show", "export"],
+        default="list",
+        help="Skill Pavilion action. Defaults to list.",
+    )
+    skill_pavilion.add_argument("--skill", default="", help="Skill name for show/export.")
+    skill_pavilion.add_argument(
+        "--output-dir",
+        default="",
+        help="Directory where exported skill bundles are written. Required for --action export.",
+    )
+    skill_pavilion.add_argument(
+        "--force",
+        action="store_true",
+        help="Overwrite an existing exported skill bundle.",
+    )
+    skill_pavilion.set_defaults(handler=_format_skill_pavilion_command)
 
     record_growth = subparsers.add_parser(
         "record-growth-referral",

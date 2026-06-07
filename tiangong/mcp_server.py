@@ -135,6 +135,7 @@ from .sect import (
 from .sect import (
     manage_sect as _manage_sect,
 )
+from .skill_scrolls import format_skill_pavilion
 from .vault import format_my_vault, init_cave
 
 logger = logging.getLogger("tiangong.mcp")
@@ -929,6 +930,32 @@ async def public_launch_preflight(target_contributors: int = 10) -> str:
             activation_events=events,
             source_path=event_path,
             target_contributors=target_contributors,
+        )
+    )
+
+
+@mcp.tool()
+async def skill_pavilion(
+    action: str = "list",
+    skill_name: str = "",
+    output_dir: str = "",
+    force: bool = False,
+) -> str:
+    """
+    Skill Pavilion - list, show, or export portable Agent Skill bundles for TianGong users.
+
+    Args:
+        action: list, show, or export.
+        skill_name: skill name for show/export, such as tiangong-first-forge.
+        output_dir: directory where exported skill bundles are written; required for export.
+        force: overwrite an existing exported skill bundle when exporting.
+    """
+    return append_brand_footer(
+        format_skill_pavilion(
+            action=action,
+            skill_name=skill_name,
+            output_dir=output_dir,
+            force=force,
         )
     )
 

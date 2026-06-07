@@ -93,7 +93,7 @@
 **Current Candidate Install**
 
 ```bash
-python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.17"
+python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.18"
 ```
 
 *PyPI-current install after registry readiness: `pip install -U tiangong-mcp`.*
@@ -167,7 +167,7 @@ Install via the current candidate tag bridge while PyPI catches up, configure yo
 PyPI currently serves an older public build, so cold-start contributors should install the current public tag first:
 
 ```bash
-python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.17"
+python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.18"
 ```
 
 ### PyPI-current install after registry readiness
@@ -207,6 +207,25 @@ start_cultivation(username="your_github_username")
 
 It returns the MCP config, first `forge_agent` command, `activation_funnel()` check, `growth_flywheel()` check, `public_launch_preflight()` check, `public_proof_pack()` first-proof kit, GitHub Growth Issue URL, and a paste-ready first-session share card without fabricating Spirit Power or registration.
 
+### Export User Skills
+
+TianGong also ships portable Agent Skill scrolls for end users. Browse them from CLI:
+
+```bash
+tiangong-mcp skill-pavilion --action list
+tiangong-mcp skill-pavilion --action show --skill tiangong-first-forge
+tiangong-mcp skill-pavilion --action export --skill tiangong-first-forge --output-dir ./tiangong-skills
+```
+
+Or from MCP:
+
+```text
+skill_pavilion(action="list")
+skill_pavilion(action="export", skill_name="tiangong-first-forge", output_dir="./tiangong-skills")
+```
+
+Each exported folder contains a standard `SKILL.md` plus `agents/openai.yaml`, so users can install the workflow in compatible Agent Skills clients.
+
 ---
 
 ## ✅ Development Quality Gates
@@ -232,9 +251,9 @@ tiangong-mcp public-release-boundary
 
 PyPI Trusted Publisher setup for `tiangong-mcp` must match the release workflow exactly: owner `JinNing6`, repository `TianGong`, workflow filename `publish-pypi.yml`, workflow path `.github/workflows/publish-pypi.yml`, and environment `pypi`. If PyPI returns `invalid-publisher`, rerun `tiangong-mcp public-launch-preflight --target-contributors 10` and use the generated Trusted Publisher runbook instead of adding a long-lived upload token.
 
-When public preflight reports PyPI latest is stale or unverified, use the generated Current Candidate Git Tag Install Bridge only as a temporary contributor path, for example `python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.17"`. This does not close the PyPI install loop; recheck PyPI JSON latest with `public_growth_report()` before claiming public install readiness.
+When public preflight reports PyPI latest is stale or unverified, use the generated Current Candidate Git Tag Install Bridge only as a temporary contributor path, for example `python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.18"`. This does not close the PyPI install loop; recheck PyPI JSON latest with `public_growth_report()` before claiming public install readiness.
 
-`tiangong-mcp public-launch-assets` also prints a full public growth release handoff: docs, package metadata, Issue Forms, workflows, public growth modules, user-facing growth surfaces, and tests to stage before creating the current local version GitHub Release, such as `v0.1.17`.
+`tiangong-mcp public-launch-assets` also prints a full public growth release handoff: docs, package metadata, Issue Forms, workflows, public growth modules, user-facing growth surfaces, and tests to stage before creating the current local version GitHub Release, such as `v0.1.18`.
 
 ---
 
@@ -392,6 +411,7 @@ public_growth_report()             # Public growth proof — GitHub public tract
 public_install_command()           # Public install command — PyPI-current install or Git tag candidate bridge
 public_launch_preflight()          # Public launch preflight — ordered IssueOps/Release/PyPI/first-proof runbook
 public_proof_pack()                # Public proof pack — no-network Growth/Share Issue kit, install-decision route, and External Contributor invite
+skill_pavilion(action="list")      # Skill Pavilion — browse portable Agent Skill scrolls for users
 public_growth_report(record_snapshot=True) # Public growth velocity — record a real GitHub traction snapshot for delta tracking
 public_growth_report(record_snapshot=True, target_contributors=10) # Campaign progress + recap — count real Issue/PR/local contributors and generate the next sprint target
 # Terminal launch gates outside an MCP client:
@@ -428,7 +448,7 @@ leaderboard(type="share")          # Share Proof Rankings from real public contr
 - ✅ Growth campaign ledger commands treat `issues/new?...` as the form entrypoint only; `record_growth_referral()` and `record_share_attribution(..., source_url=...)` reject form entrypoints and placeholder URLs, requiring the created public Issue/PR/Discussion URL as reviewable proof
 - ✅ `public_growth_report()` fetches real GitHub public repository and IssueOps metrics, compares them with the local MCP activation ledger, names the weakest external proof bridge, and refuses to invent downloads, retention, repost counts, referral conversions, or rewards
 - ✅ `public_growth_report()` also checks GitHub Contents API readiness for the remote Growth Issue Form, Share Proof Issue Form, and IssueOps workflow, then marks missing default-branch `.github` files as a public launch blocker instead of treating local-only routes as live
-- ✅ `public_growth_report()` checks GitHub Releases API readiness for the current local version tag, such as `v0.1.17`, so a missing release-trigger for PyPI Trusted Publishing is marked as a public install-loop launch blocker; if release creation is unavailable, the runbook exposes the protected tag push and `workflow_dispatch` publish fallbacks without claiming Release proof is closed
+- ✅ `public_growth_report()` checks GitHub Releases API readiness for the current local version tag, such as `v0.1.18`, so a missing release-trigger for PyPI Trusted Publishing is marked as a public install-loop launch blocker; if release creation is unavailable, the runbook exposes the protected tag push and `workflow_dispatch` publish fallbacks without claiming Release proof is closed
 - ✅ `public_growth_report()` checks PyPI JSON API distribution readiness for `tiangong-mcp`, compares the real latest PyPI version with local package metadata, and marks stale PyPI releases as a public install-loop launch blocker
 - ✅ `public_install_command()` is the shortest shareable install surface: it uses real PyPI readiness to choose either `pip install -U tiangong-mcp` or the current Git tag candidate bridge without claiming the PyPI install loop is closed
 - ✅ `public-candidate-smoke` installs the current Git tag candidate in a temporary venv, verifies the real `tiangong-mcp` console script plus proof pack invite, and cleans up on success without publishing or claiming PyPI closure
@@ -569,6 +589,7 @@ Configure TianGong into your IDE (Cursor / VSCode) or chat client (Claude) and c
 | `public_install_command` | ⚒️ Public Install Command — PyPI-current install or Git tag candidate bridge without claiming a closed install loop |
 | `public_launch_preflight` | 🚀 Public Launch Preflight — Ordered IssueOps, release, PyPI, and first-proof runbook before claiming flywheel closure |
 | `public_proof_pack` | 📣 Public Proof Pack — No-network Growth/Share Issue kit, install-decision route, and External Contributor invite without fake virality |
+| `skill_pavilion` | 📚 Skill Pavilion — List, show, or export portable Agent Skill bundles for TianGong users |
 | `leaderboard` | 🏆 Celestial Leaderboard — artifact, cultivator, season, tournament, recap, and sect-war rankings |
 | `infuse_spirit` | 💫 Appraise — Six-dimensional artifact assessment |
 | `quest` | 📜 Quests — Browse, post, claim, or submit refinement bounties |

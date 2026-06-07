@@ -8,7 +8,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "tiangong-mcp"
-version = "0.1.17"
+version = "0.1.18"
 description = "TianGong MCP - The Celestial Forge for AI Agents."
 readme = "README.md"
 requires-python = ">=3.10"

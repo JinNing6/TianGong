@@ -54,6 +54,7 @@ PUBLIC_GROWTH_CODE_ASSETS = (
     "tiangong/public_growth.py",
     "tiangong/release_boundary.py",
     "tiangong/season.py",
+    "tiangong/skill_scrolls.py",
     "tiangong/mcp_server.py",
     "tiangong/__init__.py",
     "tiangong/__main__.py",
@@ -85,6 +86,7 @@ PUBLIC_GROWTH_TEST_ASSETS = (
     "tests/test_marketplace.py",
     "tests/test_public_growth_report.py",
     "tests/test_quality_gates.py",
+    "tests/test_skill_pavilion.py",
     "tests/test_realm.py",
     "tests/test_season.py",
     "tests/test_sect.py",
@@ -425,7 +427,7 @@ def _format_table(rows: list[LaunchAssetAudit]) -> list[str]:
 
 def format_full_public_growth_release_handoff_lines(
     *,
-    release_tag: str = "v0.1.17",
+    release_tag: str = "v0.1.18",
     include_audit_instruction: bool = False,
 ) -> list[str]:
     """Return the complete release handoff commands without executing them."""
