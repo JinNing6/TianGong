@@ -156,6 +156,41 @@ Return the artifact, the improvement summary, the review status, and the next cu
 """
 
 
+ACHIEVEMENT_CARD_BODY = """
+# TianGong Achievement Card
+
+## Goal
+
+Show a user's TianGong realm, level, badge, rank, or achievement as a conversation-visible visual card.
+
+## Trigger
+
+Use this when the user asks about achievement, level, rank, badge, card, visual status, cultivation progress,
+成就、等级、境界、排名、徽章、卡片、展示、可视化, or wants something shareable in chat.
+
+## Workflow
+
+1. Require identity.
+   - If a GitHub username is known, use it.
+   - If no username is available, ask for the GitHub username.
+   - Do not invent an anonymous user, fake rank, fake Spirit Power, or fake adoption data.
+
+2. Generate the visual card.
+   - Run `achievement_card(username="<github-user>")`.
+   - Prefer the returned Markdown SVG image for chat display.
+   - If the client does not render data URI images, keep the Snapshot and Share sections visible.
+
+3. Keep the loop actionable.
+   - Mention `my_realm(username="<github-user>")` for the text profile.
+   - Mention `check_tribulation(username="<github-user>")` for the next realm gate.
+   - Mention `leaderboard(type="season")` when the user wants rank context.
+
+## Completion
+
+Return the rendered card, the real snapshot fields, and one next TianGong action.
+"""
+
+
 SKILL_SCROLLS: tuple[SkillScroll, ...] = (
     SkillScroll(
         name="tiangong-first-forge",
@@ -189,6 +224,17 @@ SKILL_SCROLLS: tuple[SkillScroll, ...] = (
             "refinement through quests, reviews, spirit infusion, and public attribution."
         ),
         body=REFINEMENT_REVIEW_BODY,
+    ),
+    SkillScroll(
+        name="tiangong-achievement-card",
+        display_name="TianGong Achievement Card",
+        short_description="Show realm, rank, badge, and achievement cards in chat.",
+        default_prompt="Use $tiangong-achievement-card to show my current TianGong achievement card.",
+        description=(
+            "Use when a TianGong user asks to see their level, realm, rank, badge, achievement, "
+            "visual card, share card, or cultivation status in a conversation. Requires a real GitHub username."
+        ),
+        body=ACHIEVEMENT_CARD_BODY,
     ),
 )
 

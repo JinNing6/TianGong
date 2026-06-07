@@ -217,7 +217,7 @@ jobs:
               '',
               route.share(),
               '',
-              'Current candidate install: `python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.18"`',
+              'Current candidate install: `python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.19"`',
               'Install decision after installation: `tiangong-mcp public-install-command`',
               'PyPI-current install after registry readiness: `pip install -U tiangong-mcp`',
               'Do not claim the PyPI install loop closed until `public_growth_report(record_snapshot=True)` shows PyPI latest is current.',

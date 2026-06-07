@@ -8,11 +8,13 @@ runbooks before a public release.
 from __future__ import annotations
 
 import argparse
+import asyncio
 import sys
 from collections.abc import Sequence
 from contextlib import suppress
 from typing import TextIO
 
+from .achievement_card import format_achievement_card, format_achievement_card_missing_username
 from .activation import (
     EVENT_ISSUEOPS_REFERRAL_RECORDED,
     EVENT_SHARE_ATTRIBUTION_RECORDED,
@@ -24,6 +26,7 @@ from .activation import (
 from .banner import append_brand_footer
 from .candidate_smoke import format_public_candidate_smoke, run_public_candidate_install_smoke
 from .config import config
+from .cultivator import get_cultivator
 from .launch_assets import format_public_launch_assets
 from .proof_pack import format_public_proof_pack
 from .public_growth import (
@@ -253,6 +256,14 @@ def _format_skill_pavilion_command(args: argparse.Namespace) -> str:
             force=args.force,
         )
     )
+
+
+def _format_achievement_card_command(args: argparse.Namespace) -> str:
+    username = _clean_cli_text(args.username, config.GITHUB_USERNAME)
+    if not username:
+        return append_brand_footer(format_achievement_card_missing_username())
+    profile = asyncio.run(get_cultivator(username))
+    return append_brand_footer(format_achievement_card(profile, theme=args.theme))
 
 
 def _format_record_growth_referral_command(args: argparse.Namespace) -> str:
@@ -551,6 +562,23 @@ def build_parser() -> argparse.ArgumentParser:
         help="Overwrite an existing exported skill bundle.",
     )
     skill_pavilion.set_defaults(handler=_format_skill_pavilion_command)
+
+    achievement = subparsers.add_parser(
+        "achievement-card",
+        help="Print a conversation-native visual achievement card for a TianGong cultivator.",
+    )
+    achievement.add_argument(
+        "--username",
+        default="",
+        help="GitHub username for the cultivator profile. Defaults to GITHUB_USERNAME when configured.",
+    )
+    achievement.add_argument(
+        "--theme",
+        choices=["celestial", "light"],
+        default="celestial",
+        help="Visual card theme. Defaults to celestial.",
+    )
+    achievement.set_defaults(handler=_format_achievement_card_command)
 
     record_growth = subparsers.add_parser(
         "record-growth-referral",

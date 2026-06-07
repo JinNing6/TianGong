@@ -22,6 +22,7 @@ if sys.platform == "win32":
 
 from mcp.server.fastmcp import FastMCP
 
+from .achievement_card import format_achievement_card, format_achievement_card_missing_username
 from .activation import (
     EVENT_FORGE_SUCCEEDED,
     EVENT_INFUSE_SUCCEEDED,
@@ -509,6 +510,31 @@ async def my_realm(
 
 
     return append_brand_footer(result)
+
+
+@mcp.tool()
+async def achievement_card(
+    username: str = "",
+    theme: str = "celestial",
+) -> str:
+    """
+    🏅 成就卡 — 生成可在对话中展示的视觉修行成就卡
+    Achievement Card — Generate a chat-visible visual achievement card.
+
+    根据真实修仙者档案生成 Markdown SVG 图片、关键快照、下一步命令和分享文案。
+    不伪造下载量、奖励、转发、留存或链路外采用数据。
+
+    Args:
+        username: GitHub 用户名 / GitHub username (defaults to env config)
+        theme: visual theme: celestial or light
+    """
+    if not username:
+        username = config.GITHUB_USERNAME
+    if not username:
+        return append_brand_footer(format_achievement_card_missing_username())
+
+    profile = await get_cultivator(username)
+    return append_brand_footer(format_achievement_card(profile, theme=theme))
 
 
 @mcp.tool()

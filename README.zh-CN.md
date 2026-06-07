@@ -94,7 +94,7 @@
 **Current Candidate Install / 当前候选安装**
 
 ```bash
-python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.18"
+python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.19"
 ```
 
 *PyPI-current install after registry readiness: `pip install -U tiangong-mcp`。*
@@ -168,7 +168,7 @@ PyPI 追平前先通过当前候选 tag bridge 安装；PyPI latest 就绪后再
 PyPI 当前公开版本仍是旧包，冷启动贡献者应先安装当前公开 tag：
 
 ```bash
-python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.18"
+python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.19"
 ```
 
 #### PyPI-current install after registry readiness / PyPI 就绪后安装
@@ -216,6 +216,22 @@ start_cultivation(username="your_github_username")
 
 它会返回 MCP 配置、第一条 `forge_agent` 命令、`activation_funnel()` 复查、`growth_flywheel()` 复查、`public_launch_preflight()` 复查、`public_proof_pack()` 首证明套件、GitHub Growth Issue 回流 URL，以及可复制首会话入门战书；不会伪造灵力或注册成功。
 
+### 对话内视觉成就卡
+
+如果用户想在对话里直接看到自己的境界、等级、徽章或成就展示，使用视觉成就卡入口：
+
+```text
+achievement_card(username="your_github_username")
+```
+
+终端用户也可以输出同样的 Markdown SVG 卡片：
+
+```bash
+tiangong-mcp achievement-card --username your_github_username
+```
+
+输出会先给出 `data:image/svg+xml;base64` Markdown 图片，然后列出真实修仙者快照、下一步行动和可复制分享文案。它只读取当前 TianGong 修仙者档案，不伪造下载量、奖励、转发、留存或链路外采用数据。
+
 ### 导出用户 Skills
 
 TianGong 现在也内置面向最终用户的可移植 Agent Skill 卷轴。可以通过 CLI 浏览：
@@ -223,6 +239,7 @@ TianGong 现在也内置面向最终用户的可移植 Agent Skill 卷轴。可�
 ```bash
 tiangong-mcp skill-pavilion --action list
 tiangong-mcp skill-pavilion --action show --skill tiangong-first-forge
+tiangong-mcp skill-pavilion --action show --skill tiangong-achievement-card
 tiangong-mcp skill-pavilion --action export --skill tiangong-first-forge --output-dir ./tiangong-skills
 ```
 
@@ -260,9 +277,9 @@ tiangong-mcp public-release-boundary
 
 `tiangong-mcp` 的 PyPI Trusted Publisher 配置必须与 release workflow 精确匹配：owner `JinNing6`，repository `TianGong`，workflow filename `publish-pypi.yml`，workflow path `.github/workflows/publish-pypi.yml`，environment `pypi`。如果 PyPI 返回 `invalid-publisher`，重新运行 `tiangong-mcp public-launch-preflight --target-contributors 10`，使用其中生成的 Trusted Publisher runbook，不要改用长期上传 token。
 
-当 public preflight 显示 PyPI latest stale 或 unverified 时，只能把生成的 Current Candidate Git Tag Install Bridge 当作临时候选贡献者路径，例如 `python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.18"`。这不代表 PyPI 安装闭环已经闭合；必须用 `public_growth_report()` 复查 PyPI JSON latest 后才能宣布公开安装就绪。
+当 public preflight 显示 PyPI latest stale 或 unverified 时，只能把生成的 Current Candidate Git Tag Install Bridge 当作临时候选贡献者路径，例如 `python -m pip install --upgrade "tiangong-mcp @ git+https://github.com/JinNing6/TianGong.git@v0.1.19"`。这不代表 PyPI 安装闭环已经闭合；必须用 `public_growth_report()` 复查 PyPI JSON latest 后才能宣布公开安装就绪。
 
-`tiangong-mcp public-launch-assets` 还会输出完整公开增长 release handoff：创建当前本地版本 GitHub Release（例如 `v0.1.18`）之前需要 staging 的文档、包元数据、Issue Forms、workflows、公开增长模块、用户可见增长表面和测试。
+`tiangong-mcp public-launch-assets` 还会输出完整公开增长 release handoff：创建当前本地版本 GitHub Release（例如 `v0.1.19`）之前需要 staging 的文档、包元数据、Issue Forms、workflows、公开增长模块、用户可见增长表面和测试。
 
 ---
 
@@ -407,6 +424,7 @@ verify_refinement(quest_issue_number=42, refiner="contributor", is_approved=True
 
 ```
 my_realm(username="your_github_username")  # 修行名片 — 复制分享你的境界、战力与下一步
+achievement_card(username="your_github_username")  # 成就卡 — 在对话中展示真实境界、等级、徽章与进度
 my_realm(username="mentor", apprentice_username="newbie")  # 师徒传承邀请或导师资格恢复 — 双方真实档案快照
 check_tribulation(username="your_github_username") # 渡劫检查 — 下一劫门槛、缺口与可复制行动路线
 submit_tribulation_evidence(username="your_github_username", evidence_key="lineage_users", amount=1, source_url="https://github.com/owner/repo/issues/1") # 高阶渡劫公开证据
@@ -458,7 +476,7 @@ sect(action="leaderboard")         # 宗门战报 — 可复制分享
 - ✅ 增长战役中的 `issues/new?...` 只作为表单入口；`record_growth_referral()` 和 `record_share_attribution(..., source_url=...)` 会拒绝表单入口和占位 URL，必须使用创建后的公开 Issue/PR/Discussion URL 作为可审查证明
 - ✅ `public_growth_report()` 会抓取真实 GitHub 公开仓库和 IssueOps 指标，并与本地 MCP 激活账本同屏比较，指出最薄弱的外部证明桥；不会伪造下载量、留存、转发数、转介绍转化或奖励
 - ✅ `public_growth_report()` 还会通过 GitHub Contents API 检查远端 Growth Issue Form、Share Proof Issue Form 和 IssueOps workflow 是否已经在默认分支上线；缺失的 `.github` 文件会被标记为公开 launch blocker，而不会把本地未发布入口当成真实闭环
-- ✅ `public_growth_report()` 会通过 GitHub Releases API 检查当前本地版本对应的发布标签，例如 `v0.1.18`；如果缺少触发 PyPI Trusted Publishing 的 GitHub Release，会标记为公开安装闭环 launch blocker；如果无法创建 Release，runbook 会给出受保护 tag 推送和 `workflow_dispatch` 发布兜底，但不会声称 Release proof 已闭合
+- ✅ `public_growth_report()` 会通过 GitHub Releases API 检查当前本地版本对应的发布标签，例如 `v0.1.19`；如果缺少触发 PyPI Trusted Publishing 的 GitHub Release，会标记为公开安装闭环 launch blocker；如果无法创建 Release，runbook 会给出受保护 tag 推送和 `workflow_dispatch` 发布兜底，但不会声称 Release proof 已闭合
 - ✅ `public_growth_report()` 会通过 PyPI JSON API 检查 `tiangong-mcp` 分发就绪状态，把真实 PyPI 最新版本与本地包元数据对齐比较；如果 PyPI 仍是旧版本，会标记为公开安装闭环 launch blocker
 - ✅ `public_install_command()` 是最短可分享安装入口：它用真实 PyPI readiness 判断应该输出 `pip install -U tiangong-mcp` 还是当前 Git tag 候选安装桥，并且不会谎称 PyPI 安装闭环已闭合
 - ✅ `public-candidate-smoke` 会在临时 venv 中安装当前 Git tag 候选包，验证真实 `tiangong-mcp` 终端命令和 proof pack 外部邀请，并在成功后清理临时环境；它不会发布包，也不会宣称 PyPI 闭环已闭合
@@ -682,6 +700,7 @@ graph TD
 | `sect` | ⛰️ 宗门系统 | 开宗立派、拜入宗门、宗门管理 |
 | `leaderboard` | 🏆 天榜 | 修仙者/法宝/赛季/天骄擂台/擂台复盘/宗门战排名 |
 | `my_realm` | 🧙 修行名片 | 查看境界、下一步与可复制分享名片 |
+| `achievement_card` | 🏅 成就卡 | 在对话中展示基于真实等级、境界、徽章和进度的 SVG 视觉卡片 |
 | `check_tribulation` | ⚡ 渡劫检查 | 查看下一劫门槛、灵力缺口、任务链与可复制战书 |
 | `submit_tribulation_evidence` | ⚡ 渡劫证据 | 记录高阶境界公开证据 |
 | `my_vault` | 🔮 我的洞府 | 查看并分享本地炼器炉/藏宝阁真实法宝快照 |

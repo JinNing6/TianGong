@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 REQUIRED_WHEEL_MODULES = (
+    "tiangong/achievement_card.py",
     "tiangong/activation.py",
     "tiangong/cli.py",
     "tiangong/growth.py",
@@ -24,6 +25,8 @@ REQUIRED_WHEEL_MODULES = (
 )
 
 REQUIRED_DOC_COMMANDS = (
+    "tiangong-mcp achievement-card --username your_github_username",
+    "achievement_card(username=\"your_github_username\")",
     "tiangong-mcp public-launch-assets",
     "tiangong-mcp public-install-command",
     "tiangong-mcp public-candidate-smoke --target-contributors 10",
@@ -73,6 +76,8 @@ REQUIRED_PROOF_LEDGER_ROUTES = (
 )
 
 REQUIRED_MCP_PUBLIC_ROUTES = (
+    "achievement_card",
+    "format_achievement_card",
     "public_proof_pack",
     "format_public_proof_pack",
     "public_install_command",
@@ -430,7 +435,7 @@ def _mcp_public_route_checks(dist: Path, expected_version: str) -> list[ReleaseB
             "Public recovery MCP routes",
             "ready" if not missing else "blocked",
             (
-                "wheel and sdist expose `public_proof_pack` and `public_install_command` for MCP clients"
+                "wheel and sdist expose `achievement_card`, `public_proof_pack`, and `public_install_command` for MCP clients"
                 if not missing
                 else f"missing {', '.join(missing)}"
             ),

@@ -42,6 +42,7 @@ RELEASE_AUTOMATION_ASSETS = (
 )
 
 PUBLIC_GROWTH_CODE_ASSETS = (
+    "tiangong/achievement_card.py",
     "tiangong/activation.py",
     "tiangong/artifact_system.py",
     "tiangong/candidate_smoke.py",
@@ -78,6 +79,7 @@ PUBLIC_GROWTH_SURFACE_ASSETS = (
 )
 
 PUBLIC_GROWTH_TEST_ASSETS = (
+    "tests/test_achievement_card.py",
     "tests/test_cli.py",
     "tests/test_activation_funnel.py",
     "tests/test_growth_experience.py",
@@ -427,7 +429,7 @@ def _format_table(rows: list[LaunchAssetAudit]) -> list[str]:
 
 def format_full_public_growth_release_handoff_lines(
     *,
-    release_tag: str = "v0.1.18",
+    release_tag: str = "v0.1.19",
     include_audit_instruction: bool = False,
 ) -> list[str]:
     """Return the complete release handoff commands without executing them."""

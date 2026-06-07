@@ -18,6 +18,7 @@ def test_skill_scrolls_are_portable_agent_skill_bundles():
         "tiangong-first-forge",
         "tiangong-public-growth-operator",
         "tiangong-refinement-review",
+        "tiangong-achievement-card",
     }
     for scroll in scrolls:
         skill_md = scroll.skill_markdown()
@@ -42,6 +43,7 @@ def test_cli_skill_pavilion_lists_shows_and_exports_skill_bundle(tmp_path):
     listing = stdout.getvalue()
     assert "TianGong Skill Pavilion" in listing
     assert "tiangong-first-forge" in listing
+    assert "tiangong-achievement-card" in listing
     assert "skill_pavilion(action=\"list\")" in listing
 
     stdout = StringIO()
